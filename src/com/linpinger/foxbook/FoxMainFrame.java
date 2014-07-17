@@ -6,6 +6,7 @@ package com.linpinger.foxbook;
 
 import static com.linpinger.foxbook.FoxBookLib.getFullURL;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,53 @@ import javax.swing.table.TableColumnModel;
  * @author guanli
  */
 public class FoxMainFrame extends javax.swing.JFrame {
+    //	private final int SITE_EASOU = 11 ;
+
+    private final int SITE_ZSSQ = 12;
+    private final int SITE_KUAIDU = 13;
+    public final int downThread = 9;  // 页面下载任务线程数
+    public int leftThread = downThread;
+
+    public class FoxTaskDownPage implements Runnable { // 多线程任务更新页面列表
+
+        List<Map<String, Object>> taskList;
+
+        public FoxTaskDownPage(List<Map<String, Object>> iTaskList) {
+            this.taskList = iTaskList;
+        }
+
+        public void run() {
+            String thName = Thread.currentThread().getName();
+            Iterator<Map<String, Object>> itr = taskList.iterator();
+            HashMap<String, Object> mm;
+            int nowID;
+            String nowURL;
+            int locCount = 0;
+            int allCount = taskList.size();
+            String pageLen = "" ;
+            while (itr.hasNext()) {
+                ++locCount;
+                mm = (HashMap<String, Object>) itr.next();
+                nowID = (Integer) mm.get("id");
+                nowURL = (String) mm.get("url");
+
+                pageLen = FoxBookLib.updatepage(nowID, oDB);
+
+ //               msg.obj = leftThread + ":" + thName + ":" + locCount + " / " + allCount;
+                Object data[] = new Object[5];
+                data[0] = mm.get("name");
+                data[1] = pageLen;   // count
+                data[2] = mm.get("id");
+                data[3] = thName;   // bid/bname
+                data[4] = mm.get("url");
+                tPage.addRow(data);
+            }
+            --leftThread;
+            if (0 == leftThread) { // 所有线程更新完毕
+//                msg.obj = "已更新完所有空白章节>25";
+            }
+        }
+    }
 
     public class UpdateBook implements Runnable { // 后台线程更新书
 
@@ -35,43 +83,112 @@ public class FoxMainFrame extends javax.swing.JFrame {
         @Override
         public void run() {
             String existList = FoxBookDB.getPageListStr(Integer.valueOf(bookID), oDB);
-            System.out.println("listLen: " + existList.length());
-            String html = FoxBookLib.downhtml(bookUrl); // 下载
-            List<Map<String, Object>> lData = FoxBookLib.tocHref(html, 55); // 分析得到目录
 
+            int site_type = 0;
+            if (bookUrl.indexOf("zhuishushenqi.com") > -1) {
+                site_type = SITE_ZSSQ;
+            }
+            if (bookUrl.indexOf(".qreader.") > -1) {
+                site_type = SITE_KUAIDU;
+            }
+
+            String html = "";
+            List<Map<String, Object>> lData;
+            switch (site_type) {
+                case SITE_KUAIDU:
+                    if (existList.length() > 3) {
+                        lData = site_qreader.qreader_GetIndex(bookUrl, 55, 1); // 更新模式  最后55章
+                    } else {
+                        lData = site_qreader.qreader_GetIndex(bookUrl, 0, 1); // 更新模式
+                    }
+                    break;
+                case SITE_ZSSQ:
+                    html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
+                    if (existList.length() > 3) {
+                        lData = site_zssq.json2PageList(html, 55, 1); // 更新模式  最后55章
+                    } else {
+                        lData = site_zssq.json2PageList(html, 0, 1); // 更新模式
+                    }
+                    break;
+                default:
+                    html = FoxBookLib.downhtml(bookUrl); // 下载url
+                    if (existList.length() > 3) {
+                        lData = FoxBookLib.tocHref(html, 55); // 分析获取 list 最后55章
+                    } else {
+                        lData = FoxBookLib.tocHref(html, 0); // 分析获取 list 所有章节
+                    }
+            }
+
+            // 比较，得到新章节
             lData = FoxBookLib.compare2GetNewPages(lData, existList);
-            System.out.println("xx:" + lData.size());
+            int cTask = lData.size(); // 总任务数
+
             if (bDownPage) {
                 FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
+                if (cTask > 0) { // 有新章节刷新左侧书籍列表
+                    refreshBookList();
+                }
+                // 获取新增章节
                 lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )");
 
-                // 单线程循环更新页面
-                Iterator<Map<String, Object>> itrz = lData.iterator();
-                String nowURL = "";
-                Integer nowpageid = 0;
-                int nowCount = 0;
-                String pageLen ;
+                if (cTask > 25) { // 当新章节数大于 25章就采用多任务下载模式
+                    int nBaseCount = cTask / downThread; //每线程基础任务数
+                    int nLeftCount = cTask % downThread; //剩余任务数
+                    int aList[] = new int[downThread]; // 每个线程中的任务数
+
+                    for (int i = 0; i < downThread; i++) {  // 分配任务数
+                        if (i < nLeftCount) {
+                            aList[i] = nBaseCount + 1;
+                        } else {
+                            aList[i] = nBaseCount;
+                        }
+                    }
+
+                    List<Map<String, Object>> subList;
+                    int startPoint = 0;
+                    leftThread = downThread ;
+                    for (int i = 0; i < downThread; i++) {
+                        if (aList[i] == 0) { // 这种情况出现在总任务比线程少的情况下
+                            --leftThread;
+                            continue;
+                        }
+                        subList = new ArrayList<Map<String, Object>>(aList[i]);
+                        for (int n = startPoint; n < startPoint + aList[i]; n++) {
+                            subList.add((HashMap<String, Object>) lData.get(n));
+                        }
+                        (new Thread(new FoxTaskDownPage(subList), "T" + i)).start();
+
+                        startPoint += aList[i];
+                    }
+                } else {
+
+                    // 单线程循环更新页面
+                    Iterator<Map<String, Object>> itrz = lData.iterator();
+                    String nowURL = "";
+                    Integer nowpageid = 0;
+                    int nowCount = 0;
+                    String pageLen;
 //                tPage.setRowCount(0); // 填充uPage
-                while (itrz.hasNext()) {
-                    HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
-                    nowURL = (String) nn.get("url");
-                    nowpageid = (Integer) nn.get("id");
+                    while (itrz.hasNext()) {
+                        HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
+                        nowURL = (String) nn.get("url");
+                        nowpageid = (Integer) nn.get("id");
 
-                    ++nowCount;
-                    //           msg.obj = bookname + ": 下载章节: " + nowCount + " / " + newpagecount;
+                        ++nowCount;
 
-                    pageLen = FoxBookLib.updatepage(getFullURL(bookUrl, nowURL), nowpageid, oDB);
-                    
-                    Object data[] = new Object[5];
-                    data[0] = nn.get("name");
-                    data[1] = pageLen;   // count
-                    data[2] = nn.get("id");
-                    data[3] = bookName;   // bid/bname
-                    data[4] = nn.get("url");
-                    tPage.addRow(data);
+                        pageLen = FoxBookLib.updatepage(getFullURL(bookUrl, nowURL), nowpageid, oDB);
+
+                        Object data[] = new Object[5];
+                        data[0] = nn.get("name");
+                        data[1] = pageLen;   // count
+                        data[2] = nn.get("id");
+                        data[3] = bookName;   // bid/bname
+                        data[4] = nn.get("url");
+                        tPage.addRow(data);
+                    }
                 }
             } else {
-                tPage.setRowCount(0); // 填充uPage
+//                tPage.setRowCount(0); // 填充uPage
                 Iterator itr = lData.iterator();
                 while (itr.hasNext()) {
                     HashMap item = (HashMap) itr.next();
@@ -104,6 +221,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tcmR.getColumn(3).setPreferredWidth(150);
     }
 
+    public void refreshBookList() {
+        tBook.setRowCount(0);
+        List rsdata = oDB.getList("select book.Name as name,count(page.id) as cc,book.ID as id,book.URL as url,book.isEnd as isend from Book left join page on book.id=page.bookid group by book.id order by book.DisOrder ;");
+        Iterator itr = rsdata.iterator();
+        while (itr.hasNext()) {
+            HashMap item = (HashMap) itr.next();
+            Object data[] = new Object[4];
+            data[0] = item.get("name");
+            data[1] = item.get("cc");
+            data[2] = item.get("id");
+            data[3] = item.get("url");
+            tBook.addRow(data);
+        }
+    }
+
     private void FoxInit() {
         tBook = new javax.swing.table.DefaultTableModel(null, new String[]{
             "Name", "Count", "ID", "URL"
@@ -130,17 +262,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         };
 
         oDB = new FoxDB();
-        List rsdata = oDB.getList("select book.Name as name,count(page.id) as cc,book.ID as id,book.URL as url,book.isEnd as isend from Book left join page on book.id=page.bookid group by book.id order by book.DisOrder ;");
-        Iterator itr = rsdata.iterator();
-        while (itr.hasNext()) {
-            HashMap item = (HashMap) itr.next();
-            Object data[] = new Object[4];
-            data[0] = item.get("name");
-            data[1] = item.get("cc");
-            data[2] = item.get("id");
-            data[3] = item.get("url");
-            tBook.addRow(data);
-        }
+        refreshBookList();
     }
 
     /**
@@ -274,7 +396,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-         oDB.closeDB();
+        oDB.closeDB();
     }//GEN-LAST:event_formWindowClosing
 
     private void uBookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uBookMouseClicked
@@ -356,6 +478,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         String nURL = uBook.getValueAt(nRow, 3).toString();
         //        System.out.println(nURL);
+        tPage.setRowCount(0); // 填充uPage
         new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, true)).start();
     }//GEN-LAST:event_mBookUpdateActionPerformed
 
