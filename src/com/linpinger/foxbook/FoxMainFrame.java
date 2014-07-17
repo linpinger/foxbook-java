@@ -39,7 +39,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             List<Map<String, Object>> lData = FoxBookLib.tocHref(html, 55); // 分析得到目录
 
             lData = FoxBookLib.compare2GetNewPages(lData, existList);
-
+            System.out.println("xx:" + lData.size());
             if (bDownPage) {
                 FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
                 lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )");
@@ -272,7 +272,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        oDB.closeDB();
+         oDB.closeDB();
     }//GEN-LAST:event_formWindowClosing
 
     private void uBookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uBookMouseClicked

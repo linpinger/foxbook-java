@@ -20,18 +20,18 @@ public class FoxBookDB {
     
     public static synchronized void setPageContent(int pageid, String text, FoxDB oDB) { // 修改指定章节的内容
         String aNow = (new java.text.SimpleDateFormat("yyyyMMddHHmmss")).format(new java.util.Date());
-
+        
         Connection con = oDB.getConnect();
         String sql = "update page set Content = ? , CharCount=" + text.length() + " , Mark=\"text\", DownTime=\"" + aNow + "\" where id = " + pageid;
         try {
             PreparedStatement pstmt = con.prepareStatement(sql);
             pstmt.setString(1, text);
-            pstmt.execute();
+            pstmt.executeUpdate();
             pstmt.close();
-        } catch (SQLException ex) {
+         } catch (SQLException ex) {
             ex.toString();
         }
-    }
+     }
 
     public static synchronized void inserNewPages(List<Map<String, Object>> data, int bookid, FoxDB oDB) { // 新增章节到数据库
         Connection con = oDB.getConnect();
@@ -48,7 +48,7 @@ public class FoxBookDB {
                 pstmt.setString(1, sBookID);
                 pstmt.setString(2, (String) mm.get("url"));
                 pstmt.setString(3, (String) mm.get("name"));
-                pstmt.execute();
+                pstmt.executeUpdate();
             }
 
             pstmt.close();

@@ -18,11 +18,10 @@ import java.util.logging.Logger;
  */
 public class FoxDB {
 
-    private String dbPath = "D:\\bin\\sqlite\\TxtBook\\FoxBook.db3.old";
+    private String dbPath = "D:\\bin\\sqlite\\FoxBook.db3";
     private String dbPath1 = "FoxBook.db3";
     private String dbPath2 = "FoxBook.db3.old";
     private Connection conn;
-    private Statement stat;
     private boolean bFirstOpen = true;
 
     public FoxDB() {
@@ -30,21 +29,24 @@ public class FoxDB {
     }
 
     public String getOneCell(String inSQL) {
-        String retStr ="";
-          try {
+        String retStr = "";
+        try {
+            Statement stat = conn.createStatement();
             ResultSet rs = stat.executeQuery(inSQL);
             rs.next();
             retStr = rs.getObject(1).toString();
             rs.close();
+            stat.close();
         } catch (SQLException e) {
             e.toString();
-        }      
+        }
         return retStr;
     }
 
     public List getList(String inSQL) {
         List retList = new ArrayList();
         try {
+            Statement stat = conn.createStatement();
             ResultSet rs = stat.executeQuery(inSQL);
             ResultSetMetaData md = rs.getMetaData();
             int nColum = md.getColumnCount();
@@ -56,6 +58,7 @@ public class FoxDB {
                 retList.add(item);
             }
             rs.close();
+            stat.close();
         } catch (SQLException ex) {
             Logger.getLogger(FoxDB.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -65,7 +68,9 @@ public class FoxDB {
     public int exec(String inSQL) {
         int rrr = 0;
         try {
+            Statement stat = conn.createStatement();
             rrr = stat.executeUpdate(inSQL);
+            stat.close();
         } catch (SQLException ex) {
             Logger.getLogger(FoxDB.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -79,13 +84,13 @@ public class FoxDB {
         try {
             Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection("jdbc:sqlite:" + this.dbPath);
-            stat = conn.createStatement();
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(FoxDB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     public Connection getConnect() {  // 事务处理需要这个
-        return this.conn ;
+        return this.conn;
     }
 
     public void switchDB() {
@@ -100,7 +105,6 @@ public class FoxDB {
 
     public void closeDB() {
         try {
-            stat.close();
             conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(FoxDB.class.getName()).log(Level.SEVERE, null, ex);
