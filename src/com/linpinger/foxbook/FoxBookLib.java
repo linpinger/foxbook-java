@@ -320,7 +320,7 @@ public class FoxBookLib {
         // 144书院的这个会导致下面正则将正文也删掉了，已使用正则修复
         html = html.replaceAll("(?smi)<span[^>]*>.*?</span>", ""); // 删除<span>里面是混淆字符， 针对 纵横中文混淆字符，以及大家读结尾标签，一般都没有span标签
         html = html.replaceAll("(?smi)<[^<>]+>", ""); // 这是最后一步，调试时可先注释: 删除 html标签,改进型，防止正文有不成对的<
-
+        html = html.replaceAll("(?smi)^\n*", "");
         return html;
     }
 

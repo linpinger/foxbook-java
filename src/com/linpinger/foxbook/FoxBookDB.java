@@ -20,15 +20,17 @@ public class FoxBookDB {
     
     public static synchronized void setPageContent(int pageid, String text, FoxDB oDB) { // 修改指定章节的内容
         String aNow = (new java.text.SimpleDateFormat("yyyyMMddHHmmss")).format(new java.util.Date());
-        
         Connection con = oDB.getConnect();
-        String sql = "update page set Content = ? , CharCount=" + text.length() + " , Mark=\"text\", DownTime=\"" + aNow + "\" where id = " + pageid;
+      
+        String sql = "update page set Content = ? , CharCount=" + text.length() + " , Mark='text', DownTime='" + aNow + "' where id = " + pageid;
         try {
+            con.setAutoCommit(false); //设置手工提交事务模式，这里由于在多线程环境下使用，所以需要开启事务，避免提交不了的状况，当然也可以每次都连接数据库也可避免
             PreparedStatement pstmt = con.prepareStatement(sql);
             pstmt.setString(1, text);
             pstmt.executeUpdate();
             pstmt.close();
-         } catch (SQLException ex) {
+            con.commit(); //提交事务
+         } catch (Exception ex) {
             ex.toString();
         }
      }

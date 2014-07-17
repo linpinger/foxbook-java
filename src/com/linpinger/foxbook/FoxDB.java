@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class FoxDB {
 
-    private String dbPath = "D:\\bin\\sqlite\\FoxBook.db3";
+    private String dbPath = "FoxBook.db3";
     private String dbPath1 = "FoxBook.db3";
     private String dbPath2 = "FoxBook.db3.old";
     private Connection conn;

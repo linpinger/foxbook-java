@@ -35,6 +35,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         @Override
         public void run() {
             String existList = FoxBookDB.getPageListStr(Integer.valueOf(bookID), oDB);
+            System.out.println("listLen: " + existList.length());
             String html = FoxBookLib.downhtml(bookUrl); // 下载
             List<Map<String, Object>> lData = FoxBookLib.tocHref(html, 55); // 分析得到目录
 
@@ -60,6 +61,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     //           msg.obj = bookname + ": 下载章节: " + nowCount + " / " + newpagecount;
 
                     pageLen = FoxBookLib.updatepage(getFullURL(bookUrl, nowURL), nowpageid, oDB);
+                    
                     Object data[] = new Object[5];
                     data[0] = nn.get("name");
                     data[1] = pageLen;   // count
