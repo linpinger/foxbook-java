@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package linpinger;
+package com.linpinger.foxbook;
 
+import static com.linpinger.foxbook.FoxBookLib.getFullURL;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,6 +17,73 @@ import javax.swing.table.TableColumnModel;
  * @author guanli
  */
 public class FoxMainFrame extends javax.swing.JFrame {
+
+    public class UpdateBook implements Runnable { // 后台线程更新书
+
+        private int bookID;
+        private String bookName;
+        private String bookUrl;
+        private boolean bDownPage = true;
+
+        UpdateBook(int inbookid, String inbookurl, String inbookname, boolean bDownPage) {
+            this.bookID = inbookid;
+            this.bookName = inbookname;
+            this.bookUrl = inbookurl;
+            this.bDownPage = bDownPage;
+        }
+
+        @Override
+        public void run() {
+            String existList = FoxBookDB.getPageListStr(Integer.valueOf(bookID), oDB);
+            String html = FoxBookLib.downhtml(bookUrl); // 下载
+            List<Map<String, Object>> lData = FoxBookLib.tocHref(html, 55); // 分析得到目录
+
+            lData = FoxBookLib.compare2GetNewPages(lData, existList);
+
+            if (bDownPage) {
+                FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
+                lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )");
+
+                // 单线程循环更新页面
+                Iterator<Map<String, Object>> itrz = lData.iterator();
+                String nowURL = "";
+                Integer nowpageid = 0;
+                int nowCount = 0;
+                String pageLen ;
+//                tPage.setRowCount(0); // 填充uPage
+                while (itrz.hasNext()) {
+                    HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
+                    nowURL = (String) nn.get("url");
+                    nowpageid = (Integer) nn.get("id");
+
+                    ++nowCount;
+                    //           msg.obj = bookname + ": 下载章节: " + nowCount + " / " + newpagecount;
+
+                    pageLen = FoxBookLib.updatepage(getFullURL(bookUrl, nowURL), nowpageid, oDB);
+                    Object data[] = new Object[5];
+                    data[0] = nn.get("name");
+                    data[1] = pageLen;   // count
+                    data[2] = nn.get("id");
+                    data[3] = bookName;   // bid/bname
+                    data[4] = nn.get("url");
+                    tPage.addRow(data);
+                }
+            } else {
+                tPage.setRowCount(0); // 填充uPage
+                Iterator itr = lData.iterator();
+                while (itr.hasNext()) {
+                    HashMap item = (HashMap) itr.next();
+                    Object data[] = new Object[5];
+                    data[0] = item.get("name");
+                    data[1] = "0";
+                    data[2] = item.get("id");
+                    data[3] = bookName;
+                    data[4] = item.get("url");
+                    tPage.addRow(data);
+                }
+            }
+        }
+    }
 
     /**
      * Creates new form FoxMainFrame
@@ -226,7 +294,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 tPage.addRow(data);
             }
         }
-        if ( java.awt.event.MouseEvent.BUTTON3 ==  evt.getButton() ) {
+        if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
             int nRow = uBook.rowAtPoint(evt.getPoint());
             uBook.setRowSelectionInterval(nRow, nRow);
             jPopupMenuBook.show(evt.getComponent(), evt.getX(), evt.getY());
@@ -237,19 +305,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (2 == evt.getClickCount()) {
             int nRow = uPage.getSelectedRow();
-            if ( Integer.valueOf(uPage.getValueAt(nRow, 2).toString()) < 1 )
-                return ;
+            if (Integer.valueOf(uPage.getValueAt(nRow, 2).toString()) < 1) {
+                return;
+            }
             List xx = oDB.getList("select name as name, content as cc from page where id=" + uPage.getValueAt(nRow, 2).toString());
-            HashMap mm = (HashMap)xx.get(0);
-           
-            if ( null == mm.get("cc") )
-                return ;
+            HashMap mm = (HashMap) xx.get(0);
+
+            if (null == mm.get("cc")) {
+                return;
+            }
             showPage sp = new showPage(mm.get("name").toString() + "\n\n" + mm.get("cc").toString());
             showContent.setContentPane(sp);
             showContent.setSize(sp.getPreferredSize());
             showContent.setVisible(true);
         }
-        if ( java.awt.event.MouseEvent.BUTTON3 ==  evt.getButton() ) {
+        if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
             int nRow = uPage.rowAtPoint(evt.getPoint());
             uPage.setRowSelectionInterval(nRow, nRow);
             jPopupMenuPage.show(evt.getComponent(), evt.getX(), evt.getY());
@@ -284,45 +354,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         String nURL = uBook.getValueAt(nRow, 3).toString();
         //        System.out.println(nURL);
-        
-        String existList = FoxBookDB.getPageListStr(Integer.valueOf(nBookID), oDB);
-        String html = FoxBookLib.downhtml(nURL); // 下载
-        List<Map<String, Object>> lData = FoxBookLib.tocHref(html, 55); // 分析得到目录
-        
-        lData = FoxBookLib.compare2GetNewPages(lData, existList);
-        
-        FoxBookDB.inserNewPages(lData, Integer.valueOf(nBookID), oDB); //写入数据库
-        lData  = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + nBookID + " ) and ( (content is null) or ( length(content) < 9 ) )");
-        
-        // 单线程循环更新页面
-        Iterator<Map<String, Object>> itrz = lData.iterator();
-        String nowURL= "";
-        Integer nowpageid = 0;
-        int nowCount = 0;
-        while (itrz.hasNext()) {
-            HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
- //           nowURL = (String) nn.get("url");
-            nowpageid = (Integer) nn.get("id");
-
-            ++nowCount;
- //           msg.obj = bookname + ": 下载章节: " + nowCount + " / " + newpagecount;
-
-            FoxBookLib.updatepage( nowpageid, oDB);
-        }
-
-        tPage.setRowCount(0); // 填充uPage
-        Iterator itr = lData.iterator();
-        while (itr.hasNext()) {
-            HashMap item = (HashMap) itr.next();
-            Object data[] = new Object[5];
-            data[0] = item.get("name");
-            data[1] = "0";
-            data[2] = item.get("id");
-            data[3] = nBookName;
-            data[4] = item.get("url");
-            tPage.addRow(data);
-        }
-
+        new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, true)).start();
     }//GEN-LAST:event_mBookUpdateActionPerformed
 
     private void mPageUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageUpdateActionPerformed
@@ -331,7 +363,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nPageName = uPage.getValueAt(nRow, 0).toString();
         String nPageID = uPage.getValueAt(nRow, 2).toString();
         String nPageURL = uPage.getValueAt(nRow, 4).toString();
-        
+
         FoxBookLib.updatepage(Integer.valueOf(nPageID), oDB);
         System.out.println("更新: " + nPageName + " : " + nPageURL);
     }//GEN-LAST:event_mPageUpdateActionPerformed
@@ -347,44 +379,44 @@ public class FoxMainFrame extends javax.swing.JFrame {
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         /*
-            private static Set<String> NIMBUS_PRIMARY_COLORS = new HashSet<String>(Arrays.asList(
-            "text", "control", "nimbusBase", "nimbusOrange", "nimbusGreen", "nimbusRed", "nimbusInfoBlue",
-            "nimbusAlertYellow", "nimbusFocus", "nimbusSelectedText", "nimbusSelectionBackground",
-            "nimbusDisabledText", "nimbusLightBackground", "info"));
-    private static Set<String> NIMBUS_SECONDARY_COLORS = new HashSet<String>(Arrays.asList(
-            "textForeground", "textBackground", "background",
-            "nimbusBlueGrey", "nimbusBorder", "nimbusSelection", "infoText", "menuText", "menu", "scrollbar",
-            "controlText", "controlHighlight", "controlLHighlight", "controlShadow", "controlDkShadow", "textHighlight",
-            "textHighlightText", "textInactiveText", "desktop", "activeCaption", "inactiveCaption"));
-    private static String[] NIMBUS_COMPONENTS = new String[]{
-            "ArrowButton", "Button", "ToggleButton", "RadioButton", "CheckBox", "ColorChooser", "ComboBox",
-            "\"ComboBox.scrollPane\"", "FileChooser", "InternalFrameTitlePane", "InternalFrame", "DesktopIcon",
-            "DesktopPane", "Label", "List", "MenuBar", "MenuItem", "RadioButtonMenuItem", "CheckBoxMenuItem", "Menu",
-            "PopupMenu", "PopupMenuSeparator", "OptionPane", "Panel", "ProgressBar", "Separator", "ScrollBar",
-            "ScrollPane", "Viewport", "Slider", "Spinner", "SplitPane", "TabbedPane", "Table", "TableHeader",
-            "\"Table.editor\"", "\"Tree.cellEditor\"", "TextField", "FormattedTextField", "PasswordField", "TextArea",
-            "TextPane", "EditorPane", "ToolBar", "ToolBarSeparator", "ToolTip", "Tree", "RootPane"};
+         private static Set<String> NIMBUS_PRIMARY_COLORS = new HashSet<String>(Arrays.asList(
+         "text", "control", "nimbusBase", "nimbusOrange", "nimbusGreen", "nimbusRed", "nimbusInfoBlue",
+         "nimbusAlertYellow", "nimbusFocus", "nimbusSelectedText", "nimbusSelectionBackground",
+         "nimbusDisabledText", "nimbusLightBackground", "info"));
+         private static Set<String> NIMBUS_SECONDARY_COLORS = new HashSet<String>(Arrays.asList(
+         "textForeground", "textBackground", "background",
+         "nimbusBlueGrey", "nimbusBorder", "nimbusSelection", "infoText", "menuText", "menu", "scrollbar",
+         "controlText", "controlHighlight", "controlLHighlight", "controlShadow", "controlDkShadow", "textHighlight",
+         "textHighlightText", "textInactiveText", "desktop", "activeCaption", "inactiveCaption"));
+         private static String[] NIMBUS_COMPONENTS = new String[]{
+         "ArrowButton", "Button", "ToggleButton", "RadioButton", "CheckBox", "ColorChooser", "ComboBox",
+         "\"ComboBox.scrollPane\"", "FileChooser", "InternalFrameTitlePane", "InternalFrame", "DesktopIcon",
+         "DesktopPane", "Label", "List", "MenuBar", "MenuItem", "RadioButtonMenuItem", "CheckBoxMenuItem", "Menu",
+         "PopupMenu", "PopupMenuSeparator", "OptionPane", "Panel", "ProgressBar", "Separator", "ScrollBar",
+         "ScrollPane", "Viewport", "Slider", "Spinner", "SplitPane", "TabbedPane", "Table", "TableHeader",
+         "\"Table.editor\"", "\"Tree.cellEditor\"", "TextField", "FormattedTextField", "PasswordField", "TextArea",
+         "TextPane", "EditorPane", "ToolBar", "ToolBarSeparator", "ToolTip", "Tree", "RootPane"};
          */
         /*
-        javax.swing.UIManager.put("nimbusBase", new Color(160, 222, 181));
-        javax.swing.UIManager.put("nimbusBlueGrey", new Color(160, 222, 181));
-        javax.swing.UIManager.put("control", new Color(160, 222, 181));
-        javax.swing.UIManager.put("textText", Color.WHITE);
-        */
+         javax.swing.UIManager.put("nimbusBase", new Color(160, 222, 181));
+         javax.swing.UIManager.put("nimbusBlueGrey", new Color(160, 222, 181));
+         javax.swing.UIManager.put("control", new Color(160, 222, 181));
+         javax.swing.UIManager.put("textText", Color.WHITE);
+         */
         javax.swing.UIManager.put("nimbusBlueGrey", new Color(179, 219, 179));        //控件色
         javax.swing.UIManager.put("nimbusLightBackground", new Color(228, 242, 228)); // 文本背景色
         javax.swing.UIManager.put("control", new Color(228, 242, 228));               // 控件背景色
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-/* 
-Metal
-Nimbus
-CDE/Motif
-Windows
-Windows Classic
-*/
+                /* 
+                 Metal
+                 Nimbus
+                 CDE/Motif
+                 Windows
+                 Windows Classic
+                 */
                 if ("Nimbus".equals(info.getName())) {
-                   javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
