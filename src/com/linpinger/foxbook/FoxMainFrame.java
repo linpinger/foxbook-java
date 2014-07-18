@@ -524,7 +524,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void mBookUpdateAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAllActionPerformed
         // TODO add your handling code here:
-        List upList = oDB.getList("select id as id, name as name, url as url from book");
+        List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 
         Iterator itr = upList.iterator();
         List<Thread> threadList = new ArrayList(30);
