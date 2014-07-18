@@ -78,6 +78,19 @@ public class FoxDB {
         }
         return rrr;
     }
+    
+    public void execPreOne(String inSQL, String escapeStr ) {
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement pstmt = conn.prepareStatement(inSQL);
+            pstmt.setString(1, escapeStr);
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.commit(); //提交事务
+        } catch (Exception ex) {
+            ex.toString();
+        }
+    }
 
     private void OpenDB() {
         if (!bFirstOpen) {

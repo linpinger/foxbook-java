@@ -23,39 +23,17 @@ public class FoxBookDB {
        if (bUpdateDelList) { // 修改 DelURL
             ArrayList<HashMap<String,String>> xx = (ArrayList<HashMap<String,String>>)oDB.getList("select book.DelURL as old, page.bookid as bid, page.url as url, page.name as name from book,page where page.id=" + pageid + " and book.id = page.bookid");
             String newDelStr = xx.get(0).get("old").replace("\n\n", "\n") + xx.get(0).get("url") + "|" + xx.get(0).get("name") + "\n" ;
-            Connection con = oDB.getConnect();
             String sql = "update book set DelURL = ? where id =" + String.valueOf(xx.get(0).get("bid"));
- //           System.out.println(newDelStr);
-            try {
-                con.setAutoCommit(false);
-                PreparedStatement pstmt = con.prepareStatement(sql);
-                pstmt.setString(1, newDelStr);
-                pstmt.executeUpdate();
-                pstmt.close();
-                con.commit(); //提交事务
-            } catch (Exception ex) {
-                ex.toString();
-            }
+            oDB.execPreOne(sql, newDelStr);
         }
         oDB.exec("Delete From Page where ID = " + pageid);
     }
 
     public static synchronized void setPageContent(int pageid, String text, FoxDB oDB) { // 修改指定章节的内容
         String aNow = (new java.text.SimpleDateFormat("yyyyMMddHHmmss")).format(new java.util.Date());
-        Connection con = oDB.getConnect();
-      
         String sql = "update page set Content = ? , CharCount=" + text.length() + " , Mark='text', DownTime='" + aNow + "' where id = " + pageid;
-        try {
-            con.setAutoCommit(false); //设置手工提交事务模式，这里由于在多线程环境下使用，所以需要开启事务，避免提交不了的状况，当然也可以每次都连接数据库也可避免
-            PreparedStatement pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, text);
-            pstmt.executeUpdate();
-            pstmt.close();
-            con.commit(); //提交事务
-         } catch (Exception ex) {
-            ex.toString();
-        }
-     }
+        oDB.execPreOne(sql, text);
+    }
 
     public static synchronized void inserNewPages(List<Map<String, Object>> data, int bookid, FoxDB oDB) { // 新增章节到数据库
         Connection con = oDB.getConnect();
