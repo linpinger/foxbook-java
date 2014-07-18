@@ -68,9 +68,11 @@ public class FoxDB {
     public int exec(String inSQL) {
         int rrr = 0;
         try {
+            conn.setAutoCommit(false);
             Statement stat = conn.createStatement();
             rrr = stat.executeUpdate(inSQL);
             stat.close();
+            conn.commit(); //提交事务
         } catch (SQLException ex) {
             Logger.getLogger(FoxDB.class.getName()).log(Level.SEVERE, null, ex);
         }

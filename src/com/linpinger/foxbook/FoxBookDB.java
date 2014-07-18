@@ -7,6 +7,7 @@ package com.linpinger.foxbook;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,27 @@ import java.util.Map;
  */
 public class FoxBookDB {
     
+    public static void deletePage(int pageid, boolean bUpdateDelList, FoxDB oDB) { // 删除单章节
+       if (bUpdateDelList) { // 修改 DelURL
+            ArrayList<HashMap<String,String>> xx = (ArrayList<HashMap<String,String>>)oDB.getList("select book.DelURL as old, page.bookid as bid, page.url as url, page.name as name from book,page where page.id=" + pageid + " and book.id = page.bookid");
+            String newDelStr = xx.get(0).get("old").replace("\n\n", "\n") + xx.get(0).get("url") + "|" + xx.get(0).get("name") + "\n" ;
+            Connection con = oDB.getConnect();
+            String sql = "update book set DelURL = ? where id =" + String.valueOf(xx.get(0).get("bid"));
+ //           System.out.println(newDelStr);
+            try {
+                con.setAutoCommit(false);
+                PreparedStatement pstmt = con.prepareStatement(sql);
+                pstmt.setString(1, newDelStr);
+                pstmt.executeUpdate();
+                pstmt.close();
+                con.commit(); //提交事务
+            } catch (Exception ex) {
+                ex.toString();
+            }
+        }
+        oDB.exec("Delete From Page where ID = " + pageid);
+    }
+
     public static synchronized void setPageContent(int pageid, String text, FoxDB oDB) { // 修改指定章节的内容
         String aNow = (new java.text.SimpleDateFormat("yyyyMMddHHmmss")).format(new java.util.Date());
         Connection con = oDB.getConnect();

@@ -43,7 +43,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             String nowURL;
             int locCount = 0;
             int allCount = taskList.size();
-            String pageLen = "" ;
+            String pageLen = "";
             while (itr.hasNext()) {
                 ++locCount;
                 mm = (HashMap<String, Object>) itr.next();
@@ -52,7 +52,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                 pageLen = FoxBookLib.updatepage(nowID, oDB);
 
- //               msg.obj = leftThread + ":" + thName + ":" + locCount + " / " + allCount;
+                //               msg.obj = leftThread + ":" + thName + ":" + locCount + " / " + allCount;
                 Object data[] = new Object[5];
                 data[0] = mm.get("name");
                 data[1] = pageLen;   // count
@@ -145,7 +145,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                     List<Map<String, Object>> subList;
                     int startPoint = 0;
-                    leftThread = downThread ;
+                    leftThread = downThread;
                     for (int i = 0; i < downThread; i++) {
                         if (aList[i] == 0) { // 这种情况出现在总任务比线程少的情况下
                             --leftThread;
@@ -275,11 +275,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         showContent = new javax.swing.JDialog();
         jPopupMenuBook = new javax.swing.JPopupMenu();
-        mBookUpdate = new javax.swing.JMenuItem();
-        mBookShowAll = new javax.swing.JMenuItem();
-        mBookUpdateAll = new javax.swing.JMenuItem();
+        mBookUpdateOne = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
-        mPageUpdate = new javax.swing.JMenuItem();
+        mPageUpdateOne = new javax.swing.JMenuItem();
+        mPageDeleteMulti = new javax.swing.JMenuItem();
+        mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         uBook = new javax.swing.JTable();
@@ -287,8 +287,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
         uPage = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        mBookShowAll1 = new javax.swing.JMenuItem();
-        mBookUpdateAll1 = new javax.swing.JMenuItem();
+        mBookShowAll = new javax.swing.JMenuItem();
+        mBookUpdateAll = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         showContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -305,37 +305,41 @@ public class FoxMainFrame extends javax.swing.JFrame {
             .addGap(0, 300, Short.MAX_VALUE)
         );
 
-        mBookUpdate.setText("更新本书");
-        mBookUpdate.addActionListener(new java.awt.event.ActionListener() {
+        mBookUpdateOne.setMnemonic('g');
+        mBookUpdateOne.setText("更新本书(G)");
+        mBookUpdateOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBookUpdateActionPerformed(evt);
+                mBookUpdateOneActionPerformed(evt);
             }
         });
-        jPopupMenuBook.add(mBookUpdate);
+        jPopupMenuBook.add(mBookUpdateOne);
 
-        mBookShowAll.setText("显示所有");
-        mBookShowAll.addActionListener(new java.awt.event.ActionListener() {
+        mPageUpdateOne.setMnemonic('g');
+        mPageUpdateOne.setText("更新本章(G)");
+        mPageUpdateOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBookShowAllActionPerformed(evt);
+                mPageUpdateOneActionPerformed(evt);
             }
         });
-        jPopupMenuBook.add(mBookShowAll);
+        jPopupMenuPage.add(mPageUpdateOne);
 
-        mBookUpdateAll.setText("更新所有书籍");
-        mBookUpdateAll.addActionListener(new java.awt.event.ActionListener() {
+        mPageDeleteMulti.setMnemonic('d');
+        mPageDeleteMulti.setText("删除选择的章节(D)");
+        mPageDeleteMulti.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBookUpdateAllActionPerformed(evt);
+                mPageDeleteMultiActionPerformed(evt);
             }
         });
-        jPopupMenuBook.add(mBookUpdateAll);
+        jPopupMenuPage.add(mPageDeleteMulti);
 
-        mPageUpdate.setText("更新本章");
-        mPageUpdate.addActionListener(new java.awt.event.ActionListener() {
+        mPageDeleteMultiNotUpdate.setMnemonic('b');
+        mPageDeleteMultiNotUpdate.setText("删除选择的章节并不写入删除列表(B)");
+        mPageDeleteMultiNotUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mPageUpdateActionPerformed(evt);
+                mPageDeleteMultiNotUpdateActionPerformed(evt);
             }
         });
-        jPopupMenuPage.add(mPageUpdate);
+        jPopupMenuPage.add(mPageDeleteMultiNotUpdate);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Hello");
@@ -349,7 +353,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jSplitPane1.setDividerLocation(250);
 
         uBook.setModel(tBook);
-        uBook.setToolTipText("书籍列表");
         uBook.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         uBook.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -374,27 +377,27 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenu1.setMnemonic('B');
         jMenu1.setText("书籍(B)");
 
-        mBookShowAll1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.ALT_MASK));
-        mBookShowAll1.setText("显示所有");
-        mBookShowAll1.addActionListener(new java.awt.event.ActionListener() {
+        mBookShowAll.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.ALT_MASK));
+        mBookShowAll.setText("显示所有");
+        mBookShowAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBookShowAll1ActionPerformed(evt);
+                mBookShowAllActionPerformed(evt);
             }
         });
-        jMenu1.add(mBookShowAll1);
+        jMenu1.add(mBookShowAll);
 
-        mBookUpdateAll1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.ALT_MASK));
-        mBookUpdateAll1.setText("更新所有");
-        mBookUpdateAll1.addActionListener(new java.awt.event.ActionListener() {
+        mBookUpdateAll.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.ALT_MASK));
+        mBookUpdateAll.setText("更新所有");
+        mBookUpdateAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBookUpdateAll1ActionPerformed(evt);
+                mBookUpdateAllActionPerformed(evt);
             }
         });
-        jMenu1.add(mBookUpdateAll1);
+        jMenu1.add(mBookUpdateAll);
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
+        jMenu2.setText("综合");
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -462,13 +465,18 @@ public class FoxMainFrame extends javax.swing.JFrame {
             showContent.setVisible(true);
         }
         if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
-            int nRow = uPage.rowAtPoint(evt.getPoint());
-            uPage.setRowSelectionInterval(nRow, nRow);
+            int nSel = uPage.getSelectedRowCount();
+//            System.out.println("选中数量: " + nSel);
+            if ( nSel <= 1 ) { // 当选中1行时
+                int nRow = uPage.rowAtPoint(evt.getPoint());
+                uPage.setRowSelectionInterval(nRow, nRow);
+            }
             jPopupMenuPage.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }//GEN-LAST:event_uPageMouseClicked
 
     private void mBookShowAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookShowAllActionPerformed
+        // TODO add your handling code here:
         tPage.setRowCount(0);
         List rsdata = oDB.getList("select page.name as name, page.CharCount as cc, page.ID as id, book.name as bname, page.url as url from book,Page where book.id=page.bookid order by page.bookid,page.ID");
         Iterator itr = rsdata.iterator();
@@ -484,12 +492,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_mBookShowAllActionPerformed
 
-    private void mBookShowAll1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookShowAll1ActionPerformed
-        // TODO add your handling code here:
-        mBookShowAllActionPerformed(evt);
-    }//GEN-LAST:event_mBookShowAll1ActionPerformed
-
-    private void mBookUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateActionPerformed
+    private void mBookUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateOneActionPerformed
         // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookName = uBook.getValueAt(nRow, 0).toString();
@@ -505,9 +508,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
             Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         refreshBookList();
-    }//GEN-LAST:event_mBookUpdateActionPerformed
+        tPage.addRow(new Object[]{"★本书更新完毕: " + nBookName});
+    }//GEN-LAST:event_mBookUpdateOneActionPerformed
 
-    private void mPageUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageUpdateActionPerformed
+    private void mPageUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageUpdateOneActionPerformed
         // TODO add your handling code here:
         int nRow = uPage.getSelectedRow();
         String nPageName = uPage.getValueAt(nRow, 0).toString();
@@ -516,42 +520,69 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         FoxBookLib.updatepage(Integer.valueOf(nPageID), oDB);
         System.out.println("更新: " + nPageName + " : " + nPageURL);
-    }//GEN-LAST:event_mPageUpdateActionPerformed
+    }//GEN-LAST:event_mPageUpdateOneActionPerformed
 
     private void mBookUpdateAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAllActionPerformed
         // TODO add your handling code here:
         List upList = oDB.getList("select id as id, name as name, url as url from book");
 
         Iterator itr = upList.iterator();
-        List<Thread> threadList = new ArrayList(30) ;
-        Thread nowT ;
+        List<Thread> threadList = new ArrayList(30);
+        Thread nowT;
         while (itr.hasNext()) {
             HashMap item = (HashMap<String, String>) itr.next();
-            nowT = new Thread(new UpdateBook((Integer)item.get("id"), (String)item.get("url"), (String)item.get("name"), true));
-            System.out.println("线程 " + nowT.getName() + " 更新:" + (String)item.get("name"));
+            nowT = new Thread(new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
+            System.out.println("线程 " + nowT.getName() + " 更新:" + (String) item.get("name"));
             threadList.add(nowT);
             nowT.start();
         }
-        
+
         tPage.setRowCount(0); // 清空uPage
         System.out.println("等待诸多线程...");
+
         Iterator itrT = threadList.iterator();
         while (itrT.hasNext()) {
-            nowT = (Thread)itrT.next();
+            nowT = (Thread) itrT.next();
             try {
                 nowT.join();
-             } catch (Exception ex) {
-               System.out.println("等待线程错误: " + ex.toString());
+            } catch (Exception ex) {
+                System.out.println("等待线程错误: " + ex.toString());
             }
         }
         refreshBookList();
         System.out.println("全部线程完毕，恭喜");
+        tPage.addRow(new Object[]{"★全部线程完毕，恭喜"});
     }//GEN-LAST:event_mBookUpdateAllActionPerformed
 
-    private void mBookUpdateAll1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAll1ActionPerformed
+    public void deleteSelectedPages(boolean bUpdateDelList) { // 删除选定章节
+        int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
+
+        String nPageName;
+        Integer nPageID;
+        for (int n = 0; n < nRow.length; n++) {  // 删除数据库，并更新dellist
+            nPageName = uPage.getValueAt(nRow[n], 0).toString();
+            nPageID = Integer.valueOf(uPage.getValueAt(nRow[n], 2).toString());
+            FoxBookDB.deletePage(nPageID, bUpdateDelList, oDB);
+            System.out.println("已删除章节: " + nPageName);
+        }
+
+        for (int i = nRow.length - 1; i >= 0; i--) { // 倒序删除 LV 中显示条目
+            tPage.removeRow(nRow[i]);
+        }
+
+        System.out.println("已删除章节数: " + nRow.length);
+        refreshBookList();
+    }
+    
+    private void mPageDeleteMultiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageDeleteMultiActionPerformed
         // TODO add your handling code here:
-        mBookUpdateAllActionPerformed(evt);
-    }//GEN-LAST:event_mBookUpdateAll1ActionPerformed
+        deleteSelectedPages(true) ;
+    }//GEN-LAST:event_mPageDeleteMultiActionPerformed
+
+    private void mPageDeleteMultiNotUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageDeleteMultiNotUpdateActionPerformed
+        // TODO add your handling code here:
+        deleteSelectedPages(false) ;
+    }//GEN-LAST:event_mPageDeleteMultiNotUpdateActionPerformed
 
     /**
      * @param args the command line arguments
@@ -636,11 +667,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JMenuItem mBookShowAll;
-    private javax.swing.JMenuItem mBookShowAll1;
-    private javax.swing.JMenuItem mBookUpdate;
     private javax.swing.JMenuItem mBookUpdateAll;
-    private javax.swing.JMenuItem mBookUpdateAll1;
-    private javax.swing.JMenuItem mPageUpdate;
+    private javax.swing.JMenuItem mBookUpdateOne;
+    private javax.swing.JMenuItem mPageDeleteMulti;
+    private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
+    private javax.swing.JMenuItem mPageUpdateOne;
     private javax.swing.JDialog showContent;
     private javax.swing.JTable uBook;
     private javax.swing.JTable uPage;
