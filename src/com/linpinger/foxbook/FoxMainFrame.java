@@ -290,6 +290,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBookShowAll = new javax.swing.JMenuItem();
         mBookUpdateAll = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+        mDBSortDesc = new javax.swing.JMenuItem();
+        mDBSortAsc = new javax.swing.JMenuItem();
+        mDBRegenPageIDs = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        mDBVacuum = new javax.swing.JMenuItem();
 
         showContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         showContent.setTitle("呵呵");
@@ -397,8 +403,47 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("综合");
+        jMenu2.setMnemonic('x');
+        jMenu2.setText("页面(X)");
         jMenuBar1.add(jMenu2);
+
+        jMenu3.setMnemonic('z');
+        jMenu3.setText("数据库(Z)");
+
+        mDBSortDesc.setText("按书籍页数倒序排列");
+        mDBSortDesc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBSortDescActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mDBSortDesc);
+
+        mDBSortAsc.setText("按书籍页数顺序排列");
+        mDBSortAsc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBSortAscActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mDBSortAsc);
+
+        mDBRegenPageIDs.setText("重新生成页面ID");
+        mDBRegenPageIDs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBRegenPageIDsActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mDBRegenPageIDs);
+        jMenu3.add(jSeparator1);
+
+        mDBVacuum.setText("缩小数据库");
+        mDBVacuum.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBVacuumActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mDBVacuum);
+
+        jMenuBar1.add(jMenu3);
 
         setJMenuBar(jMenuBar1);
 
@@ -584,6 +629,33 @@ public class FoxMainFrame extends javax.swing.JFrame {
         deleteSelectedPages(false) ;
     }//GEN-LAST:event_mPageDeleteMultiNotUpdateActionPerformed
 
+    private void mDBSortDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSortDescActionPerformed
+        // TODO add your handling code here:
+        FoxBookDB.regenID(2, oDB);
+        refreshBookList();
+    }//GEN-LAST:event_mDBSortDescActionPerformed
+
+    private void mDBSortAscActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSortAscActionPerformed
+        // TODO add your handling code here:
+        FoxBookDB.regenID(1, oDB);
+        refreshBookList();
+    }//GEN-LAST:event_mDBSortAscActionPerformed
+
+    private void mDBRegenPageIDsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBRegenPageIDsActionPerformed
+        // TODO add your handling code here:
+        FoxBookDB.regenID(9, oDB);
+        tPage.setRowCount(0); // 清空uPage
+        refreshBookList();
+        tPage.addRow(new Object[]{"★已重新生成页面ID"});
+    }//GEN-LAST:event_mDBRegenPageIDsActionPerformed
+
+    private void mDBVacuumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBVacuumActionPerformed
+        // TODO add your handling code here:
+        FoxBookDB.vacuumDB(oDB);
+        System.out.println("已缩小数据库");
+        tPage.addRow(new Object[]{"★已缩小数据库"});
+    }//GEN-LAST:event_mDBVacuumActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -660,15 +732,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPopupMenu jPopupMenuBook;
     private javax.swing.JPopupMenu jPopupMenuPage;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JMenuItem mBookShowAll;
     private javax.swing.JMenuItem mBookUpdateAll;
     private javax.swing.JMenuItem mBookUpdateOne;
+    private javax.swing.JMenuItem mDBRegenPageIDs;
+    private javax.swing.JMenuItem mDBSortAsc;
+    private javax.swing.JMenuItem mDBSortDesc;
+    private javax.swing.JMenuItem mDBVacuum;
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
     private javax.swing.JMenuItem mPageUpdateOne;

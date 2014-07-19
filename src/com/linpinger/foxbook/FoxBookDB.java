@@ -7,6 +7,7 @@ package com.linpinger.foxbook;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,6 +19,92 @@ import java.util.Map;
  * @author guanli
  */
 public class FoxBookDB {
+    public static void vacuumDB(FoxDB oDB) {
+        Connection conn = oDB.getConnect();
+        try {
+            Statement stat = conn.createStatement();
+            stat.executeUpdate("vacuum");
+            stat.close();
+        } catch (SQLException ex) {
+            ex.toString();
+        }
+    }
+        //"select book.ID from Book left join page on book.id=page.bookid group by book.id order by count(page.id),book.isEnd,book.ID"
+    public static void regenID(int sortmode, FoxDB oDB) { // 重新排序bookid ,pageid
+        String sSQL = "";
+        switch (sortmode) {
+            case 1: // 书籍页数顺序
+                sSQL = "select book.ID as id from Book left join page on book.id=page.bookid group by book.id order by count(page.id),book.isEnd,book.ID";
+                break;
+            case 2: // 书籍页数倒序
+                sSQL = "select book.ID as id from Book left join page on book.id=page.bookid group by book.id order by count(page.id) desc,book.isEnd,book.ID";
+                break;
+            case 9:  // 根据bookid重新生成pageid
+                sSQL = "select id as id from page order by bookid,id";
+                break;
+        }
+
+        int nStartID = 99999;
+        if (9 == sortmode) {
+            nStartID = 5 + Integer.valueOf(oDB.getOneCell("select max(id) from page"));
+        } else {
+            nStartID = 5 + Integer.valueOf(oDB.getOneCell("select max(id) from book"));
+        }
+        int nStartID1 = nStartID;
+        int nStartID2 = nStartID;
+
+        // 获取id列表到数组中
+        ArrayList<HashMap<String, Object>> idList = (ArrayList<HashMap<String, Object>>)oDB.getList(sSQL);
+        int nRow = idList.size();
+        int[] ids = new int[nRow];
+        for (int i = 0; i<nRow; i++ ) {
+            ids[i] = Integer.valueOf(idList.get(i).get("id").toString()) ;
+        }
+
+        Connection conn = oDB.getConnect();
+        try {
+            conn.setAutoCommit(false);
+            Statement stat = conn.createStatement();
+
+            for (int i = 0; i < nRow; i++) {
+                ++nStartID1;
+                if (9 == sortmode) {
+                    stat.executeUpdate("update page set id=" + nStartID1 + " where id=" + ids[i]);
+                } else {
+                    stat.executeUpdate("update page set bookid=" + nStartID1 + " where bookid=" + ids[i]);
+                    stat.executeUpdate("update book set id=" + nStartID1 + " where id=" + ids[i]);
+                }
+            }
+            
+            stat.close();
+            conn.commit(); //提交事务
+        } catch (SQLException ex) {
+            ex.toString();
+        }
+
+        try {
+            conn.setAutoCommit(false);
+            Statement stat = conn.createStatement();
+
+            for (int i = 1; i <= nRow; i++) {
+                ++nStartID2;
+                if (9 == sortmode) {
+                    stat.executeUpdate("update page set id=" + i + " where id=" + nStartID2);
+                } else {
+                    stat.executeUpdate("update page set bookid=" + i + " where bookid=" + nStartID2);
+                    stat.executeUpdate("update book set id=" + i + " where id=" + nStartID2);
+                }
+            }
+            stat.close();
+            conn.commit(); //提交事务
+        } catch (SQLException ex) {
+            ex.toString();
+        }
+
+        if (9 != sortmode) {
+            oDB.exec("update Book set Disorder=ID");
+        }
+    }
     
     public static void deletePage(int pageid, boolean bUpdateDelList, FoxDB oDB) { // 删除单章节
        if (bUpdateDelList) { // 修改 DelURL

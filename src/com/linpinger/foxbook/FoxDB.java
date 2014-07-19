@@ -4,6 +4,7 @@
  */
 package com.linpinger.foxbook;
 
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class FoxDB {
     public FoxDB() {
         OpenDB();
     }
-
+    
     public String getOneCell(String inSQL) {
         String retStr = "";
         try {
