@@ -170,6 +170,7 @@ public class FoxBookLib {
                 .matcher(html);
         while (mat.find()) {
             if (2 == mat.groupCount()) {
+				if ( ((String)mat.group(1)).contains("javascript:") ) continue ; // 过滤js链接
                 // System.out.println(mat.group(1) + "|" + mat.group(2)) ;
                 item = new HashMap<String, Object>();
                 item.put("url", mat.group(1));
