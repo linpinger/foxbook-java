@@ -349,7 +349,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Hello");
-        setBounds(new java.awt.Rectangle(400, 30, 0, 0));
+        setBounds(new java.awt.Rectangle(0, 0, 0, 0));
+        setLocationByPlatform(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
