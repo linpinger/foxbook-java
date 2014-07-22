@@ -721,7 +721,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         refreshBookList();
-        tPage.addRow(new Object[]{"★多线程更新本书完毕: " + nBookName});
+        tPage.addRow(new Object[]{"★多线程不受控制滴更新: " + nBookName});
     }//GEN-LAST:event_mBookMultiThreadUpdateOneActionPerformed
 
     /**
