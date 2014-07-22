@@ -74,6 +74,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         private String bookName;
         private String bookUrl;
         private boolean bDownPage = true;
+        private boolean bMultiThreadDownOneBook = false ;
 
         UpdateBook(int inbookid, String inbookurl, String inbookname, boolean bDownPage) {
             this.bookID = inbookid;
@@ -81,7 +82,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
             this.bookUrl = inbookurl;
             this.bDownPage = bDownPage;
         }
-
+        UpdateBook(int inbookid, String inbookurl, String inbookname, int bDownOneBook) {  // 多线程更新一本书
+            this.bookID = inbookid;
+            this.bookName = inbookname;
+            this.bookUrl = inbookurl;
+            this.bMultiThreadDownOneBook = true;
+        }
+        
         @Override
         public void run() {
             String existList = FoxBookDB.getPageListStr(Integer.valueOf(bookID), oDB);
@@ -98,7 +105,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             List<Map<String, Object>> lData;
             switch (site_type) {
                 case SITE_KUAIDU:
-                    if (existList.length() > 3) {
+                    if ( (existList.length() > 3) && ( ! bMultiThreadDownOneBook ) ) {
                         lData = site_qreader.qreader_GetIndex(bookUrl, 55, 1); // 更新模式  最后55章
                     } else {
                         lData = site_qreader.qreader_GetIndex(bookUrl, 0, 1); // 更新模式
@@ -106,7 +113,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     break;
                 case SITE_ZSSQ:
                     html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
-                    if (existList.length() > 3) {
+                    if ( (existList.length() > 3) && ( ! bMultiThreadDownOneBook ) ) {
                         lData = site_zssq.json2PageList(html, 55, 1); // 更新模式  最后55章
                     } else {
                         lData = site_zssq.json2PageList(html, 0, 1); // 更新模式
@@ -114,7 +121,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     break;
                 default:
                     html = FoxBookLib.downhtml(bookUrl); // 下载url
-                    if (existList.length() > 3) {
+                    if ( (existList.length() > 3) && ( ! bMultiThreadDownOneBook ) ) {
                         lData = FoxBookLib.tocHref(html, 55); // 分析获取 list 最后55章
                     } else {
                         lData = FoxBookLib.tocHref(html, 0); // 分析获取 list 所有章节
@@ -123,14 +130,17 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
             // 比较，得到新章节
             lData = FoxBookLib.compare2GetNewPages(lData, existList);
-            int cTask = lData.size(); // 总任务数
+            if ( lData.size() > 0 ) { // 有新章节才写入数据库
+                FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
+            }
+//            System.out.println("任务数:" + cTask);
 
             if (bDownPage) {
-                FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
                 // 获取新增章节
                 lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )");
-
-                if (cTask > 25) { // 当新章节数大于 25章就采用多任务下载模式
+                int cTask = lData.size(); // 总任务数
+                
+                if ( bMultiThreadDownOneBook ) { // 当新章节数大于 25章就采用多任务下载模式
                     int nBaseCount = cTask / downThread; //每线程基础任务数
                     int nLeftCount = cTask % downThread; //剩余任务数
                     int aList[] = new int[downThread]; // 每个线程中的任务数
@@ -276,6 +286,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
         showContent = new javax.swing.JDialog();
         jPopupMenuBook = new javax.swing.JPopupMenu();
         mBookUpdateOne = new javax.swing.JMenuItem();
+        mBookUpdateTocOne = new javax.swing.JMenuItem();
+        mBookMultiThreadUpdateOne = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
         mPageUpdateOne = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
@@ -319,6 +331,23 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuBook.add(mBookUpdateOne);
+
+        mBookUpdateTocOne.setMnemonic('t');
+        mBookUpdateTocOne.setText("更新本书目录(T)");
+        mBookUpdateTocOne.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookUpdateTocOneActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBookUpdateTocOne);
+
+        mBookMultiThreadUpdateOne.setText("多线程更新本书");
+        mBookMultiThreadUpdateOne.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookMultiThreadUpdateOneActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBookMultiThreadUpdateOne);
 
         mPageUpdateOne.setMnemonic('g');
         mPageUpdateOne.setText("更新本章(G)");
@@ -657,6 +686,44 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tPage.addRow(new Object[]{"★已缩小数据库"});
     }//GEN-LAST:event_mDBVacuumActionPerformed
 
+    private void mBookUpdateTocOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateTocOneActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+        String nBookName = uBook.getValueAt(nRow, 0).toString();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+        String nURL = uBook.getValueAt(nRow, 3).toString();
+        //        System.out.println(nURL);
+        tPage.setRowCount(0); // 填充uPage
+        Thread nowUP = new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, false));
+        nowUP.start();
+        try {
+            nowUP.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        refreshBookList();
+        tPage.addRow(new Object[]{"★本书更新目录完毕: " + nBookName});
+    }//GEN-LAST:event_mBookUpdateTocOneActionPerformed
+
+    private void mBookMultiThreadUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookMultiThreadUpdateOneActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+        String nBookName = uBook.getValueAt(nRow, 0).toString();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+        String nURL = uBook.getValueAt(nRow, 3).toString();
+        //        System.out.println(nURL);
+        tPage.setRowCount(0); // 填充uPage
+        Thread nowUP = new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, 9));
+        nowUP.start();
+        try {
+            nowUP.join();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        refreshBookList();
+        tPage.addRow(new Object[]{"★多线程更新本书完毕: " + nBookName});
+    }//GEN-LAST:event_mBookMultiThreadUpdateOneActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -741,9 +808,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JMenuItem mBookMultiThreadUpdateOne;
     private javax.swing.JMenuItem mBookShowAll;
     private javax.swing.JMenuItem mBookUpdateAll;
     private javax.swing.JMenuItem mBookUpdateOne;
+    private javax.swing.JMenuItem mBookUpdateTocOne;
     private javax.swing.JMenuItem mDBRegenPageIDs;
     private javax.swing.JMenuItem mDBSortAsc;
     private javax.swing.JMenuItem mDBSortDesc;
