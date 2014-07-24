@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 /**
@@ -26,6 +27,95 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private final int SITE_KUAIDU = 13;
     public final int downThread = 9;  // 页面下载任务线程数
     public int leftThread = downThread;
+    
+    public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
+
+        public void run() {
+            List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
+
+            Iterator itr = upList.iterator();
+            List<Thread> threadList = new ArrayList(30);
+            Thread nowT;
+            while (itr.hasNext()) {
+                HashMap item = (HashMap<String, String>) itr.next();
+                nowT = new Thread(new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
+                System.out.println("线程 " + nowT.getName() + " 更新:" + (String) item.get("name"));
+                threadList.add(nowT);
+                nowT.start();
+            }
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.setRowCount(0);
+                    tPage.addRow(new Object[]{"★　开始更新所有书籍"});
+                }
+            });
+            System.out.println("等待诸多线程...");
+
+            Iterator itrT = threadList.iterator();
+            while (itrT.hasNext()) {
+                nowT = (Thread) itrT.next();
+                try {
+                    nowT.join();
+                } catch (Exception ex) {
+                    System.out.println("等待线程错误: " + ex.toString());
+                }
+            }
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.addRow(new Object[]{"★　全部线程完毕，恭喜"});
+                }
+            });         
+            refreshBookList();
+            System.out.println("全部线程完毕，恭喜");
+            
+        }
+    }
+
+    public class UpdateOneBook implements Runnable { // GUI菜单更新一本书籍
+        private String nBookName ;
+        private String nURL;
+        private int nBookID;
+        private boolean bWritePage = true ;
+        
+        public UpdateOneBook(int BookID, String BookURL, String BookName, boolean bUpdatePage) {
+            this.nBookID = BookID;
+            this.nBookName = BookName;
+            this.nURL = BookURL;
+            this.bWritePage = bUpdatePage;
+        }
+
+        public void run() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.setRowCount(0);
+                    if ( bWritePage )
+                        tPage.addRow(new Object[]{"★　开始更新本书: " + nBookName});
+                    else
+                        tPage.addRow(new Object[]{"★　开始更新本书目录: " + nBookName});
+                }
+            });
+
+            Thread nowUP = new Thread(new UpdateBook(nBookID, nURL, nBookName, true));
+            nowUP.start();
+            try {
+                nowUP.join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if ( bWritePage )
+                        tPage.addRow(new Object[]{"★　本书更新完毕: " + nBookName});
+                    else
+                        tPage.addRow(new Object[]{"★　本书目录更新完毕: " + nBookName});
+                }
+            });
+            refreshBookList();
+        }
+    }
 
     public class FoxTaskDownPage implements Runnable { // 多线程任务更新页面列表
 
@@ -59,7 +149,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 data[2] = mm.get("id");
                 data[3] = thName;   // bid/bname
                 data[4] = mm.get("url");
-                tPage.addRow(data);
+                
+                final Object dataF[] = data;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        tPage.addRow(dataF);
+                    }
+                });
+                
             }
             --leftThread;
             if (0 == leftThread) { // 所有线程更新完毕
@@ -193,7 +290,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
                         data[2] = nn.get("id");
                         data[3] = bookName;   // bid/bname
                         data[4] = nn.get("url");
-                        tPage.addRow(data);
+                       
+                        final Object dataF[] = data;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                tPage.addRow(dataF);
+                            }
+                        });
+                        
                     }
                 }
             } else {
@@ -207,7 +311,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     data[2] = item.get("id");
                     data[3] = bookName;
                     data[4] = item.get("url");
-                    tPage.addRow(data);
+                    
+                    final Object dataF[] = data;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            tPage.addRow(dataF);
+                        }
+                    });
+                
                 }
             }
         }
@@ -573,17 +684,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         String nURL = uBook.getValueAt(nRow, 3).toString();
-        //        System.out.println(nURL);
-        tPage.setRowCount(0); // 填充uPage
-        Thread nowUP = new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, true));
-        nowUP.start();
-        try {
-            nowUP.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        refreshBookList();
-        tPage.addRow(new Object[]{"★本书更新完毕: " + nBookName});
+        
+        new Thread(new UpdateOneBook(Integer.valueOf(nBookID), nURL, nBookName, true)).start();
+
     }//GEN-LAST:event_mBookUpdateOneActionPerformed
 
     private void mPageUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageUpdateOneActionPerformed
@@ -599,34 +702,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void mBookUpdateAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAllActionPerformed
         // TODO add your handling code here:
-        List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
-
-        Iterator itr = upList.iterator();
-        List<Thread> threadList = new ArrayList(30);
-        Thread nowT;
-        while (itr.hasNext()) {
-            HashMap item = (HashMap<String, String>) itr.next();
-            nowT = new Thread(new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
-            System.out.println("线程 " + nowT.getName() + " 更新:" + (String) item.get("name"));
-            threadList.add(nowT);
-            nowT.start();
-        }
-
-        tPage.setRowCount(0); // 清空uPage
-        System.out.println("等待诸多线程...");
-
-        Iterator itrT = threadList.iterator();
-        while (itrT.hasNext()) {
-            nowT = (Thread) itrT.next();
-            try {
-                nowT.join();
-            } catch (Exception ex) {
-                System.out.println("等待线程错误: " + ex.toString());
-            }
-        }
-        refreshBookList();
-        System.out.println("全部线程完毕，恭喜");
-        tPage.addRow(new Object[]{"★全部线程完毕，恭喜"});
+        new Thread(new UpdateAllBook()).start();
     }//GEN-LAST:event_mBookUpdateAllActionPerformed
 
     public void deleteSelectedPages(boolean bUpdateDelList) { // 删除选定章节
@@ -692,17 +768,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         String nURL = uBook.getValueAt(nRow, 3).toString();
-        //        System.out.println(nURL);
-        tPage.setRowCount(0); // 填充uPage
-        Thread nowUP = new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, false));
-        nowUP.start();
-        try {
-            nowUP.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        refreshBookList();
-        tPage.addRow(new Object[]{"★本书更新目录完毕: " + nBookName});
+        
+        new Thread(new UpdateOneBook(Integer.valueOf(nBookID), nURL, nBookName, false)).start();
+
     }//GEN-LAST:event_mBookUpdateTocOneActionPerformed
 
     private void mBookMultiThreadUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookMultiThreadUpdateOneActionPerformed
