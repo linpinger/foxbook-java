@@ -97,7 +97,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 }
             });
 
-            Thread nowUP = new Thread(new UpdateBook(nBookID, nURL, nBookName, true));
+            Thread nowUP = new Thread(new UpdateBook(nBookID, nURL, nBookName, bWritePage));
             nowUP.start();
             try {
                 nowUP.join();
@@ -117,6 +117,44 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
     }
 
+    public class MultiThreadUpdateOneBook implements Runnable { // 多线程更新一本书
+
+        private String nBookName;
+        private String nURL;
+        private int nBookID;
+
+        public MultiThreadUpdateOneBook(int BookID, String BookURL, String BookName) {
+            this.nBookID = BookID;
+            this.nBookName = BookName;
+            this.nURL = BookURL;
+        }
+
+        public void run() {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.setRowCount(0);
+                    tPage.addRow(new Object[]{"★　开始不受控制滴多线程更新本书: " + nBookName});
+                }
+            });
+
+            Thread nowUP = new Thread(new UpdateBook(nBookID, nURL, nBookName, 9));
+            nowUP.start();
+            try {
+                nowUP.join();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+/*
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.addRow(new Object[]{"★　本书不受控制滴更新完毕: " + nBookName});
+                }
+            });
+*/
+            refreshBookList();
+        }
+    }
+    
     public class FoxTaskDownPage implements Runnable { // 多线程任务更新页面列表
 
         List<Map<String, Object>> taskList;
@@ -143,17 +181,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 pageLen = FoxBookLib.updatepage(nowID, oDB);
 
                 //               msg.obj = leftThread + ":" + thName + ":" + locCount + " / " + allCount;
-                Object data[] = new Object[5];
-                data[0] = mm.get("name");
-                data[1] = pageLen;   // count
-                data[2] = mm.get("id");
-                data[3] = thName;   // bid/bname
-                data[4] = mm.get("url");
-                
-                final Object dataF[] = data;
+                final Object data[] = new Object[]{mm.get("name"), pageLen, mm.get("id"), thName, mm.get("url")};
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        tPage.addRow(dataF);
+                        tPage.addRow(data);
                     }
                 });
                 
@@ -284,17 +315,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                         pageLen = FoxBookLib.updatepage(getFullURL(bookUrl, nowURL), nowpageid, oDB);
 
-                        Object data[] = new Object[5];
-                        data[0] = nn.get("name");
-                        data[1] = pageLen;   // count
-                        data[2] = nn.get("id");
-                        data[3] = bookName;   // bid/bname
-                        data[4] = nn.get("url");
-                       
-                        final Object dataF[] = data;
+                        final Object data[] = new Object[]{nn.get("name"), pageLen, nn.get("id"), bookName, nn.get("url")};
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                tPage.addRow(dataF);
+                                tPage.addRow(data);
                             }
                         });
                         
@@ -305,17 +329,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 Iterator itr = lData.iterator();
                 while (itr.hasNext()) {
                     HashMap item = (HashMap) itr.next();
-                    Object data[] = new Object[5];
-                    data[0] = item.get("name");
-                    data[1] = "0";
-                    data[2] = item.get("id");
-                    data[3] = bookName;
-                    data[4] = item.get("url");
-                    
-                    final Object dataF[] = data;
+                    final Object data[] = new Object[]{item.get("name"), "0", item.get("id"), bookName, item.get("url")};
+
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            tPage.addRow(dataF);
+                            tPage.addRow(data);
                         }
                     });
                 
@@ -347,12 +365,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         Iterator itr = rsdata.iterator();
         while (itr.hasNext()) {
             HashMap item = (HashMap) itr.next();
-            Object data[] = new Object[4];
-            data[0] = item.get("name");
-            data[1] = item.get("cc");
-            data[2] = item.get("id");
-            data[3] = item.get("url");
-            tBook.addRow(data);
+            tBook.addRow(new Object[]{ item.get("name"), item.get("cc"), item.get("id"), item.get("url") }) ;
         }
     }
 
@@ -616,13 +629,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             Iterator itr = rsdata.iterator();
             while (itr.hasNext()) {
                 HashMap item = (HashMap) itr.next();
-                Object data[] = new Object[5];
-                data[0] = item.get("name");
-                data[1] = item.get("cc");
-                data[2] = item.get("id");
-                data[3] = item.get("bid");
-                data[4] = item.get("url");
-                tPage.addRow(data);
+                tPage.addRow(new Object[]{ item.get("name"), item.get("cc"), item.get("id"), item.get("bid"), item.get("url") }) ;
             }
         }
         if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
@@ -668,13 +675,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         Iterator itr = rsdata.iterator();
         while (itr.hasNext()) {
             HashMap item = (HashMap) itr.next();
-            Object data[] = new Object[5];
-            data[0] = item.get("name");
-            data[1] = item.get("cc");
-            data[2] = item.get("id");
-            data[3] = item.get("bname");
-            data[4] = item.get("url");
-            tPage.addRow(data);
+            tPage.addRow(new Object[]{ item.get("name"), item.get("cc"), item.get("id"), item.get("bname"), item.get("url") }) ;
         }
     }//GEN-LAST:event_mBookShowAllActionPerformed
 
@@ -779,17 +780,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         String nURL = uBook.getValueAt(nRow, 3).toString();
-        //        System.out.println(nURL);
-        tPage.setRowCount(0); // 填充uPage
-        Thread nowUP = new Thread(new UpdateBook(Integer.valueOf(nBookID), nURL, nBookName, 9));
-        nowUP.start();
-        try {
-            nowUP.join();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        refreshBookList();
-        tPage.addRow(new Object[]{"★多线程不受控制滴更新: " + nBookName});
+        
+        new Thread(new MultiThreadUpdateOneBook(Integer.valueOf(nBookID), nURL, nBookName)).start();
     }//GEN-LAST:event_mBookMultiThreadUpdateOneActionPerformed
 
     /**
