@@ -117,6 +117,11 @@ public class bookInfoEditor extends javax.swing.JPanel {
 
         jButton1.setMnemonic('f');
         jButton1.setText("减肥(F)");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setMnemonic('s');
         jButton2.setText("保存(S)");
@@ -191,6 +196,11 @@ public class bookInfoEditor extends javax.swing.JPanel {
         // TODO add your handling code here:
         uDelList.setText("");
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        uDelList.setText(FoxBookLib.simplifyDelList(uDelList.getText()));
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

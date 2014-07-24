@@ -26,6 +26,31 @@ import java.util.zip.GZIPInputStream;
  * @author guanli
  */
 public class FoxBookLib {
+        public static String simplifyDelList(String DelList) {  // 精简 DelList
+        int qi = 0;
+        int zhi = 0;
+        if (DelList.contains("起止=")) {
+            Matcher mat = Pattern.compile("(?i)起止=([0-9\\-]+),([0-9\\-]+)").matcher(DelList);
+            while (mat.find()) {
+                qi = Integer.valueOf(mat.group(1));
+                zhi = Integer.valueOf(mat.group(2));
+            }
+        }
+        DelList = DelList.replace("\r", "").replace("\n\n", "\n");
+        String [] xx = DelList.split("\n");
+        if ( xx.length < 15 )
+            return DelList ;
+        int MaxLineCount = xx.length - 9 ;
+        
+        StringBuffer newList = new StringBuffer(1024) ;
+        for ( int i=0; i<9; i++) {
+            newList.append(xx[MaxLineCount + i]).append("\n") ;
+        }
+        if ( zhi > 0 )
+            return "起止=" + qi + "," + String.valueOf(zhi + MaxLineCount - 1 ) + "\n" + newList.toString() ;
+        else
+            return "起止=" + qi + "," + String.valueOf(zhi + MaxLineCount ) + "\n" + newList.toString() ;
+    }
 
     public static String updatepage(int pageid, FoxDB oDB) {
         ArrayList<Map<String, String>> xx = (ArrayList<Map<String, String>>) oDB.getList("select book.url as bu,page.url as pu from book,page where page.id=" + String.valueOf(pageid) + " and  book.id in (select bookid from page where id=" + String.valueOf(pageid) + ")");
