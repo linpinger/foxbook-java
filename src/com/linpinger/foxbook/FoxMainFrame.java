@@ -412,10 +412,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBookUpdateOne = new javax.swing.JMenuItem();
         mBookUpdateTocOne = new javax.swing.JMenuItem();
         mBookMultiThreadUpdateOne = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        mBookInfoEditor = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
         mPageUpdateOne = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
         mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
+        editBookInfo = new javax.swing.JDialog();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         uBook = new javax.swing.JTable();
@@ -423,6 +426,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
         uPage = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        mBookNew = new javax.swing.JMenuItem();
+        mRefreshBookList = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         mBookShowAll = new javax.swing.JMenuItem();
         mBookUpdateAll = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
@@ -472,6 +478,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuBook.add(mBookMultiThreadUpdateOne);
+        jPopupMenuBook.add(jSeparator3);
+
+        mBookInfoEditor.setMnemonic('e');
+        mBookInfoEditor.setText("编辑本书信息(E)");
+        mBookInfoEditor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookInfoEditorActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBookInfoEditor);
 
         mPageUpdateOne.setMnemonic('g');
         mPageUpdateOne.setText("更新本章(G)");
@@ -499,6 +515,20 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuPage.add(mPageDeleteMultiNotUpdate);
+
+        editBookInfo.setTitle("编辑信息");
+        editBookInfo.setLocationByPlatform(true);
+
+        javax.swing.GroupLayout editBookInfoLayout = new javax.swing.GroupLayout(editBookInfo.getContentPane());
+        editBookInfo.getContentPane().setLayout(editBookInfoLayout);
+        editBookInfoLayout.setHorizontalGroup(
+            editBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        editBookInfoLayout.setVerticalGroup(
+            editBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Hello");
@@ -536,6 +566,25 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jMenu1.setMnemonic('B');
         jMenu1.setText("书籍(B)");
+
+        mBookNew.setMnemonic('n');
+        mBookNew.setText("新增书籍(N)");
+        mBookNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookNewActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mBookNew);
+
+        mRefreshBookList.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        mRefreshBookList.setText("刷新书籍列表");
+        mRefreshBookList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mRefreshBookListActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mRefreshBookList);
+        jMenu1.add(jSeparator2);
 
         mBookShowAll.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.ALT_MASK));
         mBookShowAll.setText("显示所有");
@@ -784,6 +833,31 @@ public class FoxMainFrame extends javax.swing.JFrame {
         new Thread(new MultiThreadUpdateOneBook(Integer.valueOf(nBookID), nURL, nBookName)).start();
     }//GEN-LAST:event_mBookMultiThreadUpdateOneActionPerformed
 
+    private void mBookInfoEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookInfoEditorActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+        String nBookName = uBook.getValueAt(nRow, 0).toString();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+
+        bookInfoEditor edtBI = new bookInfoEditor(Integer.valueOf(nBookID), oDB, editBookInfo);
+        editBookInfo.setContentPane(edtBI);
+        editBookInfo.setSize(edtBI.getPreferredSize());
+        editBookInfo.setVisible(true);
+    }//GEN-LAST:event_mBookInfoEditorActionPerformed
+
+    private void mBookNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookNewActionPerformed
+        // TODO add your handling code here:
+        bookInfoEditor edtBI = new bookInfoEditor(0, oDB, editBookInfo);
+        editBookInfo.setContentPane(edtBI);
+        editBookInfo.setSize(edtBI.getPreferredSize());
+        editBookInfo.setVisible(true);
+    }//GEN-LAST:event_mBookNewActionPerformed
+
+    private void mRefreshBookListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRefreshBookListActionPerformed
+        // TODO add your handling code here:
+        refreshBookList();
+    }//GEN-LAST:event_mRefreshBookListActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -858,6 +932,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.table.DefaultTableModel tBook;
     private javax.swing.table.DefaultTableModel tPage;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDialog editBookInfo;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -867,8 +942,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JMenuItem mBookInfoEditor;
     private javax.swing.JMenuItem mBookMultiThreadUpdateOne;
+    private javax.swing.JMenuItem mBookNew;
     private javax.swing.JMenuItem mBookShowAll;
     private javax.swing.JMenuItem mBookUpdateAll;
     private javax.swing.JMenuItem mBookUpdateOne;
@@ -880,6 +959,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
     private javax.swing.JMenuItem mPageUpdateOne;
+    private javax.swing.JMenuItem mRefreshBookList;
     private javax.swing.JDialog showContent;
     private javax.swing.JTable uBook;
     private javax.swing.JTable uPage;

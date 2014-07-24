@@ -4,7 +4,6 @@
  */
 package com.linpinger.foxbook;
 
-import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
