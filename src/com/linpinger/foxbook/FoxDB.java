@@ -4,6 +4,7 @@
  */
 package com.linpinger.foxbook;
 
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,6 +105,11 @@ public class FoxDB {
         }
     }
 
+    public void reOpenDB() {
+        this.bFirstOpen = false;
+        OpenDB();
+    }
+    
     public Connection getConnect() {  // 事务处理需要这个
         return this.conn;
     }
@@ -114,8 +120,21 @@ public class FoxDB {
         } else {
             this.dbPath = this.dbPath1;
         }
-        this.bFirstOpen = false;
-        OpenDB();
+        reOpenDB();
+    }
+    
+    public double vacuumDB() {
+        long sizeBefore = new File(this.dbPath).length() ;
+        reOpenDB();
+        try {
+            Statement stat = conn.createStatement();
+            stat.executeUpdate("vacuum");
+            stat.close();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        }
+        long sizeAfter = new File(this.dbPath).length() ;
+        return Math.floor((sizeBefore - sizeAfter) / 1024) ;
     }
 
     public void closeDB() {

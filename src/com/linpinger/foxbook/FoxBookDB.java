@@ -19,16 +19,6 @@ import java.util.Map;
  * @author guanli
  */
 public class FoxBookDB {
-    public static void vacuumDB(FoxDB oDB) {
-        Connection conn = oDB.getConnect();
-        try {
-            Statement stat = conn.createStatement();
-            stat.executeUpdate("vacuum");
-            stat.close();
-        } catch (SQLException ex) {
-            ex.toString();
-        }
-    }
         //"select book.ID from Book left join page on book.id=page.bookid group by book.id order by count(page.id),book.isEnd,book.ID"
     public static void regenID(int sortmode, FoxDB oDB) { // 重新排序bookid ,pageid
         String sSQL = "";

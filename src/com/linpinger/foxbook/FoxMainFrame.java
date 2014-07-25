@@ -414,6 +414,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBookMultiThreadUpdateOne = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         mBookInfoEditor = new javax.swing.JMenuItem();
+        mBookDelete = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
         mPageUpdateOne = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
@@ -488,6 +489,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuBook.add(mBookInfoEditor);
+
+        mBookDelete.setText("删除本书");
+        mBookDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookDeleteActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBookDelete);
 
         mPageUpdateOne.setMnemonic('g');
         mPageUpdateOne.setText("更新本章(G)");
@@ -807,9 +816,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void mDBVacuumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBVacuumActionPerformed
         // TODO add your handling code here:
-        FoxBookDB.vacuumDB(oDB);
-        System.out.println("已缩小数据库");
-        tPage.addRow(new Object[]{"★已缩小数据库"});
+        tPage.setRowCount(0);
+        double subSize = oDB.vacuumDB();
+        tPage.addRow(new Object[]{"★已缩小数据库: " + subSize + " K"});
     }//GEN-LAST:event_mDBVacuumActionPerformed
 
     private void mBookUpdateTocOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateTocOneActionPerformed
@@ -857,6 +866,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         refreshBookList();
     }//GEN-LAST:event_mRefreshBookListActionPerformed
+
+    private void mBookDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookDeleteActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+ //       String nBookName = uBook.getValueAt(nRow, 0).toString();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+        oDB.exec("Delete From Page where BookID = " + nBookID);
+        oDB.exec("Delete From Book where ID = " + nBookID);
+        refreshBookList();
+    }//GEN-LAST:event_mBookDeleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -945,6 +964,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JMenuItem mBookDelete;
     private javax.swing.JMenuItem mBookInfoEditor;
     private javax.swing.JMenuItem mBookMultiThreadUpdateOne;
     private javax.swing.JMenuItem mBookNew;
