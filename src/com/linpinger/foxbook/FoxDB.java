@@ -5,6 +5,7 @@
 package com.linpinger.foxbook;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,17 +19,16 @@ import java.util.logging.Logger;
  * @author guanli
  */
 public class FoxDB {
-
+    private int nowDBnum = 0 ;
     private String dbPath = "FoxBook.db3";
-    private String dbPath1 = "FoxBook.db3";
-    private String dbPath2 = "FoxBook.db3.old";
+
     private Connection conn;
     private boolean bFirstOpen = true;
 
     public FoxDB() {
         OpenDB();
     }
-    
+
     public String getOneCell(String inSQL) {
         String retStr = "";
         try {
@@ -79,8 +79,8 @@ public class FoxDB {
         }
         return rrr;
     }
-    
-    public void execPreOne(String inSQL, String escapeStr ) {
+
+    public void execPreOne(String inSQL, String escapeStr) {
         try {
             conn.setAutoCommit(false);
             PreparedStatement pstmt = conn.prepareStatement(inSQL);
@@ -109,21 +109,52 @@ public class FoxDB {
         this.bFirstOpen = false;
         OpenDB();
     }
-    
+
     public Connection getConnect() {  // 事务处理需要这个
         return this.conn;
     }
 
-    public void switchDB() {
-        if (this.dbPath == this.dbPath1) {
-            this.dbPath = this.dbPath2;
-        } else {
-            this.dbPath = this.dbPath1;
+    public String switchDB() {
+        File xx = new File("") ; // 获取当前路径 c:\etc 这样
+        ArrayList<String> dbList = getDBList(xx.getAbsolutePath() + File.separator) ;
+        int countDBs = dbList.size();
+        ++this.nowDBnum;
+        if ( this.nowDBnum >= countDBs ) {
+            this.nowDBnum = 0 ;
         }
+        this.dbPath = dbList.get(this.nowDBnum) ;
         reOpenDB();
+        return this.dbPath;
     }
-    
-    public double vacuumDB() {
+
+    public ArrayList<String> getDBList(String DBDir) {
+        ArrayList<String> retList = new ArrayList<String>(9); // 最多9个路径，以后可以按需修改
+        retList.add(DBDir + "FoxBook.db3");
+
+        File xx = new File(DBDir);
+        File[] fff = xx.listFiles(new FileFilter() {
+            public boolean accept(File ff) {
+                if (ff.isFile()) {
+                    if (ff.toString().endsWith(".db3")) {
+                        if (ff.getName().equalsIgnoreCase("FoxBook.db3")) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        });
+
+        int fc = fff.length;
+        for (int i = 0; i < fc; i++) {
+            retList.add(fff[i].getAbsolutePath());
+        }
+        return retList;
+    }
+
+public double vacuumDB() {
         long sizeBefore = new File(this.dbPath).length() ;
         reOpenDB();
         try {
@@ -140,8 +171,12 @@ public class FoxDB {
     public void closeDB() {
         try {
             conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(FoxDB.class.getName()).log(Level.SEVERE, null, ex);
+        
+
+} catch (SQLException ex) {
+            Logger.getLogger(FoxDB.class  
+
+.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

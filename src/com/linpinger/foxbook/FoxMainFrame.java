@@ -439,6 +439,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mDBRegenPageIDs = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mDBVacuum = new javax.swing.JMenuItem();
+        mDBSwich = new javax.swing.JMenuItem();
 
         showContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         showContent.setTitle("呵呵");
@@ -654,6 +655,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jMenu3.add(mDBVacuum);
+
+        mDBSwich.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_MASK));
+        mDBSwich.setMnemonic('s');
+        mDBSwich.setText("切换数据库(S)");
+        mDBSwich.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBSwichActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mDBSwich);
 
         jMenuBar1.add(jMenu3);
 
@@ -877,6 +888,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
         refreshBookList();
     }//GEN-LAST:event_mBookDeleteActionPerformed
 
+    private void mDBSwichActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSwichActionPerformed
+        // TODO add your handling code here:
+        tPage.setRowCount(0);
+        String nowDB = oDB.switchDB();
+        refreshBookList();
+        tPage.addRow(new Object[]{"★切换到: " + nowDB});
+    }//GEN-LAST:event_mDBSwichActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -975,6 +994,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mDBRegenPageIDs;
     private javax.swing.JMenuItem mDBSortAsc;
     private javax.swing.JMenuItem mDBSortDesc;
+    private javax.swing.JMenuItem mDBSwich;
     private javax.swing.JMenuItem mDBVacuum;
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
