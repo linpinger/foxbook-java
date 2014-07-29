@@ -6,6 +6,7 @@ package com.linpinger.foxbook;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,11 +112,14 @@ public class FoxBookLib {
         }
     }
 
-    // List<Map<String, Object>> data = FoxDB.getUMDArray();
     // data包含的hashmap中需包含三个必要key: bookname,title,content
     public static void all2txt(ArrayList<HashMap<String, String>> data, boolean bOneBook) { // 所有书籍转为txt
         // select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=1 order by p.bookid,p.id
         String txtPath = "foxbook.txt";
+        File saveDir = new File("c:/etc") ;
+        if ( saveDir.exists() && saveDir.isDirectory() )
+            txtPath = "c:/etc/foxbook.txt";
+        
         StringBuilder txt = new StringBuilder(512000) ;
         Iterator<HashMap<String, String>> itr = data.iterator();
         HashMap<String, String> mm ;
