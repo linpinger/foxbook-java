@@ -415,7 +415,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         mBookInfoEditor = new javax.swing.JMenuItem();
         mBookDelete = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        mBook2Txt = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
+        mPages2txt = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         mPageUpdateOne = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
         mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
@@ -498,6 +502,24 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuBook.add(mBookDelete);
+        jPopupMenuBook.add(jSeparator4);
+
+        mBook2Txt.setText("本书转为txt");
+        mBook2Txt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBook2TxtActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBook2Txt);
+
+        mPages2txt.setText("选中章节转为txt");
+        mPages2txt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPages2txtActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPages2txt);
+        jPopupMenuPage.add(jSeparator5);
 
         mPageUpdateOne.setMnemonic('g');
         mPageUpdateOne.setText("更新本章(G)");
@@ -896,6 +918,38 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tPage.addRow(new Object[]{"★切换到: " + nowDB});
     }//GEN-LAST:event_mDBSwichActionPerformed
 
+    private void mBook2TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2TxtActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+        
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换为Txt"});
+        ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>)oDB.getList("select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=" + nBookID + " order by p.bookid,p.id") ;
+        FoxBookLib.all2txt(data, true);
+        tPage.addRow(new Object[]{"★转换完毕"});
+    }//GEN-LAST:event_mBook2TxtActionPerformed
+
+    private void mPages2txtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2txtActionPerformed
+        // TODO add your handling code here:
+        int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
+
+        StringBuilder ids = new StringBuilder(10240);
+        int nMax = nRow.length - 1;
+        for (int n = 0; n < nMax; n++) {  // 删除数据库，并更新dellist
+            ids.append(uPage.getValueAt(nRow[n], 2)).append(", ");
+        }
+        ids.append(uPage.getValueAt(nRow[nMax], 2));
+ //       System.out.println(ids.toString());
+
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换为Txt"});
+        ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>)oDB.getList("select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and p.id in (" + ids.toString() + ") order by p.bookid,p.id") ;
+        FoxBookLib.all2txt(data, false);
+        tPage.addRow(new Object[]{"★转换完毕"});
+
+    }//GEN-LAST:event_mPages2txtActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -982,7 +1036,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JMenuItem mBook2Txt;
     private javax.swing.JMenuItem mBookDelete;
     private javax.swing.JMenuItem mBookInfoEditor;
     private javax.swing.JMenuItem mBookMultiThreadUpdateOne;
@@ -999,6 +1056,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
     private javax.swing.JMenuItem mPageUpdateOne;
+    private javax.swing.JMenuItem mPages2txt;
     private javax.swing.JMenuItem mRefreshBookList;
     private javax.swing.JDialog showContent;
     private javax.swing.JTable uBook;

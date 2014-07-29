@@ -112,18 +112,30 @@ public class FoxBookLib {
     }
 
     // List<Map<String, Object>> data = FoxDB.getUMDArray();
-    public static void all2txt(List<Map<String, Object>> data) { // 所有书籍转为txt
-        String txtPath = "fox.txt";
-        String sContent = "";
-        Iterator<Map<String, Object>> itr = data.iterator();
-        while (itr.hasNext()) {
-            HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
-            sContent = sContent + (String) mm.get("title") + "\n\n" + (String) mm.get("content") + "\n\n\n";
+    // data包含的hashmap中需包含三个必要key: bookname,title,content
+    public static void all2txt(ArrayList<HashMap<String, String>> data, boolean bOneBook) { // 所有书籍转为txt
+        // select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=1 order by p.bookid,p.id
+        String txtPath = "foxbook.txt";
+        StringBuilder txt = new StringBuilder(512000) ;
+        Iterator<HashMap<String, String>> itr = data.iterator();
+        HashMap<String, String> mm ;
+        
+        if (bOneBook) {
+            txt.append(data.get(0).get("bookname")).append("\n\n");
+            while (itr.hasNext()) {
+                mm = itr.next();
+                txt.append(mm.get("title")).append("\n\n").append(mm.get("content")).append("\n\n\n");
+            }
+        } else {
+            while (itr.hasNext()) {
+                mm = itr.next();
+                txt.append("●").append(mm.get("bookname")).append("●").append(mm.get("title")).append("\n\n").append(mm.get("content")).append("\n\n\n");
+            }
         }
 
         try {
             BufferedWriter bw1 = new BufferedWriter(new FileWriter(txtPath, false));
-            bw1.write(sContent);
+            bw1.write(txt.toString());
             bw1.flush();
             bw1.close();
         } catch (IOException e) {
