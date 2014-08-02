@@ -430,7 +430,8 @@ public class FoxBookLib {
             conn.setRequestProperty("User-Agent", "ZhuiShuShenQi/2.14 Java/1.6.0_55"); // Android自带头部和IE8头部会导致yahoo搜索结果链接为追踪链接
             conn.setRequestProperty("Accept", "*/*");
             conn.setRequestProperty("Accept-Encoding", "gzip,deflate");
-            conn.setConnectTimeout(5000);
+            conn.setConnectTimeout(5000);  // 连接超时
+            conn.setReadTimeout(15000);    // 读取超时15s
             conn.connect();
 
             if ("GET" != PostData) {

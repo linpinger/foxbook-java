@@ -39,7 +39,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             while (itr.hasNext()) {
                 HashMap item = (HashMap<String, String>) itr.next();
                 nowT = new Thread(new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
-                System.out.println("线程 " + nowT.getName() + " 更新:" + (String) item.get("name"));
+         //       System.out.println("线程 " + nowT.getName() + " 更新:" + (String) item.get("name"));
                 threadList.add(nowT);
                 nowT.start();
             }
