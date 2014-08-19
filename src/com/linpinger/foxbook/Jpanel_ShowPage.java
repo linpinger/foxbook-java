@@ -8,13 +8,13 @@ package com.linpinger.foxbook;
  *
  * @author guanli
  */
-public class showPage extends javax.swing.JPanel {
+public class Jpanel_ShowPage extends javax.swing.JPanel {
     private String content;
 
     /**
-     * Creates new form showPage
+     * Creates new form Jpanel_ShowPage
      */
-    public showPage(String nr) {
+    public Jpanel_ShowPage(String nr) {
         this.content = nr.replace("\n", "\n　　");
         initComponents();
         uContent.setText(this.content);

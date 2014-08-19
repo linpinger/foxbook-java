@@ -743,7 +743,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             if (null == mm.get("cc")) {
                 return;
             }
-            showPage sp = new showPage(mm.get("name").toString() + "\n\n" + mm.get("cc").toString());
+            Jpanel_ShowPage sp = new Jpanel_ShowPage(mm.get("name").toString() + "\n\n" + mm.get("cc").toString());
             showContent.setContentPane(sp);
             showContent.setSize(sp.getPreferredSize());
             showContent.setVisible(true);
@@ -881,7 +881,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
-        bookInfoEditor edtBI = new bookInfoEditor(Integer.valueOf(nBookID), oDB, editBookInfo);
+        JPanel_BookInfoEditor edtBI = new JPanel_BookInfoEditor(Integer.valueOf(nBookID), oDB, editBookInfo);
         editBookInfo.setContentPane(edtBI);
         editBookInfo.setSize(edtBI.getPreferredSize());
         editBookInfo.setVisible(true);
@@ -889,7 +889,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void mBookNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookNewActionPerformed
         // TODO add your handling code here:
-        bookInfoEditor edtBI = new bookInfoEditor(0, oDB, editBookInfo);
+        JPanel_BookInfoEditor edtBI = new JPanel_BookInfoEditor(0, oDB, editBookInfo);
         editBookInfo.setContentPane(edtBI);
         editBookInfo.setSize(edtBI.getPreferredSize());
         editBookInfo.setVisible(true);

@@ -12,15 +12,15 @@ import javax.swing.JDialog;
  *
  * @author guanli
  */
-public class bookInfoEditor extends javax.swing.JPanel {
+public class JPanel_BookInfoEditor extends javax.swing.JPanel {
     private int bookid = 0;
     private FoxDB oDB ;
     private JDialog thisWin ;
 
     /**
-     * Creates new form bookInfoEditor
+     * Creates new form JPanel_BookInfoEditor
      */
-    public bookInfoEditor(int ibookid, FoxDB oDB, JDialog xx) {
+    public JPanel_BookInfoEditor(int ibookid, FoxDB oDB, JDialog xx) {
         this.bookid = ibookid ;
         this.oDB = oDB;
         this.thisWin = xx;
@@ -47,6 +47,7 @@ public class bookInfoEditor extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        uSearchBook = new javax.swing.JDialog();
         jPanel1 = new javax.swing.JPanel();
         uBookID = new javax.swing.JLabel();
         uBookName = new javax.swing.JTextField();
@@ -60,7 +61,16 @@ public class bookInfoEditor extends javax.swing.JPanel {
         uDelListScrool = new javax.swing.JScrollPane();
         uDelList = new javax.swing.JTextArea();
 
-        setPreferredSize(null);
+        javax.swing.GroupLayout uSearchBookLayout = new javax.swing.GroupLayout(uSearchBook.getContentPane());
+        uSearchBook.getContentPane().setLayout(uSearchBookLayout);
+        uSearchBookLayout.setHorizontalGroup(
+            uSearchBookLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        uSearchBookLayout.setVerticalGroup(
+            uSearchBookLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, null, new java.awt.Color(0, 0, 255)));
 
@@ -69,12 +79,22 @@ public class bookInfoEditor extends javax.swing.JPanel {
         uBookName.setText("BookName");
 
         uBookSearch.setMnemonic('d');
-        uBookSearch.setText("D");
+        uBookSearch.setText("搜D");
+        uBookSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uBookSearchActionPerformed(evt);
+            }
+        });
 
         uQidianID.setText("QidianID");
 
         uQidianIDProc.setMnemonic('q');
         uQidianIDProc.setText("QD");
+        uQidianIDProc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uQidianIDProcActionPerformed(evt);
+            }
+        });
 
         uBookURL.setText("URL");
 
@@ -87,10 +107,10 @@ public class bookInfoEditor extends javax.swing.JPanel {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(8, 8, 8)
                         .addComponent(uBookID, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)
+                        .addComponent(uBookName, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(uBookName, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(uBookSearch)
+                        .addComponent(uBookSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(uQidianID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -159,7 +179,7 @@ public class bookInfoEditor extends javax.swing.JPanel {
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton2)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -177,7 +197,7 @@ public class bookInfoEditor extends javax.swing.JPanel {
                                 .addComponent(jButton3))
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(uDelListScrool, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addComponent(uDelListScrool, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -202,6 +222,20 @@ public class bookInfoEditor extends javax.swing.JPanel {
         uDelList.setText(FoxBookLib.simplifyDelList(uDelList.getText()));
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void uBookSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uBookSearchActionPerformed
+        // TODO add your handling code here:
+        JPanel_SearchBook edtBI = new JPanel_SearchBook(uBookName.getText(), uSearchBook);
+        uSearchBook.setContentPane(edtBI);
+        uSearchBook.setSize(edtBI.getPreferredSize());
+        uSearchBook.setVisible(true);
+    }//GEN-LAST:event_uBookSearchActionPerformed
+
+    private void uQidianIDProcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uQidianIDProcActionPerformed
+        // TODO add your handling code here:
+        int qidianid = site_qidian.qidian_getBookID_FromURL(uQidianID.getText());
+        uQidianID.setText(String.valueOf(qidianid));
+    }//GEN-LAST:event_uQidianIDProcActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -215,5 +249,6 @@ public class bookInfoEditor extends javax.swing.JPanel {
     private javax.swing.JScrollPane uDelListScrool;
     private javax.swing.JTextField uQidianID;
     private javax.swing.JButton uQidianIDProc;
+    private javax.swing.JDialog uSearchBook;
     // End of variables declaration//GEN-END:variables
 }
