@@ -227,6 +227,7 @@ public class JPanel_BookInfoEditor extends javax.swing.JPanel {
         JPanel_SearchBook edtBI = new JPanel_SearchBook(uBookName.getText(), uSearchBook);
         uSearchBook.setContentPane(edtBI);
         uSearchBook.setSize(edtBI.getPreferredSize());
+        uSearchBook.setLocationRelativeTo(null);
         uSearchBook.setVisible(true);
     }//GEN-LAST:event_uBookSearchActionPerformed
 

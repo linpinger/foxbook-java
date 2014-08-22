@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -158,6 +160,15 @@ public class FoxBookDB {
             addDelList += item.get("url").toString() + "|" + item.get("name").toString() + "\n";
         }
 	return addDelList;
+    }
+    public static String getSiteType(FoxDB oDB) {
+        String sitetype = "unknown";
+        String urls = oDB.getOneCell("select URL from book where ( isEnd isnull or isEnd < 1 )");
+        Matcher mat = Pattern.compile("(?i)http[s]?://[0-9a-z]*[\\.]?([^\\.]+)\\.(com|net|org|se|me|cc|cn|net\\.cn|com\\.cn|org\\.cn)/").matcher(urls);
+        while (mat.find()) {
+            sitetype = mat.group(1);
+        }
+        return sitetype;
     }
     
 }

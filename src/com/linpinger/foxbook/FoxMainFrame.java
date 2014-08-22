@@ -6,6 +6,7 @@ package com.linpinger.foxbook;
 
 import static com.linpinger.foxbook.FoxBookLib.getFullURL;
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -357,6 +358,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tcmR.getColumn(0).setPreferredWidth(300);
         tcmR.getColumn(2).setPreferredWidth(40);
         tcmR.getColumn(3).setPreferredWidth(150);
+        this.setLocationRelativeTo(null); // 屏幕居中显示
     }
 
     public void refreshBookList() {
@@ -416,8 +418,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBookInfoEditor = new javax.swing.JMenuItem();
         mBookDelete = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        mBook2Mobi = new javax.swing.JMenuItem();
+        mBook2Epub = new javax.swing.JMenuItem();
         mBook2Txt = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
+        mPages2Mobi = new javax.swing.JMenuItem();
+        mPages2Epub = new javax.swing.JMenuItem();
         mPages2txt = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
         mPageUpdateOne = new javax.swing.JMenuItem();
@@ -436,6 +442,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         mBookShowAll = new javax.swing.JMenuItem();
         mBookUpdateAll = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        mAll2Mobi = new javax.swing.JMenuItem();
+        mAll2Epub = new javax.swing.JMenuItem();
+        mAll2Txt = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         mDBSortDesc = new javax.swing.JMenuItem();
@@ -504,6 +514,22 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jPopupMenuBook.add(mBookDelete);
         jPopupMenuBook.add(jSeparator4);
 
+        mBook2Mobi.setText("本书转为mobi");
+        mBook2Mobi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBook2MobiActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBook2Mobi);
+
+        mBook2Epub.setText("本书转为epub");
+        mBook2Epub.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBook2EpubActionPerformed(evt);
+            }
+        });
+        jPopupMenuBook.add(mBook2Epub);
+
         mBook2Txt.setText("本书转为txt");
         mBook2Txt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -511,6 +537,22 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuBook.add(mBook2Txt);
+
+        mPages2Mobi.setText("选中章节转为mobi");
+        mPages2Mobi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPages2MobiActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPages2Mobi);
+
+        mPages2Epub.setText("选中章节转为epub");
+        mPages2Epub.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPages2EpubActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPages2Epub);
 
         mPages2txt.setText("选中章节转为txt");
         mPages2txt.addActionListener(new java.awt.event.ActionListener() {
@@ -635,6 +677,32 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(mBookUpdateAll);
+        jMenu1.add(jSeparator6);
+
+        mAll2Mobi.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, java.awt.event.InputEvent.ALT_MASK));
+        mAll2Mobi.setText("所有转为 Mobi");
+        mAll2Mobi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mAll2MobiActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mAll2Mobi);
+
+        mAll2Epub.setText("所有转为 Epub");
+        mAll2Epub.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mAll2EpubActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mAll2Epub);
+
+        mAll2Txt.setText("所有转为 Txt");
+        mAll2Txt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mAll2TxtActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mAll2Txt);
 
         jMenuBar1.add(jMenu1);
 
@@ -743,9 +811,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
             if (null == mm.get("cc")) {
                 return;
             }
-            Jpanel_ShowPage sp = new Jpanel_ShowPage(mm.get("name").toString() + "\n\n" + mm.get("cc").toString());
+            Jpanel_ShowPage sp = new Jpanel_ShowPage(mm.get("name").toString() + "\n\n" + mm.get("cc").toString(), showContent);
             showContent.setContentPane(sp);
             showContent.setSize(sp.getPreferredSize());
+            showContent.setLocationRelativeTo(null);
             showContent.setVisible(true);
         }
         if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
@@ -884,6 +953,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         JPanel_BookInfoEditor edtBI = new JPanel_BookInfoEditor(Integer.valueOf(nBookID), oDB, editBookInfo);
         editBookInfo.setContentPane(edtBI);
         editBookInfo.setSize(edtBI.getPreferredSize());
+        editBookInfo.setLocationRelativeTo(null);
         editBookInfo.setVisible(true);
     }//GEN-LAST:event_mBookInfoEditorActionPerformed
 
@@ -892,6 +962,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         JPanel_BookInfoEditor edtBI = new JPanel_BookInfoEditor(0, oDB, editBookInfo);
         editBookInfo.setContentPane(edtBI);
         editBookInfo.setSize(edtBI.getPreferredSize());
+        editBookInfo.setLocationRelativeTo(null);
         editBookInfo.setVisible(true);
     }//GEN-LAST:event_mBookNewActionPerformed
 
@@ -918,16 +989,107 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tPage.addRow(new Object[]{"★切换到: " + nowDB});
     }//GEN-LAST:event_mDBSwichActionPerformed
 
+    public class book2ebook implements Runnable {
+        private int transType = 0; // 1:mobi 2:epub 9:txt
+        private int transMode = 9; // 0:all pages 1:selected pages 2:one book
+        private int bookid = 0;
+        private String pageids = "";
+        book2ebook(int inTransType, int inBookIDorMode){
+            this.transType = inTransType;
+            if ( inBookIDorMode == 0 ) {
+                this.transMode = 0 ;
+            } else {
+                this.transMode = 2;
+                this.bookid = inBookIDorMode ;
+            }
+        }
+        book2ebook(int inTransType, String inPageIDs) {
+            this.transType = inTransType;
+            this.transMode = 1;
+            this.pageids = inPageIDs;
+        }
+        public void run(){
+            String sql = "";
+             switch (transMode) {
+                 case 0:
+                     sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid order by p.bookid,p.id";
+                     break;
+                 case 2:
+                     sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=" + bookid + " order by p.bookid,p.id";
+                     break;
+                 case 1:
+                     sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and p.id in (" + pageids + ") order by p.bookid,p.id";
+                     break;
+             }
+            ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>) oDB.getList(sql);
+            String bookname = data.get(0).get("bookname");
+            String outDir = "./";
+            File saveDir = new File("c:/etc");
+            if (saveDir.exists() && saveDir.isDirectory()) {
+                outDir = "c:/etc/";
+            }
+            String oBookName = bookname;
+            String fBookName = bookname;
+            if ( transMode != 2) { // 0:all pages 1:selected pages 2:one book
+                String sst = FoxBookDB.getSiteType(oDB);
+                oBookName = bookname + "_" + sst ;
+                fBookName = "all_" + sst ;
+                
+                //处理章节名 内容
+                String preBName = "";
+                String nowBName = "";
+                HashMap<String, String> mm;
+                int cData = data.size();
+                for (int i = 0; i < cData; i++) {
+                    mm = data.get(i);
+                    nowBName = mm.get("bookname");
+                    mm.put("content", "\n　　" + mm.get("content").replace("\n", "<br/>\n　　"));
+                    if (!preBName.equals(nowBName)) { // 书名和上一条的不同，修改本条
+                        mm.put("title", "●" + nowBName + "●" + mm.get("title"));
+                        data.set(i, mm);
+                        preBName = nowBName;
+                    }
+                }
+            } else { // 处理txt -> html
+                HashMap<String, String> mm;
+                int cData = data.size();
+                for (int i = 0; i < cData; i++) {
+                    mm = data.get(i);
+                    mm.put("content", "\n　　" + mm.get("content").replace("\n", "<br/>\n　　"));
+                    data.set(i, mm);
+                }
+            }
+
+             switch (transType) { // 1:mobi 2:epub 9:txt
+                 case 1:
+                     FoxBookLib.all2Epub(data, oBookName, outDir + fBookName + ".mobi");
+                    break;
+                 case 2:
+                     FoxBookLib.all2Epub(data, oBookName, outDir + fBookName + ".epub");
+                     break;
+                 case 9:
+                     if ( transMode == 2 ) {
+                        FoxBookLib.all2txt(data, true);
+                     } else {
+                         FoxBookLib.all2txt(data, false);
+                     }
+                     break;
+             }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.addRow(new Object[]{"★转换完毕"});
+                }
+            });
+        }
+    }
     private void mBook2TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2TxtActionPerformed
         // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换为Txt"});
-        ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>)oDB.getList("select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=" + nBookID + " order by p.bookid,p.id") ;
-        FoxBookLib.all2txt(data, true);
-        tPage.addRow(new Object[]{"★转换完毕"});
+        tPage.addRow(new Object[]{"★开始转换本书为Txt"});
+        new Thread(new book2ebook(9, Integer.valueOf(nBookID))).start();
     }//GEN-LAST:event_mBook2TxtActionPerformed
 
     private void mPages2txtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2txtActionPerformed
@@ -943,12 +1105,82 @@ public class FoxMainFrame extends javax.swing.JFrame {
  //       System.out.println(ids.toString());
 
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换为Txt"});
-        ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>)oDB.getList("select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and p.id in (" + ids.toString() + ") order by p.bookid,p.id") ;
-        FoxBookLib.all2txt(data, false);
-        tPage.addRow(new Object[]{"★转换完毕"});
-
+        tPage.addRow(new Object[]{"★开始转换选定章节为Txt"});
+        new Thread(new book2ebook(9, ids.toString())).start();
     }//GEN-LAST:event_mPages2txtActionPerformed
+
+    private void mBook2MobiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2MobiActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换本书为mobi"});
+        new Thread(new book2ebook(1, Integer.valueOf(nBookID))).start();
+    }//GEN-LAST:event_mBook2MobiActionPerformed
+
+    private void mPages2MobiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2MobiActionPerformed
+        // TODO add your handling code here:
+        int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
+
+        StringBuilder ids = new StringBuilder(10240);
+        int nMax = nRow.length - 1;
+        for (int n = 0; n < nMax; n++) {  // 删除数据库，并更新dellist
+            ids.append(uPage.getValueAt(nRow[n], 2)).append(", ");
+        }
+        ids.append(uPage.getValueAt(nRow[nMax], 2));
+        //       System.out.println(ids.toString());
+
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换选定章节为mobi"});
+        new Thread(new book2ebook(1, ids.toString())).start();
+    }//GEN-LAST:event_mPages2MobiActionPerformed
+
+    private void mBook2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2EpubActionPerformed
+        // TODO add your handling code here:
+        int nRow = uBook.getSelectedRow();
+        String nBookID = uBook.getValueAt(nRow, 2).toString();
+
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换本书为epub"});
+        new Thread(new book2ebook(2, Integer.valueOf(nBookID))).start();
+    }//GEN-LAST:event_mBook2EpubActionPerformed
+
+    private void mPages2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2EpubActionPerformed
+        // TODO add your handling code here:
+        int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
+
+        StringBuilder ids = new StringBuilder(10240);
+        int nMax = nRow.length - 1;
+        for (int n = 0; n < nMax; n++) {  // 删除数据库，并更新dellist
+            ids.append(uPage.getValueAt(nRow[n], 2)).append(", ");
+        }
+        ids.append(uPage.getValueAt(nRow[nMax], 2));
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换选定章节为epub"});
+        new Thread(new book2ebook(2, ids.toString())).start();
+    }//GEN-LAST:event_mPages2EpubActionPerformed
+
+    private void mAll2MobiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2MobiActionPerformed
+        // TODO add your handling code here:
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换所有章节为 mobi"});
+        new Thread(new book2ebook(1, 0)).start();
+    }//GEN-LAST:event_mAll2MobiActionPerformed
+
+    private void mAll2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2EpubActionPerformed
+        // TODO add your handling code here:
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换所有章节为 epub"});
+        new Thread(new book2ebook(2, 0)).start();
+    }//GEN-LAST:event_mAll2EpubActionPerformed
+
+    private void mAll2TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2TxtActionPerformed
+        // TODO add your handling code here:
+        tPage.setRowCount(0);
+        tPage.addRow(new Object[]{"★开始转换所有章节为 txt"});
+        new Thread(new book2ebook(9, 0)).start();
+    }//GEN-LAST:event_mAll2TxtActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1038,7 +1270,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JMenuItem mAll2Epub;
+    private javax.swing.JMenuItem mAll2Mobi;
+    private javax.swing.JMenuItem mAll2Txt;
+    private javax.swing.JMenuItem mBook2Epub;
+    private javax.swing.JMenuItem mBook2Mobi;
     private javax.swing.JMenuItem mBook2Txt;
     private javax.swing.JMenuItem mBookDelete;
     private javax.swing.JMenuItem mBookInfoEditor;
@@ -1056,6 +1294,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
     private javax.swing.JMenuItem mPageUpdateOne;
+    private javax.swing.JMenuItem mPages2Epub;
+    private javax.swing.JMenuItem mPages2Mobi;
     private javax.swing.JMenuItem mPages2txt;
     private javax.swing.JMenuItem mRefreshBookList;
     private javax.swing.JDialog showContent;

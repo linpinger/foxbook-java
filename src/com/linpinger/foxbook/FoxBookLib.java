@@ -146,6 +146,18 @@ public class FoxBookLib {
             e.toString();
         }
     }
+    
+    public static void all2Epub(ArrayList<HashMap<String, String>> data, String inBookName, String inSavePath) {
+        Iterator<HashMap<String, String>> itr = data.iterator();
+        HashMap<String, String> mm;
+
+        FoxEpub oEpub = new FoxEpub(inBookName, inSavePath);
+        while (itr.hasNext()) {
+            mm = itr.next();
+            oEpub.AddChapter(mm.get("title"), mm.get("content"), -1);
+         }
+        oEpub.SaveTo();
+    }
 
     public static List<Map<String, Object>> getSearchEngineHref(String html, String KeyWord) {
 //		String KeyWord = "三界血歌" ;
