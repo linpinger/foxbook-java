@@ -42,6 +42,7 @@
 
 - sqlite3 java版 [sqlite-jdbc-3.7.2.jar](https://bitbucket.org/xerial/sqlite-jdbc)
 - kindlegen 程序 这个是amazon公司提供的转换为mobi格式的工具，提供win/linux/mac版，需翻Q下载
+- json库 和 android下的json库是一样滴
 
 
 **更新日志:**
