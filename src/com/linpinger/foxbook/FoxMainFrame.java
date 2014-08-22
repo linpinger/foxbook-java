@@ -1039,7 +1039,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
             String oBookName = bookname;
             String fBookName = bookname;
-            if (transMode != 2) { // 0:all pages 1:selected pages 2:one book
+			if ( transType != 9 ) {
+            if (transMode != 2 ) { // 0:all pages 1:selected pages 2:one book
                 String sst = FoxBookDB.getSiteType(oDB);
                 oBookName = bookname + "_" + sst;
                 fBookName = "all_" + sst;
@@ -1068,6 +1069,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     data.set(i, mm);
                 }
             }
+			}
 
             switch (transType) { // 1:mobi 2:epub 9:txt
                 case 1:
