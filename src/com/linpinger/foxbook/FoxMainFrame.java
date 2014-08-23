@@ -29,6 +29,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
     public final int downThread = 9;  // 页面下载任务线程数
     public int leftThread = downThread;
 
+	private void msg(String inMsg) {
+		msg.setText(inMsg);
+//		tPage.addRow(new Object[]{inMsg});
+	}
+
     public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
 
         public void run() {
@@ -48,7 +53,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     tPage.setRowCount(0);
-                    tPage.addRow(new Object[]{"★　开始更新所有书籍"});
+                    msg("★　开始更新所有书籍，请耐心等待...");
                 }
             });
             System.out.println("等待诸多线程...");
@@ -65,12 +70,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    tPage.addRow(new Object[]{"★　全部线程完毕，恭喜"});
+                    msg.setForeground(Color.BLUE);
+                    msg("★　全部线程更新完毕，恭喜");
                 }
             });
             refreshBookList();
             System.out.println("全部线程完毕，恭喜");
-
         }
     }
 
@@ -93,9 +98,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 public void run() {
                     tPage.setRowCount(0);
                     if (bWritePage) {
-                        tPage.addRow(new Object[]{"★　开始更新本书: " + nBookName});
+                        msg("★　开始更新本书: " + nBookName);
                     } else {
-                        tPage.addRow(new Object[]{"★　开始更新本书目录: " + nBookName});
+                        msg("★　开始更新本书目录: " + nBookName);
                     }
                 }
             });
@@ -111,9 +116,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     if (bWritePage) {
-                        tPage.addRow(new Object[]{"★　本书更新完毕: " + nBookName});
+                        msg("★　本书更新完毕: " + nBookName);
                     } else {
-                        tPage.addRow(new Object[]{"★　本书目录更新完毕: " + nBookName});
+                        msg("★　本书目录更新完毕: " + nBookName);
                     }
                 }
             });
@@ -137,7 +142,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     tPage.setRowCount(0);
-                    tPage.addRow(new Object[]{"★　开始不受控制滴多线程更新本书: " + nBookName});
+                    msg("★　开始不受控制滴多线程更新本书: " + nBookName);
                 }
             });
 
@@ -146,7 +151,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             try {
                 nowUP.join();
             } catch (InterruptedException ex) {
-                Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
+				ex.toString();
             }
             /*
              SwingUtilities.invokeLater(new Runnable() {
@@ -451,13 +456,15 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mAll2Epub = new javax.swing.JMenuItem();
         mAll2Txt = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        jMenu3 = new javax.swing.JMenu();
         mDBSortDesc = new javax.swing.JMenuItem();
         mDBSortAsc = new javax.swing.JMenuItem();
         mDBRegenPageIDs = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mDBVacuum = new javax.swing.JMenuItem();
         mDBSwich = new javax.swing.JMenuItem();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
+        mDBQuickA = new javax.swing.JMenuItem();
+        msg = new javax.swing.JMenu();
 
         showContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         showContent.setTitle("呵呵");
@@ -642,6 +649,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jScrollPane1);
 
+        jMenuBar1.setFont(new java.awt.Font("宋体", 1, 12)); // NOI18N
+
         jMenu1.setMnemonic('B');
         jMenu1.setText("书籍(B)");
 
@@ -710,12 +719,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setMnemonic('x');
-        jMenu2.setText("页面(X)");
-        jMenuBar1.add(jMenu2);
-
-        jMenu3.setMnemonic('z');
-        jMenu3.setText("数据库(Z)");
+        jMenu2.setMnemonic('z');
+        jMenu2.setText("数据库(Z)");
 
         mDBSortDesc.setText("按书籍页数倒序排列");
         mDBSortDesc.addActionListener(new java.awt.event.ActionListener() {
@@ -723,7 +728,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 mDBSortDescActionPerformed(evt);
             }
         });
-        jMenu3.add(mDBSortDesc);
+        jMenu2.add(mDBSortDesc);
 
         mDBSortAsc.setText("按书籍页数顺序排列");
         mDBSortAsc.addActionListener(new java.awt.event.ActionListener() {
@@ -731,7 +736,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 mDBSortAscActionPerformed(evt);
             }
         });
-        jMenu3.add(mDBSortAsc);
+        jMenu2.add(mDBSortAsc);
 
         mDBRegenPageIDs.setText("重新生成页面ID");
         mDBRegenPageIDs.addActionListener(new java.awt.event.ActionListener() {
@@ -739,8 +744,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 mDBRegenPageIDsActionPerformed(evt);
             }
         });
-        jMenu3.add(mDBRegenPageIDs);
-        jMenu3.add(jSeparator1);
+        jMenu2.add(mDBRegenPageIDs);
+        jMenu2.add(jSeparator1);
 
         mDBVacuum.setText("缩小数据库");
         mDBVacuum.addActionListener(new java.awt.event.ActionListener() {
@@ -748,7 +753,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 mDBVacuumActionPerformed(evt);
             }
         });
-        jMenu3.add(mDBVacuum);
+        jMenu2.add(mDBVacuum);
 
         mDBSwich.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.ALT_MASK));
         mDBSwich.setMnemonic('s');
@@ -758,9 +763,26 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 mDBSwichActionPerformed(evt);
             }
         });
-        jMenu3.add(mDBSwich);
+        jMenu2.add(mDBSwich);
+        jMenu2.add(jSeparator7);
 
-        jMenuBar1.add(jMenu3);
+        mDBQuickA.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.ALT_MASK));
+        mDBQuickA.setText("快捷倒序缩小数据库");
+        mDBQuickA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBQuickAActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mDBQuickA);
+
+        jMenuBar1.add(jMenu2);
+
+        msg.setForeground(new java.awt.Color(0, 0, 255));
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-08-23");
+        msg.setToolTipText("★　哈哈我是消息栏");
+        msg.setEnabled(false);
+        msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jMenuBar1.add(msg);
 
         setJMenuBar(jMenuBar1);
 
@@ -783,10 +805,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void uBookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uBookMouseClicked
-        // TODO add your handling code here:
         if (2 == evt.getClickCount()) {
             int nRow = uBook.getSelectedRow();
-//            System.out.println(jTable3.getValueAt(nRow, 0));
+            msg("★　" + uBook.getValueAt(nRow, 0) + "　" + uBook.getValueAt(nRow, 3));
             tPage.setRowCount(0);
             List rsdata = oDB.getList("select name as name, charcount as cc, id as id, bookid as bid, url as url from page where bookid=" + uBook.getValueAt(nRow, 2));
             Iterator itr = rsdata.iterator();
@@ -809,6 +830,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             if (Integer.valueOf(uPage.getValueAt(nRow, 2).toString()) < 1) {
                 return;
             }
+            msg("★　查看: " + uPage.getValueAt(nRow, 0) + "　" + uPage.getValueAt(nRow, 4));
             List xx = oDB.getList("select name as name, content as cc from page where id=" + uPage.getValueAt(nRow, 2).toString());
             HashMap mm = (HashMap) xx.get(0);
 
@@ -841,6 +863,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             HashMap item = (HashMap) itr.next();
             tPage.addRow(new Object[]{item.get("name"), item.get("cc"), item.get("id"), item.get("bname"), item.get("url")});
         }
+        msg("★　章节总数: " + rsdata.size());
     }//GEN-LAST:event_mBookShowAllActionPerformed
 
     private void mBookUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateOneActionPerformed
@@ -867,6 +890,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void mBookUpdateAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAllActionPerformed
         // TODO add your handling code here:
+        msg.setForeground(Color.GREEN);
         new Thread(new UpdateAllBook()).start();
     }//GEN-LAST:event_mBookUpdateAllActionPerformed
 
@@ -879,7 +903,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             nPageName = uPage.getValueAt(nRow[n], 0).toString();
             nPageID = Integer.valueOf(uPage.getValueAt(nRow[n], 2).toString());
             FoxBookDB.deletePage(nPageID, bUpdateDelList, oDB);
-            System.out.println("已删除章节: " + nPageName);
+//            System.out.println("已删除章节: " + nPageName);
         }
 
         for (int i = nRow.length - 1; i >= 0; i--) { // 倒序删除 LV 中显示条目
@@ -917,14 +941,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
         FoxBookDB.regenID(9, oDB);
         tPage.setRowCount(0); // 清空uPage
         refreshBookList();
-        tPage.addRow(new Object[]{"★已重新生成页面ID"});
+        msg("★　已重新生成页面ID");
     }//GEN-LAST:event_mDBRegenPageIDsActionPerformed
 
     private void mDBVacuumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBVacuumActionPerformed
         // TODO add your handling code here:
         tPage.setRowCount(0);
         double subSize = oDB.vacuumDB();
-        tPage.addRow(new Object[]{"★已缩小数据库: " + subSize + " K"});
+        msg("★　已缩小数据库: " + subSize + " K");
     }//GEN-LAST:event_mDBVacuumActionPerformed
 
     private void mBookUpdateTocOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateTocOneActionPerformed
@@ -990,7 +1014,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tPage.setRowCount(0);
         String nowDB = oDB.switchDB();
         refreshBookList();
-        tPage.addRow(new Object[]{"★切换到: " + nowDB});
+        msg("★　切换到: " + nowDB);
     }//GEN-LAST:event_mDBSwichActionPerformed
 
     public class book2ebook implements Runnable {
@@ -1089,7 +1113,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
             final long eTime = System.currentTimeMillis() - sTime;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    tPage.addRow(new Object[]{"★转换完毕，耗时(ms): " + eTime});
+                    msg.setForeground(Color.BLUE);
+                    msg("★　转换完毕，耗时(ms): " + eTime);
                 }
             });
         }
@@ -1100,7 +1125,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换本书为Txt"});
+        msg("★　开始转换本书为 txt");
         new Thread(new book2ebook(9, Integer.valueOf(nBookID))).start();
     }//GEN-LAST:event_mBook2TxtActionPerformed
 
@@ -1117,7 +1142,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         //       System.out.println(ids.toString());
 
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换选定章节为Txt"});
+        msg("★　开始转换选定章节为 txt");
         new Thread(new book2ebook(9, ids.toString())).start();
     }//GEN-LAST:event_mPages2txtActionPerformed
 
@@ -1127,7 +1152,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换本书为mobi"});
+        msg("★　开始转换本书为 mobi");
         new Thread(new book2ebook(1, Integer.valueOf(nBookID))).start();
     }//GEN-LAST:event_mBook2MobiActionPerformed
 
@@ -1144,7 +1169,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         //       System.out.println(ids.toString());
 
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换选定章节为mobi"});
+        msg("★　开始转换选定章节为 mobi");
         new Thread(new book2ebook(1, ids.toString())).start();
     }//GEN-LAST:event_mPages2MobiActionPerformed
 
@@ -1154,7 +1179,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换本书为epub"});
+        msg("★　开始转换本书为 epub");
         new Thread(new book2ebook(2, Integer.valueOf(nBookID))).start();
     }//GEN-LAST:event_mBook2EpubActionPerformed
 
@@ -1169,30 +1194,46 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
         ids.append(uPage.getValueAt(nRow[nMax], 2));
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换选定章节为epub"});
+        msg("★　开始转换选定章节为 epub");
         new Thread(new book2ebook(2, ids.toString())).start();
     }//GEN-LAST:event_mPages2EpubActionPerformed
 
     private void mAll2MobiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2MobiActionPerformed
         // TODO add your handling code here:
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换所有章节为 mobi"});
+        msg.setForeground(Color.GREEN);
+        msg("★　开始转换所有章节为 mobi");
         new Thread(new book2ebook(1, 0)).start();
     }//GEN-LAST:event_mAll2MobiActionPerformed
 
     private void mAll2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2EpubActionPerformed
         // TODO add your handling code here:
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换所有章节为 epub"});
+        msg("★　开始转换所有章节为 epub");
         new Thread(new book2ebook(2, 0)).start();
     }//GEN-LAST:event_mAll2EpubActionPerformed
 
     private void mAll2TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2TxtActionPerformed
         // TODO add your handling code here:
         tPage.setRowCount(0);
-        tPage.addRow(new Object[]{"★开始转换所有章节为 txt"});
+        msg("★　开始转换所有章节为 txt");
         new Thread(new book2ebook(9, 0)).start();
     }//GEN-LAST:event_mAll2TxtActionPerformed
+
+    private void mDBQuickAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBQuickAActionPerformed
+        // TODO add your handling code here:
+        long sTime = System.currentTimeMillis();
+        msg("★　开始倒序所有书籍...");
+        FoxBookDB.regenID(2, oDB);
+        refreshBookList();
+        tPage.setRowCount(0);
+        msg("★　开始重新生成pageID");
+        FoxBookDB.regenID(9, oDB);
+        msg("★　开始缩小数据库...");
+        double subSize = oDB.vacuumDB();
+        long eTime = System.currentTimeMillis() - sTime;
+        msg("★　已完成倒序并缩小数据库: " + subSize + " K   耗时(ms): " + eTime);
+    }//GEN-LAST:event_mDBQuickAActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1271,7 +1312,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JDialog editBookInfo;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPopupMenu jPopupMenuBook;
     private javax.swing.JPopupMenu jPopupMenuPage;
@@ -1283,6 +1323,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JMenuItem mAll2Epub;
     private javax.swing.JMenuItem mAll2Mobi;
@@ -1298,6 +1339,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mBookUpdateAll;
     private javax.swing.JMenuItem mBookUpdateOne;
     private javax.swing.JMenuItem mBookUpdateTocOne;
+    private javax.swing.JMenuItem mDBQuickA;
     private javax.swing.JMenuItem mDBRegenPageIDs;
     private javax.swing.JMenuItem mDBSortAsc;
     private javax.swing.JMenuItem mDBSortDesc;
@@ -1310,6 +1352,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPages2Mobi;
     private javax.swing.JMenuItem mPages2txt;
     private javax.swing.JMenuItem mRefreshBookList;
+    private javax.swing.JMenu msg;
     private javax.swing.JDialog showContent;
     private javax.swing.JTable uBook;
     private javax.swing.JTable uPage;

@@ -40,13 +40,14 @@
 
 **工程中包含的其他文件:**
 
-- sqlite3 java版 [sqlite-jdbc-3.7.2.jar](https://bitbucket.org/xerial/sqlite-jdbc)
+- sqlite3 java版 [sqlite-jdbc-3.7.15-M1.jar](https://bitbucket.org/xerial/sqlite-jdbc)
 - kindlegen 程序 这个是amazon公司提供的转换为mobi格式的工具，提供win/linux/mac版，需翻Q下载
-- json库 和 android下的json库是一样滴
+- [JSON-java](https://github.com/douglascrockford/JSON-java)库 和 android下的json库用法是一样滴
 
 
 **更新日志:**
 
+- 2014-08-23: 使用sqlite的内存数据库功能，升级 sqlite-jdbc-xxx.jar，旧的backup和restore数据库到内存数据库有问题，将显示在右侧Table中的消息移到菜单栏显示，并设置颜色，一些小的空指针问题处理，无数据库时建立表结构
 - 2014-08-22: 发布Java-Swing版，和FoxBook-ahk/android共用同一数据库文件，放在FoxBook.jar所在文件夹
 - ...: 懒得写了，就这样吧
 
