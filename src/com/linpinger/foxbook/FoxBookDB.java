@@ -36,11 +36,20 @@ public class FoxBookDB {
                 break;
         }
 
-        int nStartID = 99999;
+        int nStartID = 99000;
+        String MaxID = "";
         if (9 == sortmode) {
-            nStartID = 5 + Integer.valueOf(oDB.getOneCell("select max(id) from page"));
+            MaxID = oDB.getOneCell("select max(id) from page");
+            if (MaxID.isEmpty()) {
+                return;
+            }
+            nStartID = 5 + Integer.valueOf(MaxID);
         } else {
-            nStartID = 5 + Integer.valueOf(oDB.getOneCell("select max(id) from book"));
+            MaxID = oDB.getOneCell("select max(id) from book");
+            if (MaxID.isEmpty()) {
+                return;
+            }
+            nStartID = 5 + Integer.valueOf(MaxID);
         }
         int nStartID1 = nStartID;
         int nStartID2 = nStartID;
@@ -48,6 +57,9 @@ public class FoxBookDB {
         // 获取id列表到数组中
         ArrayList<HashMap<String, Object>> idList = (ArrayList<HashMap<String, Object>>)oDB.getList(sSQL);
         int nRow = idList.size();
+        if ( nRow == 0 ) {
+            return;
+        }
         int[] ids = new int[nRow];
         for (int i = 0; i<nRow; i++ ) {
             ids[i] = Integer.valueOf(idList.get(i).get("id").toString()) ;
@@ -170,5 +182,14 @@ public class FoxBookDB {
         }
         return sitetype;
     }
+    
+    public static void simplifyAllDelList(FoxDB oDB) {
+        List xx = oDB.getList("select ID as id, DelURL as du from book where length(DelURL) > 200");
+        Iterator itr = xx.iterator();
+        while (itr.hasNext()) {
+            HashMap item = (HashMap) itr.next();
+            oDB.execPreOne("update Book set DelURL=? where ID = " + item.get("id").toString(), FoxBookLib.simplifyDelList(item.get("du").toString()));
+        }
+     }
     
 }

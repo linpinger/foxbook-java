@@ -431,13 +431,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBook2Epub = new javax.swing.JMenuItem();
         mBook2Txt = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
-        mPages2Mobi = new javax.swing.JMenuItem();
-        mPages2Epub = new javax.swing.JMenuItem();
-        mPages2txt = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         mPageUpdateOne = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
         mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        mPages2Mobi = new javax.swing.JMenuItem();
+        mPages2Epub = new javax.swing.JMenuItem();
+        mPages2txt = new javax.swing.JMenuItem();
         editBookInfo = new javax.swing.JDialog();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -456,9 +456,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mAll2Epub = new javax.swing.JMenuItem();
         mAll2Txt = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        mDBSortDesc = new javax.swing.JMenuItem();
         mDBSortAsc = new javax.swing.JMenuItem();
+        mDBSortDesc = new javax.swing.JMenuItem();
         mDBRegenPageIDs = new javax.swing.JMenuItem();
+        mDBSimpAllDelList = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mDBVacuum = new javax.swing.JMenuItem();
         mDBSwich = new javax.swing.JMenuItem();
@@ -549,31 +550,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jPopupMenuBook.add(mBook2Txt);
 
-        mPages2Mobi.setText("选中章节转为mobi");
-        mPages2Mobi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mPages2MobiActionPerformed(evt);
-            }
-        });
-        jPopupMenuPage.add(mPages2Mobi);
-
-        mPages2Epub.setText("选中章节转为epub");
-        mPages2Epub.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mPages2EpubActionPerformed(evt);
-            }
-        });
-        jPopupMenuPage.add(mPages2Epub);
-
-        mPages2txt.setText("选中章节转为txt");
-        mPages2txt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mPages2txtActionPerformed(evt);
-            }
-        });
-        jPopupMenuPage.add(mPages2txt);
-        jPopupMenuPage.add(jSeparator5);
-
         mPageUpdateOne.setMnemonic('g');
         mPageUpdateOne.setText("更新本章(G)");
         mPageUpdateOne.addActionListener(new java.awt.event.ActionListener() {
@@ -600,6 +576,31 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuPage.add(mPageDeleteMultiNotUpdate);
+        jPopupMenuPage.add(jSeparator5);
+
+        mPages2Mobi.setText("选中章节转为mobi");
+        mPages2Mobi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPages2MobiActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPages2Mobi);
+
+        mPages2Epub.setText("选中章节转为epub");
+        mPages2Epub.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPages2EpubActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPages2Epub);
+
+        mPages2txt.setText("选中章节转为txt");
+        mPages2txt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPages2txtActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPages2txt);
 
         editBookInfo.setTitle("编辑信息");
         editBookInfo.setLocationByPlatform(true);
@@ -722,14 +723,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenu2.setMnemonic('z');
         jMenu2.setText("数据库(Z)");
 
-        mDBSortDesc.setText("按书籍页数倒序排列");
-        mDBSortDesc.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mDBSortDescActionPerformed(evt);
-            }
-        });
-        jMenu2.add(mDBSortDesc);
-
         mDBSortAsc.setText("按书籍页数顺序排列");
         mDBSortAsc.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -738,6 +731,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jMenu2.add(mDBSortAsc);
 
+        mDBSortDesc.setText("按书籍页数倒序排列");
+        mDBSortDesc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBSortDescActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mDBSortDesc);
+
         mDBRegenPageIDs.setText("重新生成页面ID");
         mDBRegenPageIDs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -745,6 +746,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(mDBRegenPageIDs);
+
+        mDBSimpAllDelList.setText("精简所有DelList");
+        mDBSimpAllDelList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBSimpAllDelListActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mDBSimpAllDelList);
         jMenu2.add(jSeparator1);
 
         mDBVacuum.setText("缩小数据库");
@@ -778,7 +787,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-08-23");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-09-01");
         msg.setToolTipText("★　哈哈我是消息栏");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1229,11 +1238,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tPage.setRowCount(0);
         msg("★　开始重新生成pageID");
         FoxBookDB.regenID(9, oDB);
+        msg("★　开始精简所有DelList");
+        FoxBookDB.simplifyAllDelList(oDB);
         msg("★　开始缩小数据库...");
         double subSize = oDB.vacuumDB();
         long eTime = System.currentTimeMillis() - sTime;
         msg("★　已完成倒序并缩小数据库: " + subSize + " K   耗时(ms): " + eTime);
     }//GEN-LAST:event_mDBQuickAActionPerformed
+
+    private void mDBSimpAllDelListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSimpAllDelListActionPerformed
+        msg("★　开始精简所有DelList");
+        long sTime = System.currentTimeMillis();
+        FoxBookDB.simplifyAllDelList(oDB);
+        long eTime = System.currentTimeMillis() - sTime;
+        msg("★　已精简所有DelList   耗时(ms): " + eTime);
+    }//GEN-LAST:event_mDBSimpAllDelListActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1341,6 +1360,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mBookUpdateTocOne;
     private javax.swing.JMenuItem mDBQuickA;
     private javax.swing.JMenuItem mDBRegenPageIDs;
+    private javax.swing.JMenuItem mDBSimpAllDelList;
     private javax.swing.JMenuItem mDBSortAsc;
     private javax.swing.JMenuItem mDBSortDesc;
     private javax.swing.JMenuItem mDBSwich;

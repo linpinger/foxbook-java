@@ -47,6 +47,7 @@
 
 **更新日志:**
 
+- 2014-09-01: 添加菜单精简所有DelList，并添加进快捷菜单，修复regenID当数据库无记录的异常bug
 - 2014-08-23: 使用sqlite的内存数据库功能，升级 sqlite-jdbc-xxx.jar，旧的backup和restore数据库到内存数据库有问题，将显示在右侧Table中的消息移到菜单栏显示，并设置颜色，一些小的空指针问题处理，无数据库时建立表结构
 - 2014-08-22: 发布Java-Swing版，和FoxBook-ahk/android共用同一数据库文件，放在FoxBook.jar所在文件夹
 - ...: 懒得写了，就这样吧
