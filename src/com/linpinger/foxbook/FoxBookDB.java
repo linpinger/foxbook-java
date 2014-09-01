@@ -35,25 +35,6 @@ public class FoxBookDB {
                 sSQL = "select id as id from page order by bookid,id";
                 break;
         }
-
-        int nStartID = 99000;
-        String MaxID = "";
-        if (9 == sortmode) {
-            MaxID = oDB.getOneCell("select max(id) from page");
-            if (MaxID.isEmpty()) {
-                return;
-            }
-            nStartID = 5 + Integer.valueOf(MaxID);
-        } else {
-            MaxID = oDB.getOneCell("select max(id) from book");
-            if (MaxID.isEmpty()) {
-                return;
-            }
-            nStartID = 5 + Integer.valueOf(MaxID);
-        }
-        int nStartID1 = nStartID;
-        int nStartID2 = nStartID;
-
         // 获取id列表到数组中
         ArrayList<HashMap<String, Object>> idList = (ArrayList<HashMap<String, Object>>)oDB.getList(sSQL);
         int nRow = idList.size();
@@ -64,6 +45,17 @@ public class FoxBookDB {
         for (int i = 0; i<nRow; i++ ) {
             ids[i] = Integer.valueOf(idList.get(i).get("id").toString()) ;
         }
+
+        // 最大ID
+        int nStartID;
+        if (9 == sortmode) {
+            nStartID = 5 + Integer.valueOf(oDB.getOneCell("select max(id) from page"));
+        } else {
+            nStartID = 5 + Integer.valueOf(oDB.getOneCell("select max(id) from book"));
+        }
+        int nStartID1 = nStartID;
+        int nStartID2 = nStartID;
+
 
         Connection conn = oDB.getConnect();
         try {
