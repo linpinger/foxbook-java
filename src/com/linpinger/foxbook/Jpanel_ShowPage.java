@@ -42,8 +42,8 @@ public class Jpanel_ShowPage extends javax.swing.JPanel {
         uContent.setEditable(false);
         uContent.setFont(new java.awt.Font("宋体", 0, 24)); // NOI18N
         uContent.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                uContentKeyReleased(evt);
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                uContentKeyPressed(evt);
             }
         });
         jScrollPane1.setViewportView(uContent);
@@ -60,16 +60,16 @@ public class Jpanel_ShowPage extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void uContentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_uContentKeyReleased
+    private void uContentKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_uContentKeyPressed
         // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_SPACE) {
             JScrollBar ss = jScrollPane1.getVerticalScrollBar();
             ss.setValue(ss.getValue() + ss.getBlockIncrement(JScrollBar.VERTICAL) - 25);
         }
-        if ( evt.getKeyCode() == KeyEvent.VK_ESCAPE ) {
+        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
             this.thisWin.dispose();
         }
-    }//GEN-LAST:event_uContentKeyReleased
+    }//GEN-LAST:event_uContentKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
