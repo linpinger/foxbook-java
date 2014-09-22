@@ -377,6 +377,7 @@ public class FoxEpub {
         }
     }
 
+/*
     public static void main(String[] args) {
 //        FoxEpub oEpub = new FoxEpub("书名是我", "C:\\etc\\xxx.mobi");
         FoxEpub oEpub = new FoxEpub("书名是我", "C:\\etc\\xxx.epub");
@@ -384,5 +385,6 @@ public class FoxEpub {
         oEpub.AddChapter("第2章", "今2天你当天嫩肤流口水司法会计地方<br>\n咖啡碱史蒂22222222文非风机暗示", -1);
         oEpub.SaveTo();
     }
+*/
 }
 

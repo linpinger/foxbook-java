@@ -465,6 +465,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mDBSwich = new javax.swing.JMenuItem();
         jSeparator7 = new javax.swing.JPopupMenu.Separator();
         mDBQuickA = new javax.swing.JMenuItem();
+        mDBQuickD = new javax.swing.JMenuItem();
         msg = new javax.swing.JMenu();
 
         showContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -775,8 +776,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenu2.add(mDBSwich);
         jMenu2.add(jSeparator7);
 
-        mDBQuickA.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.ALT_MASK));
-        mDBQuickA.setText("快捷倒序缩小数据库");
+        mDBQuickA.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, java.awt.event.InputEvent.ALT_MASK));
+        mDBQuickA.setText("快捷顺序缩小数据库");
         mDBQuickA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mDBQuickAActionPerformed(evt);
@@ -784,10 +785,19 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jMenu2.add(mDBQuickA);
 
+        mDBQuickD.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.ALT_MASK));
+        mDBQuickD.setText("快捷倒序缩小数据库");
+        mDBQuickD.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mDBQuickDActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mDBQuickD);
+
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-09-17");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-09-22");
         msg.setToolTipText("★　哈哈我是消息栏");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1229,8 +1239,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         new Thread(new book2ebook(9, 0)).start();
     }//GEN-LAST:event_mAll2TxtActionPerformed
 
-    private void mDBQuickAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBQuickAActionPerformed
-        // TODO add your handling code here:
+    private void mDBQuickDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBQuickDActionPerformed
         long sTime = System.currentTimeMillis();
         msg("★　开始倒序所有书籍...");
         FoxBookDB.regenID(2, oDB);
@@ -1244,7 +1253,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         double subSize = oDB.vacuumDB();
         long eTime = System.currentTimeMillis() - sTime;
         msg("★　已完成倒序并缩小数据库: " + subSize + " K   耗时(ms): " + eTime);
-    }//GEN-LAST:event_mDBQuickAActionPerformed
+    }//GEN-LAST:event_mDBQuickDActionPerformed
 
     private void mDBSimpAllDelListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSimpAllDelListActionPerformed
         msg("★　开始精简所有DelList");
@@ -1253,6 +1262,22 @@ public class FoxMainFrame extends javax.swing.JFrame {
         long eTime = System.currentTimeMillis() - sTime;
         msg("★　已精简所有DelList   耗时(ms): " + eTime);
     }//GEN-LAST:event_mDBSimpAllDelListActionPerformed
+
+    private void mDBQuickAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBQuickAActionPerformed
+        long sTime = System.currentTimeMillis();
+        msg("★　开始顺序所有书籍...");
+        FoxBookDB.regenID(1, oDB);
+        refreshBookList();
+        tPage.setRowCount(0);
+        msg("★　开始重新生成pageID");
+        FoxBookDB.regenID(9, oDB);
+        msg("★　开始精简所有DelList");
+        FoxBookDB.simplifyAllDelList(oDB);
+        msg("★　开始缩小数据库...");
+        double subSize = oDB.vacuumDB();
+        long eTime = System.currentTimeMillis() - sTime;
+        msg("★　已完成顺序并缩小数据库: " + subSize + " K   耗时(ms): " + eTime);
+    }//GEN-LAST:event_mDBQuickAActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1359,6 +1384,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mBookUpdateOne;
     private javax.swing.JMenuItem mBookUpdateTocOne;
     private javax.swing.JMenuItem mDBQuickA;
+    private javax.swing.JMenuItem mDBQuickD;
     private javax.swing.JMenuItem mDBRegenPageIDs;
     private javax.swing.JMenuItem mDBSimpAllDelList;
     private javax.swing.JMenuItem mDBSortAsc;
