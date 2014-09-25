@@ -38,7 +38,7 @@ public class FoxDB {
                 statR.executeUpdate("INSERT INTO Book (Name, URL, QiDianID) VALUES ('狐闹大唐', 'http://read.qidian.com/BookReader/1939238.aspx', '1939238');");
                 statR.close();
                 conn.close();
-            } catch (ClassNotFoundException | SQLException ex) {
+            } catch (Exception ex) {
                 ex.toString();
             }
 
@@ -129,7 +129,7 @@ public class FoxDB {
             Statement statR = conn.createStatement();
             statR.executeUpdate("restore from '" + this.dbPath + "'");
             statR.close();
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (Exception ex) {
             ex.toString();
         }
     }

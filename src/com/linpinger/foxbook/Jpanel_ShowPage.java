@@ -40,7 +40,7 @@ public class Jpanel_ShowPage extends javax.swing.JPanel {
         uContent = new javax.swing.JTextPane();
 
         uContent.setEditable(false);
-        uContent.setFont(new java.awt.Font("宋体", 0, 24)); // NOI18N
+        uContent.setFont(new java.awt.Font("文泉驿正黑", 0, 24)); // NOI18N
         uContent.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 uContentKeyPressed(evt);

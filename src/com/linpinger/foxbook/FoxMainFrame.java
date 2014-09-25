@@ -270,13 +270,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
             lData = FoxBookLib.compare2GetNewPages(lData, existList);
             if (lData.size() > 0) { // 有新章节才写入数据库
                 FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
+                lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )"); // 获取新增章节
             }
-//            System.out.println("任务数:" + cTask);
 
             if (bDownPage) {
-                // 获取新增章节
-                lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )");
                 int cTask = lData.size(); // 总任务数
+//            System.out.println("任务数:" + cTask);
 
                 if (bMultiThreadDownOneBook) { // 当新章节数大于 25章就采用多任务下载模式
                     int nBaseCount = cTask / downThread; //每线程基础任务数
@@ -797,7 +796,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-09-22");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-09-25");
         msg.setToolTipText("★　哈哈我是消息栏");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
