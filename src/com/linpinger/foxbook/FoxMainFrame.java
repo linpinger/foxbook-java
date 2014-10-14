@@ -449,6 +449,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mRefreshBookList = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         mBookShowAll = new javax.swing.JMenuItem();
+        mBookShowSize = new javax.swing.JMenuItem();
         mBookShowLessLen = new javax.swing.JMenuItem();
         mBookUpdateAll = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
@@ -684,6 +685,15 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(mBookShowAll);
 
+        mBookShowSize.setMnemonic('z');
+        mBookShowSize.setText("显示书籍占用空间(Z)");
+        mBookShowSize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookShowSizeActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mBookShowSize);
+
         mBookShowLessLen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
         mBookShowLessLen.setText("显示字数过少章节");
         mBookShowLessLen.addActionListener(new java.awt.event.ActionListener() {
@@ -806,7 +816,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-10-10");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-10-14");
         msg.setToolTipText("★　哈哈我是消息栏");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1299,6 +1309,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
         msg("★　字数少于1K的章节总数: " + rsdata.size());
     }//GEN-LAST:event_mBookShowLessLenActionPerformed
 
+    private void mBookShowSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookShowSizeActionPerformed
+        tPage.setRowCount(0);
+        List rsdata = oDB.getList("select sum(length(p.content)) * 3 / 1024 as ss, p.bookid as bid, b.name as bname from page as p, book as b where b.id=p.bookid group by p.bookid order by ss, p.bookid");
+        Iterator itr = rsdata.iterator();
+        int allSize = 0;
+        int nowSize = 0;
+        while (itr.hasNext()) {
+            HashMap item = (HashMap) itr.next();
+            nowSize = Integer.valueOf(item.get("ss").toString());
+            allSize += nowSize ;
+            tPage.addRow(new Object[]{item.get("bname"), nowSize + " k", 0, item.get("bid"), 0});
+        }
+        msg("★　共占用空间(K): " + allSize);
+    }//GEN-LAST:event_mBookShowSizeActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1401,6 +1426,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mBookNew;
     private javax.swing.JMenuItem mBookShowAll;
     private javax.swing.JMenuItem mBookShowLessLen;
+    private javax.swing.JMenuItem mBookShowSize;
     private javax.swing.JMenuItem mBookUpdateAll;
     private javax.swing.JMenuItem mBookUpdateOne;
     private javax.swing.JMenuItem mBookUpdateTocOne;
