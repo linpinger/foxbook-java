@@ -25,7 +25,6 @@
 -   [源码工程](https://github.com/linpinger/foxbook-java)
 
 -   [文件下载点1:baidu][pan_baidu]
--   [文件下载点2:qiniu](http://linpinger.qiniudn.com/foxbook-java.7z)
 
 **安装及使用方法:**
 
