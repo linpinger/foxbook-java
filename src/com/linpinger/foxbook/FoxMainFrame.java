@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
@@ -438,6 +439,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mPages2Epub = new javax.swing.JMenuItem();
         mPages2txt = new javax.swing.JMenuItem();
         editBookInfo = new javax.swing.JDialog();
+        chooseTxt = new javax.swing.JFileChooser();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         uBook = new javax.swing.JTable();
@@ -447,6 +449,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         mBookNew = new javax.swing.JMenuItem();
         mRefreshBookList = new javax.swing.JMenuItem();
+        mBookImportFromQidianTxt = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         mBookShowAll = new javax.swing.JMenuItem();
         mBookShowSize = new javax.swing.JMenuItem();
@@ -674,6 +677,15 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(mRefreshBookList);
+
+        mBookImportFromQidianTxt.setMnemonic('q');
+        mBookImportFromQidianTxt.setText("导入起点txt(Q)");
+        mBookImportFromQidianTxt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookImportFromQidianTxtActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mBookImportFromQidianTxt);
         jMenu1.add(jSeparator2);
 
         mBookShowAll.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.ALT_MASK));
@@ -816,7 +828,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-10-14");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-10-15");
         msg.setToolTipText("★　哈哈我是消息栏");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1324,6 +1336,17 @@ public class FoxMainFrame extends javax.swing.JFrame {
         msg("★　共占用空间(K): " + allSize);
     }//GEN-LAST:event_mBookShowSizeActionPerformed
 
+    private void mBookImportFromQidianTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookImportFromQidianTxtActionPerformed
+        int returnVal = chooseTxt.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String txtPath = chooseTxt.getSelectedFile().getAbsolutePath();
+            msg("★　开始导入起点Txt文件: " + txtPath);
+            FoxBookDB.importQidianTxt(txtPath, oDB);
+            msg("★　导入起点Txt文件完毕: " + txtPath);
+            refreshBookList();
+        }
+    }//GEN-LAST:event_mBookImportFromQidianTxtActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1398,6 +1421,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.table.DefaultTableModel tBook;
     private javax.swing.table.DefaultTableModel tPage;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFileChooser chooseTxt;
     private javax.swing.JDialog editBookInfo;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -1421,6 +1445,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mBook2Mobi;
     private javax.swing.JMenuItem mBook2Txt;
     private javax.swing.JMenuItem mBookDelete;
+    private javax.swing.JMenuItem mBookImportFromQidianTxt;
     private javax.swing.JMenuItem mBookInfoEditor;
     private javax.swing.JMenuItem mBookMultiThreadUpdateOne;
     private javax.swing.JMenuItem mBookNew;

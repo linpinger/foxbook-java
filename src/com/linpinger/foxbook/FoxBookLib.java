@@ -4,12 +4,15 @@
  */
 package com.linpinger.foxbook;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,6 +30,20 @@ import java.util.zip.GZIPInputStream;
  * @author guanli
  */
 public class FoxBookLib {
+    public static String fileRead(String filePath, String encoding) {
+        StringBuffer retStr = new StringBuffer(102400);
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), encoding));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                retStr.append(line).append("\n");
+            }
+            br.close();
+        } catch (Exception e) {
+            e.toString();
+        }
+        return retStr.toString();
+    }
         public static String simplifyDelList(String DelList) {  // 精简 DelList
         int qi = 0;
         int zhi = 0;

@@ -4,6 +4,10 @@
  */
 package com.linpinger.foxbook;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -21,6 +25,49 @@ import java.util.regex.Pattern;
  * @author guanli
  */
 public class FoxBookDB {
+    public static void importQidianTxt(String txtPath, FoxDB oDB) {
+        File ttt = new File(txtPath);
+        
+        String sQidianid = ttt.getName().replace(".txt", ""); // 文件名
+        String sQidianURL = site_qidian.qidian_getIndexURL_Desk(Integer.valueOf(sQidianid)); // URL
+        String sBookName = sQidianid;
+        try {  // 第一行书名
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(txtPath), "GBK"));
+            sBookName =  br.readLine() ;
+            br.close();
+        } catch (Exception e) {
+            e.toString();
+        }
+        
+        oDB.execPreOne("insert into book (Name, QidianID, URL) values(?, \"" + sQidianid + "\", \"" + sQidianURL +  "\")", sBookName); // 新增书籍
+        String sBookid = oDB.getOneCell("select id from book where qidianid=" + sQidianid); // 获取id
+        
+        String txtContent = FoxBookLib.fileRead(txtPath, "GBK").replace("　　", "").replace("<a href=http://www.qidian.com>起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！</a>", "").replace("<a>手机用户请到m.qidian.com阅读。</a>", "") + "\r\n<end>\r\n" ;
+        
+        String sql = "insert into page(bookid,name,content,CharCount) values(" + sBookid + ",?,?,?);";
+        
+        Connection con = oDB.getConnect();
+
+        try {
+            con.setAutoCommit(false); //设置手工提交事务模式
+            PreparedStatement pstmt = con.prepareStatement(sql);
+
+            Matcher mat = Pattern.compile("(?mi)^([^\\r\\n]+)[\\r\\n]{1,2}更新时间.*$[\\r\\n]{2,4}([^\\a]+?)(?=(^([^\\r\\n]+)[\\r\\n]{1,2}更新时间)|^<end>$)").matcher(txtContent);
+            while (mat.find()) {
+                
+                pstmt.setString(1, mat.group(1));
+                pstmt.setString(2, mat.group(2).replace("\n\n", "\n"));
+                pstmt.setString(3, String.valueOf(mat.group(2).length()));
+                pstmt.executeUpdate();
+            }
+
+            pstmt.close();
+            con.commit(); //提交事务
+        } catch (SQLException ex) {
+            ex.toString();
+        }
+        
+    }
         //"select book.ID from Book left join page on book.id=page.bookid group by book.id order by count(page.id),book.isEnd,book.ID"
     public static void regenID(int sortmode, FoxDB oDB) { // 重新排序bookid ,pageid
         String sSQL = "";
