@@ -42,10 +42,12 @@
 - sqlite3 java版 [sqlite-jdbc-3.7.15-M1.jar](https://bitbucket.org/xerial/sqlite-jdbc)
 - kindlegen 程序 这个是amazon公司提供的转换为mobi格式的工具，提供win/linux/mac版，需翻Q下载
 - [JSON-java](https://github.com/douglascrockford/JSON-java)库 和 android下的json库用法是一样滴
+- icon 全部是从[findicons](http://findicons.com)网站上搜的图标
 
 
 **更新日志:**
 
+- 2014-12-08: 添加: 工具栏
 - 2014-10-15: 添加: 导入起点txt
 - 2014-10-14: 添加: 显示各书籍占用空间，修正: 搜索sogou时显示的多余链接
 - 2014-10-10: 修正: 比较新章节时未小写网址可能造成的无新章节状况，例如起点的网址
