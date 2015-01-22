@@ -36,6 +36,11 @@
 - 制作为mobi/epub/txt格式，如果存在c:\etc就保存到该文件夹，否则就在程序所在目录生成
 - 新增书籍，先输入书名，然后按书名旁边的搜D按钮进入搜索界面，选择搜索渠道，复制目录地址(Ctrl+C)到新增书籍界面的地址栏，保存即可
 
+**其他小提示:**
+
+- Linux下使kindlegen能正确运行: chmod a+x kindlegen  然后添加kindlegen所在路径到 .bashrc中，例如: export PATH="/home/fox/bin:$PATH"
+- Linux下有些中文字体有锯齿，添加这行到.bashrc : export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd'
+- 修改.bashrc后，运行 source .bashrc使其生效
 
 **工程中包含的其他文件:**
 
@@ -47,6 +52,7 @@
 
 **更新日志:**
 
+- 2015-01-22: 修改: 调整工具栏按钮位置，说明添加小提示，便于Linux下使用
 - 2014-12-09: 修改: 工具栏左侧垂直安放，修正: 未释放kindlegen标准输出缓冲区造成的卡死
 - 2014-12-08: 添加: 工具栏
 - 2014-10-15: 添加: 导入起点txt

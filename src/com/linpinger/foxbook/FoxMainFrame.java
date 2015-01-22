@@ -442,12 +442,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
         chooseTxt = new javax.swing.JFileChooser();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         jSeparator8 = new javax.swing.JToolBar.Separator();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         uBook = new javax.swing.JTable();
@@ -656,6 +656,19 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton1);
 
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/refresh_yellow.png"))); // NOI18N
+        jButton3.setMnemonic('d');
+        jButton3.setToolTipText("更新所有 (Alt + D)");
+        jButton3.setFocusable(false);
+        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton3);
+
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/mixx.png"))); // NOI18N
         jButton2.setMnemonic('m');
         jButton2.setToolTipText("所有转为Mobi (Alt + M)");
@@ -669,18 +682,18 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton2);
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/refresh_yellow.png"))); // NOI18N
-        jButton3.setMnemonic('d');
-        jButton3.setToolTipText("更新所有 (Alt + D)");
-        jButton3.setFocusable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/database_refresh.png"))); // NOI18N
+        jButton6.setMnemonic('s');
+        jButton6.setToolTipText("切换数据库 (Alt + S)");
+        jButton6.setFocusable(false);
+        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButton6ActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton3);
+        jToolBar1.add(jButton6);
         jToolBar1.add(jSeparator8);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/sort_up_green.png"))); // NOI18N
@@ -709,19 +722,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton5);
 
-        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/database_refresh.png"))); // NOI18N
-        jButton6.setMnemonic('s');
-        jButton6.setToolTipText("切换数据库 (Alt + S)");
-        jButton6.setFocusable(false);
-        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton6);
-
         jSplitPane1.setDividerLocation(250);
 
         uBook.setModel(tBook);
@@ -745,8 +745,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jScrollPane1.setViewportView(uPage);
 
         jSplitPane1.setRightComponent(jScrollPane1);
-
-        jMenuBar1.setFont(new java.awt.Font("宋体", 1, 12)); // NOI18N
 
         jMenu1.setMnemonic('B');
         jMenu1.setText("书籍(B)");
@@ -919,7 +917,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2014-12-09");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-22");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
