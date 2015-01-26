@@ -1555,6 +1555,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
         uDelList.setText(list.get(0).get("dlist").toString());
 
         jdEditBookInfo.setVisible(true);
+
+        uBookSearch.requestFocusInWindow(); // 设置焦点到搜索按钮上
+
     }//GEN-LAST:event_mBookInfoEditorActionPerformed
 
     private void mBookNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookNewActionPerformed
@@ -2161,6 +2164,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jtaPageContent.setCaretPosition(0); // 跳到头部
 
         jdEditPageInfo.setVisible(true);
+        jbLeanPage.requestFocusInWindow(); // 设置焦点到按钮上
     }//GEN-LAST:event_mPageEditInfoActionPerformed
 
     // 精简章节内容按钮
