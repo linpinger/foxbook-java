@@ -484,6 +484,11 @@
       </Layout>
       <SubComponents>
         <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="null"/>
+            </Property>
+          </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
@@ -493,7 +498,6 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new java.awt.Font(&quot;&#x6587;&#x6cc9;&#x9a7f;&#x6b63;&#x9ed1;&quot;, 0, 24)" type="code"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="&#x7a7a;&#x683c;&#x5411;&#x4e0b;&#x7ffb;&#x9875;&#xff0c;ESC&#x952e;&#x9000;&#x51fa;"/>
               </Properties>
             </Component>
           </SubComponents>

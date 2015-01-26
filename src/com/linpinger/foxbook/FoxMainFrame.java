@@ -922,9 +922,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdShowContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jdShowContent.setTitle("呵呵");
 
+        jScrollPane2.setBorder(null);
+
         uPageContent.setEditable(false);
         uPageContent.setFont(new java.awt.Font("文泉驿正黑", 0, 24));
-        uPageContent.setToolTipText("空格向下翻页，ESC键退出");
         jScrollPane2.setViewportView(uPageContent);
 
         javax.swing.GroupLayout jdShowContentLayout = new javax.swing.GroupLayout(jdShowContent.getContentPane());
