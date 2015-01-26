@@ -423,6 +423,18 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         // } 搜索书籍
+        
+        // { 编辑章节信息
+        jdEditPageInfo.setSize(jdEditPageInfo.getPreferredSize());
+        jdEditPageInfo.setLocationRelativeTo(null);
+        // ESC 退出子窗口
+        jdEditPageInfo.getRootPane().registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jdEditPageInfo.dispose();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        // } 编辑章节信息
+        
     }
 
     public void refreshBookList() {
@@ -487,9 +499,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jdShowContent = new javax.swing.JDialog();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        uPageContent = new javax.swing.JTextPane();
         jPopupMenuBook = new javax.swing.JPopupMenu();
         mBookUpdateOne = new javax.swing.JMenuItem();
         mBookUpdateTocOne = new javax.swing.JMenuItem();
@@ -503,12 +512,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBook2Txt = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
         mPageUpdateOne = new javax.swing.JMenuItem();
+        mPageEditInfo = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
         mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
         mPages2Mobi = new javax.swing.JMenuItem();
         mPages2Epub = new javax.swing.JMenuItem();
         mPages2txt = new javax.swing.JMenuItem();
+        chooseTxt = new javax.swing.JFileChooser();
         jdEditBookInfo = new javax.swing.JDialog();
         jPanel1 = new javax.swing.JPanel();
         uBookID = new javax.swing.JLabel();
@@ -522,7 +533,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
         uDelListScrool = new javax.swing.JScrollPane();
         uDelList = new javax.swing.JTextArea();
-        chooseTxt = new javax.swing.JFileChooser();
         jdSearchBook = new javax.swing.JDialog();
         uSearchType = new javax.swing.JComboBox();
         uSearchString = new javax.swing.JComboBox();
@@ -530,6 +540,20 @@ public class FoxMainFrame extends javax.swing.JFrame {
         uSearchIt = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         uList = new javax.swing.JTable();
+        jdShowContent = new javax.swing.JDialog();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        uPageContent = new javax.swing.JTextPane();
+        jdEditPageInfo = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
+        jlPID = new javax.swing.JLabel();
+        jtfBID = new javax.swing.JTextField();
+        jtfPName = new javax.swing.JTextField();
+        jtfCharCount = new javax.swing.JTextField();
+        jtfPURL = new javax.swing.JTextField();
+        jbLeanPage = new javax.swing.JButton();
+        jbSavePage = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jtaPageContent = new javax.swing.JTextArea();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -569,25 +593,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mDBQuickA = new javax.swing.JMenuItem();
         mDBQuickD = new javax.swing.JMenuItem();
         msg = new javax.swing.JMenu();
-
-        jdShowContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        jdShowContent.setTitle("呵呵");
-
-        uPageContent.setEditable(false);
-        uPageContent.setFont(new java.awt.Font("文泉驿正黑", 0, 24));
-        uPageContent.setToolTipText("空格向下翻页，ESC键退出");
-        jScrollPane2.setViewportView(uPageContent);
-
-        javax.swing.GroupLayout jdShowContentLayout = new javax.swing.GroupLayout(jdShowContent.getContentPane());
-        jdShowContent.getContentPane().setLayout(jdShowContentLayout);
-        jdShowContentLayout.setHorizontalGroup(
-            jdShowContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
-        );
-        jdShowContentLayout.setVerticalGroup(
-            jdShowContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
-        );
 
         mBookUpdateOne.setMnemonic('g');
         mBookUpdateOne.setText("更新本书(G)");
@@ -666,6 +671,15 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuPage.add(mPageUpdateOne);
+
+        mPageEditInfo.setMnemonic('e');
+        mPageEditInfo.setText("编辑本章(E)");
+        mPageEditInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPageEditInfoActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPageEditInfo);
 
         mPageDeleteMulti.setMnemonic('d');
         mPageDeleteMulti.setText("删除选择的章节(D)");
@@ -902,6 +916,137 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     .addComponent(uSearchBookURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jdShowContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        jdShowContent.setTitle("呵呵");
+
+        uPageContent.setEditable(false);
+        uPageContent.setFont(new java.awt.Font("文泉驿正黑", 0, 24));
+        uPageContent.setToolTipText("空格向下翻页，ESC键退出");
+        jScrollPane2.setViewportView(uPageContent);
+
+        javax.swing.GroupLayout jdShowContentLayout = new javax.swing.GroupLayout(jdShowContent.getContentPane());
+        jdShowContent.getContentPane().setLayout(jdShowContentLayout);
+        jdShowContentLayout.setHorizontalGroup(
+            jdShowContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+        );
+        jdShowContentLayout.setVerticalGroup(
+            jdShowContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
+        );
+
+        jdEditPageInfo.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        jdEditPageInfo.setTitle("编辑章节信息");
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), new java.awt.Color(0, 0, 255))); // NOI18N
+
+        jlPID.setText("Page");
+        jlPID.setToolTipText("PageID");
+
+        jtfBID.setText("BID");
+        jtfBID.setToolTipText("BookID");
+
+        jtfPName.setText("PageName");
+        jtfPName.setToolTipText("章节名");
+
+        jtfCharCount.setText("Count");
+        jtfCharCount.setToolTipText("章节字数");
+
+        jtfPURL.setText("PageURL");
+        jtfPURL.setToolTipText("章节内容地址");
+
+        jbLeanPage.setMnemonic('r');
+        jbLeanPage.setText("R");
+        jbLeanPage.setToolTipText("精简内容");
+        jbLeanPage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbLeanPageActionPerformed(evt);
+            }
+        });
+
+        jbSavePage.setMnemonic('s');
+        jbSavePage.setText("保存(S)");
+        jbSavePage.setToolTipText("保存所有修改的内容");
+        jbSavePage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSavePageActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jlPID)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jtfBID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jtfPName, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jtfPURL, javax.swing.GroupLayout.PREFERRED_SIZE, 480, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jtfCharCount, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jbLeanPage, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jbSavePage)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jlPID, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jtfBID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jtfPName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(10, 10, 10))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(jtfCharCount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jtfPURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jbLeanPage, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jbSavePage, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        jScrollPane5.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        jtaPageContent.setColumns(20);
+        jtaPageContent.setFont(new java.awt.Font("宋体", 0, 16)); // NOI18N
+        jtaPageContent.setLineWrap(true);
+        jtaPageContent.setRows(5);
+        jScrollPane5.setViewportView(jtaPageContent);
+
+        javax.swing.GroupLayout jdEditPageInfoLayout = new javax.swing.GroupLayout(jdEditPageInfo.getContentPane());
+        jdEditPageInfo.getContentPane().setLayout(jdEditPageInfoLayout);
+        jdEditPageInfoLayout.setHorizontalGroup(
+            jdEditPageInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jdEditPageInfoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jdEditPageInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane5)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jdEditPageInfoLayout.setVerticalGroup(
+            jdEditPageInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdEditPageInfoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1193,7 +1338,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-25");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-26");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -2002,6 +2147,37 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_uListMouseClicked
 
+    private void mPageEditInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageEditInfoActionPerformed
+        int nRow = uPage.getSelectedRow();
+        String nPageID = uPage.getValueAt(nRow, 2).toString();
+
+        jlPID.setText(nPageID);
+        ArrayList<HashMap<String, Object>> list = (ArrayList<HashMap<String, Object>>) oDB.getList("select bookid as bid, name as name, url as url, CharCount as cc, Content as ct from page where id=" + nPageID);
+        jtfBID.setText(list.get(0).get("bid").toString());
+        jtfPName.setText(list.get(0).get("name").toString());
+        jtfCharCount.setText(list.get(0).get("cc").toString());
+        jtfPURL.setText(list.get(0).get("url").toString());
+        jtaPageContent.setText(list.get(0).get("ct").toString());
+        jtaPageContent.setCaretPosition(0); // 跳到头部
+
+        jdEditPageInfo.setVisible(true);
+    }//GEN-LAST:event_mPageEditInfoActionPerformed
+
+    // 精简章节内容按钮
+    private void jbLeanPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbLeanPageActionPerformed
+        String pc = jtaPageContent.getText();
+        pc = pc.replaceAll("\r", "").replaceAll("\n\n", "\n").replaceAll("　", "").replaceAll("\n ", "\n");
+        jtaPageContent.setText(pc);
+        jtaPageContent.setCaretPosition(0); // 跳到头部
+    }//GEN-LAST:event_jbLeanPageActionPerformed
+
+    // Page保存退出按钮
+    private void jbSavePageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSavePageActionPerformed
+        String pageid = jlPID.getText();
+        oDB.execPreOne("update page set Content=?, name=\"" + jtfPName.getText() + "\", BookID=" + jtfBID.getText() + ", CharCount=" + jtfCharCount.getText()  + ", url=\"" + jtfPURL.getText() + "\" where id=" + pageid, jtaPageContent.getText());
+        jdEditPageInfo.dispose();
+    }//GEN-LAST:event_jbSavePageActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2101,12 +2277,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPopupMenu jPopupMenuBook;
     private javax.swing.JPopupMenu jPopupMenuPage;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
@@ -2117,9 +2295,18 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator8;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JButton jbLeanPage;
+    private javax.swing.JButton jbSavePage;
     private javax.swing.JDialog jdEditBookInfo;
+    private javax.swing.JDialog jdEditPageInfo;
     private javax.swing.JDialog jdSearchBook;
     private javax.swing.JDialog jdShowContent;
+    private javax.swing.JLabel jlPID;
+    private javax.swing.JTextArea jtaPageContent;
+    private javax.swing.JTextField jtfBID;
+    private javax.swing.JTextField jtfCharCount;
+    private javax.swing.JTextField jtfPName;
+    private javax.swing.JTextField jtfPURL;
     private javax.swing.JMenuItem mAll2Epub;
     private javax.swing.JMenuItem mAll2Mobi;
     private javax.swing.JMenuItem mAll2Txt;
@@ -2147,6 +2334,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mDBVacuum;
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
+    private javax.swing.JMenuItem mPageEditInfo;
     private javax.swing.JMenuItem mPageUpdateOne;
     private javax.swing.JMenuItem mPages2Epub;
     private javax.swing.JMenuItem mPages2Mobi;

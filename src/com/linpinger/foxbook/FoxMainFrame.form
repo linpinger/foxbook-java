@@ -2,42 +2,6 @@
 
 <Form version="1.6" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Container class="javax.swing.JDialog" name="jdShowContent">
-      <Properties>
-        <Property name="defaultCloseOperation" type="int" value="2"/>
-        <Property name="title" type="java.lang.String" value="&#x5475;&#x5475;"/>
-      </Properties>
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jScrollPane2" alignment="0" pref="800" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jScrollPane2" alignment="0" pref="555" max="32767" attributes="0"/>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane2">
-
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-          <SubComponents>
-            <Component class="javax.swing.JTextPane" name="uPageContent">
-              <Properties>
-                <Property name="editable" type="boolean" value="false"/>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new java.awt.Font(&quot;&#x6587;&#x6cc9;&#x9a7f;&#x6b63;&#x9ed1;&quot;, 0, 24)" type="code"/>
-                </Property>
-                <Property name="toolTipText" type="java.lang.String" value="&#x7a7a;&#x683c;&#x5411;&#x4e0b;&#x7ffb;&#x9875;&#xff0c;ESC&#x952e;&#x9000;&#x51fa;"/>
-              </Properties>
-            </Component>
-          </SubComponents>
-        </Container>
-      </SubComponents>
-    </Container>
     <Container class="javax.swing.JPopupMenu" name="jPopupMenuBook">
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
@@ -132,6 +96,15 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mPageUpdateOneActionPerformed"/>
           </Events>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="mPageEditInfo">
+          <Properties>
+            <Property name="mnemonic" type="int" value="101"/>
+            <Property name="text" type="java.lang.String" value="&#x7f16;&#x8f91;&#x672c;&#x7ae0;(E)"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mPageEditInfoActionPerformed"/>
+          </Events>
+        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="mPageDeleteMulti">
           <Properties>
             <Property name="mnemonic" type="int" value="100"/>
@@ -178,6 +151,8 @@
         </MenuItem>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JFileChooser" name="chooseTxt">
+    </Component>
     <Container class="javax.swing.JDialog" name="jdEditBookInfo">
       <Properties>
         <Property name="title" type="java.lang.String" value="&#x7f16;&#x8f91;&#x4fe1;&#x606f;"/>
@@ -379,8 +354,6 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JFileChooser" name="chooseTxt">
-    </Component>
     <Container class="javax.swing.JDialog" name="jdSearchBook">
       <Properties>
         <Property name="defaultCloseOperation" type="int" value="2"/>
@@ -486,6 +459,218 @@
               <Events>
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="uListMouseClicked"/>
               </Events>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JDialog" name="jdShowContent">
+      <Properties>
+        <Property name="defaultCloseOperation" type="int" value="2"/>
+        <Property name="title" type="java.lang.String" value="&#x5475;&#x5475;"/>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jScrollPane2" alignment="0" pref="800" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jScrollPane2" alignment="0" pref="555" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Container class="javax.swing.JScrollPane" name="jScrollPane2">
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+          <SubComponents>
+            <Component class="javax.swing.JTextPane" name="uPageContent">
+              <Properties>
+                <Property name="editable" type="boolean" value="false"/>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new java.awt.Font(&quot;&#x6587;&#x6cc9;&#x9a7f;&#x6b63;&#x9ed1;&quot;, 0, 24)" type="code"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" value="&#x7a7a;&#x683c;&#x5411;&#x4e0b;&#x7ffb;&#x9875;&#xff0c;ESC&#x952e;&#x9000;&#x51fa;"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JDialog" name="jdEditPageInfo">
+      <Properties>
+        <Property name="defaultCloseOperation" type="int" value="2"/>
+        <Property name="title" type="java.lang.String" value="&#x7f16;&#x8f91;&#x7ae0;&#x8282;&#x4fe1;&#x606f;"/>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="jScrollPane5" max="32767" attributes="0"/>
+                      <Component id="jPanel2" max="32767" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jScrollPane5" pref="343" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Container class="javax.swing.JPanel" name="jPanel2">
+          <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                <TitledBorder title="PageID | BookID | Name | CharCount | URL">
+                  <Color PropertyName="color" blue="ff" green="0" red="0" type="rgb"/>
+                </TitledBorder>
+              </Border>
+            </Property>
+          </Properties>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="jlPID" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jtfBID" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jtfPName" min="-2" pref="434" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="jtfPURL" min="-2" pref="480" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jtfCharCount" alignment="0" min="-2" pref="52" max="-2" attributes="0"/>
+                          <Component id="jbLeanPage" alignment="0" min="-2" pref="53" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="jbSavePage" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="1" attributes="0">
+                                          <Component id="jlPID" alignment="1" min="-2" pref="21" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="3" attributes="0">
+                                              <Component id="jtfBID" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jtfPName" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="jtfCharCount" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jtfPURL" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jbLeanPage" alignment="3" min="-2" pref="21" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Component id="jbSavePage" alignment="0" min="-2" pref="52" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JLabel" name="jlPID">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Page"/>
+                <Property name="toolTipText" type="java.lang.String" value="PageID"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="jtfBID">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="BID"/>
+                <Property name="toolTipText" type="java.lang.String" value="BookID"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="jtfPName">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="PageName"/>
+                <Property name="toolTipText" type="java.lang.String" value="&#x7ae0;&#x8282;&#x540d;"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="jtfCharCount">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Count"/>
+                <Property name="toolTipText" type="java.lang.String" value="&#x7ae0;&#x8282;&#x5b57;&#x6570;"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="jtfPURL">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="PageURL"/>
+                <Property name="toolTipText" type="java.lang.String" value="&#x7ae0;&#x8282;&#x5185;&#x5bb9;&#x5730;&#x5740;"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="jbLeanPage">
+              <Properties>
+                <Property name="mnemonic" type="int" value="114"/>
+                <Property name="text" type="java.lang.String" value="R"/>
+                <Property name="toolTipText" type="java.lang.String" value="&#x7cbe;&#x7b80;&#x5185;&#x5bb9;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbLeanPageActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="jbSavePage">
+              <Properties>
+                <Property name="mnemonic" type="int" value="115"/>
+                <Property name="text" type="java.lang.String" value="&#x4fdd;&#x5b58;(S)"/>
+                <Property name="toolTipText" type="java.lang.String" value="&#x4fdd;&#x5b58;&#x6240;&#x6709;&#x4fee;&#x6539;&#x7684;&#x5185;&#x5bb9;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSavePageActionPerformed"/>
+              </Events>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JScrollPane" name="jScrollPane5">
+          <Properties>
+            <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
+          </Properties>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+          <SubComponents>
+            <Component class="javax.swing.JTextArea" name="jtaPageContent">
+              <Properties>
+                <Property name="columns" type="int" value="20"/>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="&#x5b8b;&#x4f53;" size="16" style="0"/>
+                </Property>
+                <Property name="lineWrap" type="boolean" value="true"/>
+                <Property name="rows" type="int" value="5"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>
@@ -694,7 +879,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="0" red="0" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2015-01-25"/>
+            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2015-01-26"/>
             <Property name="toolTipText" type="java.lang.String" value="&#x2605;&#x3000;&#x54c8;&#x54c8;&#x6211;&#x662f;&#x6d88;&#x606f;&#x680f;&#xff0c;&#x6211;&#x603b;&#x662f;&#x840c;&#x840c;&#x54d2;"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="10"/>
