@@ -4,24 +4,27 @@
  */
 package com.linpinger.foxbook;
 
-import static com.linpinger.foxbook.FoxBookLib.getFullURL;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-/**
- *
- * @author guanli
- */
 public class FoxMainFrame extends javax.swing.JFrame {
     //	private final int SITE_EASOU = 11 ;
 
@@ -30,13 +33,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
     public final int downThread = 9;  // 页面下载任务线程数
     public int leftThread = downThread;
 
-	private void msg(String inMsg) {
-		msg.setText(inMsg);
-//		tPage.addRow(new Object[]{inMsg});
-	}
+    private void msg(String inMsg) {
+        msg.setText(inMsg);
+//	tPage.addRow(new Object[]{inMsg});
+    }
 
     public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
-
         public void run() {
             List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 
@@ -111,7 +113,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             try {
                 nowUP.join();
             } catch (InterruptedException ex) {
-                Logger.getLogger(FoxMainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                ex.toString();
             }
 
             SwingUtilities.invokeLater(new Runnable() {
@@ -152,7 +154,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             try {
                 nowUP.join();
             } catch (InterruptedException ex) {
-				ex.toString();
+                ex.toString();
             }
             /*
              SwingUtilities.invokeLater(new Runnable() {
@@ -323,7 +325,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                         ++nowCount;
 
-                        pageLen = FoxBookLib.updatepage(getFullURL(bookUrl, nowURL), nowpageid, oDB);
+                        pageLen = FoxBookLib.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
 
                         final Object data[] = new Object[]{nn.get("name"), pageLen, nn.get("id"), bookName, nn.get("url")};
                         SwingUtilities.invokeLater(new Runnable() {
@@ -358,16 +360,69 @@ public class FoxMainFrame extends javax.swing.JFrame {
     public FoxMainFrame() {
         FoxInit();
         initComponents();
+        this.setLocationRelativeTo(null); // 屏幕居中显示
 
-        // 设置宽度
+        // 设置LV列宽度
         TableColumnModel tcmL = uBook.getTableHeader().getColumnModel();
         tcmL.getColumn(0).setPreferredWidth(200);
         tcmL.getColumn(2).setPreferredWidth(40);
+        
         TableColumnModel tcmR = uPage.getTableHeader().getColumnModel();
         tcmR.getColumn(0).setPreferredWidth(300);
         tcmR.getColumn(2).setPreferredWidth(40);
         tcmR.getColumn(3).setPreferredWidth(150);
-        this.setLocationRelativeTo(null); // 屏幕居中显示
+ 
+ 
+        // 设置宽度
+        TableColumnModel tcmX = uList.getTableHeader().getColumnModel();
+        tcmX.getColumn(0).setPreferredWidth(60);
+        tcmX.getColumn(1).setPreferredWidth(400);
+        tcmX.getColumn(2).setPreferredWidth(350);
+        
+
+
+        // { 显示内容
+        jdShowContent.setSize(jdShowContent.getPreferredSize());
+        jdShowContent.setLocationRelativeTo(null);
+
+        // ESC 退出子窗口
+        jdShowContent.getRootPane().registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jdShowContent.dispose();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        // SPACE 翻页
+        jdShowContent.getRootPane().registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JScrollBar ss = jScrollPane2.getVerticalScrollBar();
+                ss.setValue(ss.getValue() + ss.getBlockIncrement(JScrollBar.VERTICAL) - 25);
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        // } 显示内容
+        
+        // { 编辑书籍信息
+        jdEditBookInfo.setSize(jdEditBookInfo.getPreferredSize());
+        jdEditBookInfo.setLocationRelativeTo(null);
+        // ESC 退出子窗口
+        jdEditBookInfo.getRootPane().registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jdEditBookInfo.dispose();
+ //               FoxDialogEditBookInfoSaveInfo(); // 退出保存到数据库
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        // } 编辑书籍信息
+        
+        // { 搜索书籍
+        jdSearchBook.setSize(jdSearchBook.getPreferredSize());
+        jdSearchBook.setLocationRelativeTo(null);
+        jdSearchBook.getRootPane().registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jdSearchBook.dispose();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        // } 搜索书籍
     }
 
     public void refreshBookList() {
@@ -404,7 +459,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 return canEdit[columnIndex];
             }
         };
+        
+        tList = new javax.swing.table.DefaultTableModel(null, new String[]{
+            "类型", "URL", "标题"
+        }) {
+            boolean[] canEdit = new boolean[]{
+                false, false, false
+            };
 
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
+            }
+        };
+
+
+        
         oDB = new FoxDB();
         refreshBookList();
     }
@@ -418,7 +487,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        showContent = new javax.swing.JDialog();
+        jdShowContent = new javax.swing.JDialog();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        uPageContent = new javax.swing.JTextPane();
         jPopupMenuBook = new javax.swing.JPopupMenu();
         mBookUpdateOne = new javax.swing.JMenuItem();
         mBookUpdateTocOne = new javax.swing.JMenuItem();
@@ -438,8 +509,27 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mPages2Mobi = new javax.swing.JMenuItem();
         mPages2Epub = new javax.swing.JMenuItem();
         mPages2txt = new javax.swing.JMenuItem();
-        editBookInfo = new javax.swing.JDialog();
+        jdEditBookInfo = new javax.swing.JDialog();
+        jPanel1 = new javax.swing.JPanel();
+        uBookID = new javax.swing.JLabel();
+        uBookName = new javax.swing.JTextField();
+        uBookSearch = new javax.swing.JButton();
+        uQidianID = new javax.swing.JTextField();
+        uQidianIDProc = new javax.swing.JButton();
+        uBookURL = new javax.swing.JTextField();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        uDelListScrool = new javax.swing.JScrollPane();
+        uDelList = new javax.swing.JTextArea();
         chooseTxt = new javax.swing.JFileChooser();
+        jdSearchBook = new javax.swing.JDialog();
+        uSearchType = new javax.swing.JComboBox();
+        uSearchString = new javax.swing.JComboBox();
+        uSearchBookURL = new javax.swing.JTextField();
+        uSearchIt = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        uList = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -480,18 +570,23 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mDBQuickD = new javax.swing.JMenuItem();
         msg = new javax.swing.JMenu();
 
-        showContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        showContent.setTitle("呵呵");
+        jdShowContent.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        jdShowContent.setTitle("呵呵");
 
-        javax.swing.GroupLayout showContentLayout = new javax.swing.GroupLayout(showContent.getContentPane());
-        showContent.getContentPane().setLayout(showContentLayout);
-        showContentLayout.setHorizontalGroup(
-            showContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        uPageContent.setEditable(false);
+        uPageContent.setFont(new java.awt.Font("文泉驿正黑", 0, 24));
+        uPageContent.setToolTipText("空格向下翻页，ESC键退出");
+        jScrollPane2.setViewportView(uPageContent);
+
+        javax.swing.GroupLayout jdShowContentLayout = new javax.swing.GroupLayout(jdShowContent.getContentPane());
+        jdShowContent.getContentPane().setLayout(jdShowContentLayout);
+        jdShowContentLayout.setHorizontalGroup(
+            jdShowContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
         );
-        showContentLayout.setVerticalGroup(
-            showContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jdShowContentLayout.setVerticalGroup(
+            jdShowContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
         );
 
         mBookUpdateOne.setMnemonic('g');
@@ -615,18 +710,199 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jPopupMenuPage.add(mPages2txt);
 
-        editBookInfo.setTitle("编辑信息");
-        editBookInfo.setLocationByPlatform(true);
+        jdEditBookInfo.setTitle("编辑信息");
 
-        javax.swing.GroupLayout editBookInfoLayout = new javax.swing.GroupLayout(editBookInfo.getContentPane());
-        editBookInfo.getContentPane().setLayout(editBookInfoLayout);
-        editBookInfoLayout.setHorizontalGroup(
-            editBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), new java.awt.Color(0, 0, 255))); // NOI18N
+
+        uBookID.setText("xx");
+        uBookID.setToolTipText("BookID");
+
+        uBookName.setText("BookName");
+        uBookName.setToolTipText("书名");
+
+        uBookSearch.setMnemonic('d');
+        uBookSearch.setText("搜D");
+        uBookSearch.setToolTipText("搜索左侧小说名");
+        uBookSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uBookSearchActionPerformed(evt);
+            }
+        });
+
+        uQidianID.setText("QidianID");
+        uQidianID.setToolTipText("起点书号，可在这里粘贴地址，按右边按钮得到");
+
+        uQidianIDProc.setMnemonic('q');
+        uQidianIDProc.setText("QD");
+        uQidianIDProc.setToolTipText("将书籍地址复制到左边，按我来得到起点书号");
+        uQidianIDProc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uQidianIDProcActionPerformed(evt);
+            }
+        });
+
+        uBookURL.setText("URL");
+        uBookURL.setToolTipText("目录页地址");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(8, 8, 8)
+                        .addComponent(uBookID, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)
+                        .addComponent(uBookName, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(uBookSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(uQidianID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(uQidianIDProc))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(uBookURL, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
-        editBookInfoLayout.setVerticalGroup(
-            editBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(uBookID, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uBookName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uBookSearch)
+                    .addComponent(uQidianID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uQidianIDProc))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(uBookURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jButton7.setMnemonic('f');
+        jButton7.setText("减肥(F)");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
+        jButton8.setMnemonic('c');
+        jButton8.setText("清空(C)");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
+        jButton9.setMnemonic('s');
+        jButton9.setText("保存(S)");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+
+        uDelList.setColumns(20);
+        uDelList.setRows(5);
+        uDelListScrool.setViewportView(uDelList);
+
+        javax.swing.GroupLayout jdEditBookInfoLayout = new javax.swing.GroupLayout(jdEditBookInfo.getContentPane());
+        jdEditBookInfo.getContentPane().setLayout(jdEditBookInfoLayout);
+        jdEditBookInfoLayout.setHorizontalGroup(
+            jdEditBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdEditBookInfoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jdEditBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(uDelListScrool)
+                    .addGroup(jdEditBookInfoLayout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jdEditBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jdEditBookInfoLayout.setVerticalGroup(
+            jdEditBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdEditBookInfoLayout.createSequentialGroup()
+                .addGroup(jdEditBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jdEditBookInfoLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jdEditBookInfoLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(jdEditBookInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jdEditBookInfoLayout.createSequentialGroup()
+                                .addComponent(jButton7)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton8))
+                            .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(uDelListScrool, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jdSearchBook.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        uSearchType.setMaximumRowCount(15);
+        uSearchType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "S:起点中文", "S:追书神器", "S:快读", "S:宜搜", "E:SoGou", "E:Yahoo", "E:Bing", "E:soso", "E:baidu", "E:so", "E:pangusou" }));
+
+        uSearchString.setEditable(true);
+        uSearchString.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "书名", "书名 site:qidian.com" }));
+
+        uSearchBookURL.setText("最终书籍URL，复制我哦");
+
+        uSearchIt.setMnemonic('s');
+        uSearchIt.setText("搜索(S)");
+        uSearchIt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uSearchItActionPerformed(evt);
+            }
+        });
+
+        uList.setModel(tList);
+        uList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                uListMouseClicked(evt);
+            }
+        });
+        jScrollPane4.setViewportView(uList);
+
+        javax.swing.GroupLayout jdSearchBookLayout = new javax.swing.GroupLayout(jdSearchBook.getContentPane());
+        jdSearchBook.getContentPane().setLayout(jdSearchBookLayout);
+        jdSearchBookLayout.setHorizontalGroup(
+            jdSearchBookLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdSearchBookLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jdSearchBookLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 849, Short.MAX_VALUE)
+                    .addGroup(jdSearchBookLayout.createSequentialGroup()
+                        .addComponent(uSearchType, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(uSearchString, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(uSearchBookURL)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(uSearchIt)))
+                .addContainerGap())
+        );
+        jdSearchBookLayout.setVerticalGroup(
+            jdSearchBookLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdSearchBookLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jdSearchBookLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(uSearchType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uSearchString, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uSearchIt)
+                    .addComponent(uSearchBookURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -917,7 +1193,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-22");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-25");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -980,11 +1256,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
             if (null == mm.get("cc")) {
                 return;
             }
-            Jpanel_ShowPage sp = new Jpanel_ShowPage(mm.get("name").toString() + "\n\n" + mm.get("cc").toString(), showContent);
-            showContent.setContentPane(sp);
-            showContent.setSize(sp.getPreferredSize());
-            showContent.setLocationRelativeTo(null);
-            showContent.setVisible(true);
+            
+            String cc = mm.get("name").toString() + "\n\n" + mm.get("cc").toString();
+            uPageContent.setText(cc.replace("\n", "\n　　"));
+            uPageContent.setCaretPosition(0); // 跳到头部
+            jdShowContent.setVisible(true);
+
+ 
         }
         if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
             int nSel = uPage.getSelectedRowCount();
@@ -1120,25 +1398,28 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBookMultiThreadUpdateOneActionPerformed
 
     private void mBookInfoEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookInfoEditorActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
-        String nBookName = uBook.getValueAt(nRow, 0).toString();
+//        String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
-        JPanel_BookInfoEditor edtBI = new JPanel_BookInfoEditor(Integer.valueOf(nBookID), oDB, editBookInfo);
-        editBookInfo.setContentPane(edtBI);
-        editBookInfo.setSize(edtBI.getPreferredSize());
-        editBookInfo.setLocationRelativeTo(null);
-        editBookInfo.setVisible(true);
+        uBookID.setText(nBookID);
+        ArrayList<HashMap<String, Object>> list = (ArrayList<HashMap<String, Object>>) oDB.getList("select name as name, url as url, DelURL as dlist, QidianID as qid from book where id=" + nBookID);
+        uBookName.setText(list.get(0).get("name").toString());
+        uQidianID.setText(list.get(0).get("qid").toString());
+        uBookURL.setText(list.get(0).get("url").toString());
+        uDelList.setText(list.get(0).get("dlist").toString());
+
+        jdEditBookInfo.setVisible(true);
     }//GEN-LAST:event_mBookInfoEditorActionPerformed
 
     private void mBookNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookNewActionPerformed
-        // TODO add your handling code here:
-        JPanel_BookInfoEditor edtBI = new JPanel_BookInfoEditor(0, oDB, editBookInfo);
-        editBookInfo.setContentPane(edtBI);
-        editBookInfo.setSize(edtBI.getPreferredSize());
-        editBookInfo.setLocationRelativeTo(null);
-        editBookInfo.setVisible(true);
+        uBookID.setText("0");
+        uBookName.setText("书名");
+        uQidianID.setText("起点书号");
+        uBookURL.setText("目录地址");
+        uDelList.setText("");
+     
+        jdEditBookInfo.setVisible(true);
     }//GEN-LAST:event_mBookNewActionPerformed
 
     private void mRefreshBookListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRefreshBookListActionPerformed
@@ -1480,16 +1761,252 @@ public class FoxMainFrame extends javax.swing.JFrame {
         fSwitchDB() ; // 切换数据库
     }//GEN-LAST:event_jButton6ActionPerformed
 
+    private void uBookSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uBookSearchActionPerformed
+        uSearchString.insertItemAt(uBookName.getText(), 0); // 设置要搜索的书名
+        uSearchString.setSelectedIndex(0);
+        jdSearchBook.setVisible(true);
+    }//GEN-LAST:event_uBookSearchActionPerformed
+
+    private void uQidianIDProcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uQidianIDProcActionPerformed
+        int qidianid = site_qidian.qidian_getBookID_FromURL(uQidianID.getText());
+        uQidianID.setText(String.valueOf(qidianid));
+    }//GEN-LAST:event_uQidianIDProcActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        uDelList.setText(FoxBookLib.simplifyDelList(uDelList.getText()));
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        uDelList.setText("");
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    // 退出保存到数据库
+    private void FoxDialogEditBookInfoSaveInfo() {
+        String bookid = uBookID.getText();
+        if ( bookid.equalsIgnoreCase("0") ) { // 添加书籍
+            oDB.execPreOne("insert into book (DelURL, Name, QidianID, URL) values(?, \"" + uBookName.getText() + "\", \"" + uQidianID.getText() + "\", \"" + uBookURL.getText() + "\")", uDelList.getText());
+        } else {
+            oDB.execPreOne("update book set DelURL=?, name=\"" + uBookName.getText() + "\", qidianid=\"" + uQidianID.getText() + "\", url=\"" + uBookURL.getText() + "\" where id=" + bookid, uDelList.getText());
+        }
+        jdEditBookInfo.dispose();
+        refreshBookList();
+    }
+    
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        FoxDialogEditBookInfoSaveInfo(); // 退出保存到数据库
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void uSearchItActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uSearchItActionPerformed
+        // TODO add your handling code here:
+        String siteType = uSearchType.getSelectedItem().toString();
+        String SearchString = uSearchString.getSelectedItem().toString();
+
+        String html = "";
+        String seURL = "";
+        if (siteType.contains("E:")) { // 搜索引擎
+            try {
+                if (siteType.equalsIgnoreCase("E:SoGou")) {
+                    seURL = "http://www.sogou.com/web?query=" + URLEncoder.encode(SearchString, "GB2312") + "&num=50";
+                }
+                if (siteType.equalsIgnoreCase("E:Yahoo")) {
+                    seURL = "http://search.yahoo.com/search?n=40&p=" + URLEncoder.encode(SearchString, "UTF-8");
+                }
+                if (siteType.equalsIgnoreCase("E:Bing")) {
+                    seURL = "http://cn.bing.com/search?q=" + URLEncoder.encode(SearchString, "UTF-8");
+                }
+                if (siteType.equalsIgnoreCase("E:soso")) {
+                    seURL = "http://www.soso.com/q?w=" + URLEncoder.encode(SearchString, "GB2312");
+                }
+                if (siteType.equalsIgnoreCase("E:baidu")) {
+                    seURL = "http://www.baidu.com/s?wd=" + URLEncoder.encode(SearchString, "UTF-8");
+                }
+                if (siteType.equalsIgnoreCase("E:so")) {
+                    seURL = "http://www.so.com/s?q=" + URLEncoder.encode(SearchString, "UTF-8");
+                }
+                if (siteType.equalsIgnoreCase("E:pangusou")) {
+                    seURL = "http://search.panguso.com/pagesearch.htm?q=" + URLEncoder.encode(SearchString, "UTF-8");
+                }
+                // 下载页面，分析链接
+                html = FoxBookLib.downhtml(seURL);
+                List<Map<String, Object>> seo = FoxBookLib.getSearchEngineHref(html, SearchString);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = seo.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_SE_SITE_LIST, mm.get("url"), mm.get("name")});
+                }
+            } catch (Exception e) {
+                e.toString();
+            }
+        }
+        if (siteType.contains("S:")) {  // 特殊站点
+            if (siteType.equalsIgnoreCase("S:起点中文")) {
+                seURL = site_qidian.qidian_getSearchURL_Mobile(SearchString);
+                String json = FoxBookLib.downhtml(seURL, "utf-8");
+                List<Map<String, Object>> qds = site_qidian.json2BookList(json);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = qds.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_SE_SITE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (siteType.equalsIgnoreCase("S:追书神器")) {
+                seURL = site_zssq.getUrlSE(SearchString);
+                String json = site_zssq.json2BookID(FoxBookLib.downhtml(seURL, "utf-8"));
+                uSearchBookURL.setText("&bid=" + json);
+                uBookURL.setText("&bid=" + json);
+                seURL = site_zssq.getUrlSL(json);
+                json = FoxBookLib.downhtml(seURL, "utf-8");
+                List<Map<String, Object>> ddl = site_zssq.json2SiteList(json);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = ddl.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_ZSSQ_SITE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (siteType.equalsIgnoreCase("S:快读")) {
+                seURL = site_qreader.qreader_Search(SearchString);
+                uSearchBookURL.setText(seURL);
+                uBookURL.setText(seURL);
+                List<Map<String, Object>> kds = site_qreader.qreader_GetIndex(seURL, 22, 0);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = kds.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_QREADER_PAGE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (siteType.equalsIgnoreCase("S:宜搜")) {
+                seURL = site_easou.getUrlSE(SearchString);
+                String json = FoxBookLib.downhtml(seURL, "utf-8");
+                seURL = site_easou.getUrlSL(site_easou.json2IDs(json, 1));
+                json = FoxBookLib.downhtml(seURL, "utf-8");
+                List<Map<String, Object>> ddl = site_easou.json2SiteList(json);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = ddl.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_EASOU_SITE_LIST, mm.get("url"), mm.get("name")});
+                }
+
+            }
+
+        }
+    }//GEN-LAST:event_uSearchItActionPerformed
+
+    private void uListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uListMouseClicked
+        // TODO add your handling code here:
+        String RootURL = "" ;
+        
+        if (2 == evt.getClickCount()) {
+            int nRow = uList.getSelectedRow();
+            String nowResultType = uList.getValueAt(nRow, 0).toString();
+            String nowURL = uList.getValueAt(nRow, 1).toString();
+            //System.out.println(uList.getValueAt(nRow, 0));
+
+            String html = "";
+            if (nowResultType.equalsIgnoreCase(TYPE_SE_SITE_LIST)) { // 处理:搜索引擎返回的站点列表
+                uSearchBookURL.setText(nowURL);
+                uBookURL.setText(nowURL);
+                RootURL = nowURL; // 作为后面子目录的根路径
+                html = FoxBookLib.downhtml(nowURL);
+                List<Map<String, Object>> srt = FoxBookLib.tocHref(html, 22);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = srt.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_SE_PAGE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (nowResultType.equalsIgnoreCase(TYPE_SE_PAGE_LIST)) { // 处理:章节列表
+                if (RootURL.length() > 3) { // 获取完整路径
+                    nowURL = FoxBookLib.getFullURL(RootURL, nowURL);
+                }
+                html = FoxBookLib.downhtml(nowURL);
+                html = FoxBookLib.pagetext(html);
+                if (html != null && html.length() > 200) {
+                    JOptionPane.showMessageDialog(null, html.substring(0, 200));
+                }
+            }
+
+            if (nowResultType.equalsIgnoreCase(TYPE_ZSSQ_SITE_LIST)) { // 处理: 追书神器 站点列表
+                String oldBID = uBookURL.getText();
+                if (oldBID.contains("&bid=")) {
+                    uSearchBookURL.setText(nowURL + oldBID);
+                    uBookURL.setText(nowURL + oldBID);
+                } else {
+                    uSearchBookURL.setText(nowURL);
+                    uBookURL.setText(nowURL);
+                }
+                html = FoxBookLib.downhtml(nowURL, "utf-8");
+                List<Map<String, Object>> dtl = site_zssq.json2PageList(html, 22);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = dtl.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_ZSSQ_PAGE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (nowResultType.equalsIgnoreCase(TYPE_ZSSQ_PAGE_LIST)) { // 处理: 追书神器 章节列表
+                html = FoxBookLib.downhtml(nowURL, "utf-8");
+                html = site_zssq.json2Text(html);
+                if (html != null && html.length() > 200) {
+                    JOptionPane.showMessageDialog(null, html.substring(0, 200));
+                }
+            }
+            if (nowResultType.equalsIgnoreCase(TYPE_QREADER_PAGE_LIST)) { // 处理: 快读 章节列表
+                html = site_qreader.qreader_GetContent(nowURL);
+                if (html != null && html.length() > 200) {
+                    JOptionPane.showMessageDialog(null, html.substring(0, 200));
+                }
+            }
+            if (nowResultType.equalsIgnoreCase(TYPE_EASOU_SITE_LIST)) { // 处理: 宜搜 站点列表
+                uSearchBookURL.setText(nowURL);
+                uBookURL.setText(nowURL);
+                String sGIDNID = "";
+                Matcher m = Pattern.compile("(?i).*(gid=[0-9]+&nid=[0-9]+)&").matcher(nowURL);
+                while (m.find()) {
+                    sGIDNID = m.group(1);
+                }
+                html = FoxBookLib.downhtml(nowURL, "utf-8");
+                List<Map<String, Object>> dtl = site_easou.json2PageList(html, sGIDNID, 22);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = dtl.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_EASOU_PAGE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (nowResultType.equalsIgnoreCase(TYPE_EASOU_PAGE_LIST)) { // 处理: 宜搜 章节列表
+                html = FoxBookLib.downhtml(nowURL, "utf-8");
+                html = site_easou.json2Text(html);
+                if (html != null && html.length() > 200) {
+                    JOptionPane.showMessageDialog(null, html.substring(0, 200));
+                }
+            }
+        }
+        if (java.awt.event.MouseEvent.BUTTON3 == evt.getButton()) {
+            int nRow = uList.rowAtPoint(evt.getPoint());
+            uList.setRowSelectionInterval(nRow, nRow);
+            //           jPopupMenuBook.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_uListMouseClicked
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    /* Set the Nimbus look and feel */
         /*
          private static Set<String> NIMBUS_PRIMARY_COLORS = new HashSet<String>(Arrays.asList(
          "text", "control", "nimbusBase", "nimbusOrange", "nimbusGreen", "nimbusRed", "nimbusInfoBlue",
@@ -1509,40 +2026,48 @@ public class FoxMainFrame extends javax.swing.JFrame {
          "\"Table.editor\"", "\"Tree.cellEditor\"", "TextField", "FormattedTextField", "PasswordField", "TextArea",
          "TextPane", "EditorPane", "ToolBar", "ToolBarSeparator", "ToolTip", "Tree", "RootPane"};
          */
-        /*
-         javax.swing.UIManager.put("nimbusBase", new Color(160, 222, 181));
-         javax.swing.UIManager.put("nimbusBlueGrey", new Color(160, 222, 181));
-         javax.swing.UIManager.put("control", new Color(160, 222, 181));
-         javax.swing.UIManager.put("textText", Color.WHITE);
-         */
-        javax.swing.UIManager.put("nimbusBlueGrey", new Color(179, 219, 179));        //控件色
-        javax.swing.UIManager.put("nimbusLightBackground", new Color(228, 242, 228)); // 文本背景色
         javax.swing.UIManager.put("control", new Color(228, 242, 228));               // 控件背景色
+        javax.swing.UIManager.put("nimbusLightBackground", new Color(228, 242, 228)); // 文本背景色
+        javax.swing.UIManager.put("nimbusSelectionBackground", new Color( 129, 193, 115 ));          // 选定文本 129, 193, 115    55, 165, 55    64, 128, 128 
+
+        javax.swing.UIManager.put("nimbusBlueGrey", new Color(179, 219, 179));        //控件色
+        javax.swing.UIManager.put("nimbusBase", new Color(70, 140, 60));              //滚动条，基础颜色
+
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                /* 
-                 Metal
-                 Nimbus
-                 CDE/Motif
-                 Windows
-                 Windows Classic
-                 */
-                if ("Nimbus".equals(info.getName())) {
+                if ("Nimbus".equals(info.getName())) {  //Metal, Nimbus,CDE/Motif,Windows,Windows Classic
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FoxMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FoxMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FoxMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FoxMainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            ex.toString();
         }
-        //</editor-fold>
 
+  
+/*
+         // 显示所有值
+        UIManager.LookAndFeelInfo looks[] = UIManager.getInstalledLookAndFeels();
+
+        for (UIManager.LookAndFeelInfo info : looks) {
+            try {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+
+                    UIDefaults defaults = UIManager.getDefaults();
+                    Enumeration newKeys = defaults.keys();
+
+                    while (newKeys.hasMoreElements()) {
+                        Object obj = newKeys.nextElement();
+                        System.out.printf("%50s : %s\n", obj, UIManager.get(obj));
+                    }
+                }
+            } catch (Exception ex) {
+                ex.toString();
+            }
+        }
+*/
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -1553,22 +2078,35 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private FoxDB oDB;
     private javax.swing.table.DefaultTableModel tBook;
     private javax.swing.table.DefaultTableModel tPage;
+    private javax.swing.table.DefaultTableModel tList;  // 搜索结果列表
+    final String TYPE_SE_SITE_LIST = "ES";  // 搜索结果类型
+    final String TYPE_SE_PAGE_LIST = "EL";
+    final String TYPE_ZSSQ_SITE_LIST = "SZS";
+    final String TYPE_ZSSQ_PAGE_LIST = "SZL";
+    final String TYPE_QREADER_PAGE_LIST = "SKL";
+    final String TYPE_EASOU_SITE_LIST = "SES";
+    final String TYPE_EASOU_PAGE_LIST = "SEL";
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser chooseTxt;
-    private javax.swing.JDialog editBookInfo;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu jPopupMenuBook;
     private javax.swing.JPopupMenu jPopupMenuPage;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
@@ -1579,6 +2117,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JToolBar.Separator jSeparator8;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JDialog jdEditBookInfo;
+    private javax.swing.JDialog jdSearchBook;
+    private javax.swing.JDialog jdShowContent;
     private javax.swing.JMenuItem mAll2Epub;
     private javax.swing.JMenuItem mAll2Mobi;
     private javax.swing.JMenuItem mAll2Txt;
@@ -1612,8 +2153,21 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPages2txt;
     private javax.swing.JMenuItem mRefreshBookList;
     private javax.swing.JMenu msg;
-    private javax.swing.JDialog showContent;
     private javax.swing.JTable uBook;
+    private javax.swing.JLabel uBookID;
+    private javax.swing.JTextField uBookName;
+    private javax.swing.JButton uBookSearch;
+    private javax.swing.JTextField uBookURL;
+    private javax.swing.JTextArea uDelList;
+    private javax.swing.JScrollPane uDelListScrool;
+    private javax.swing.JTable uList;
     private javax.swing.JTable uPage;
+    private javax.swing.JTextPane uPageContent;
+    private javax.swing.JTextField uQidianID;
+    private javax.swing.JButton uQidianIDProc;
+    private javax.swing.JTextField uSearchBookURL;
+    private javax.swing.JButton uSearchIt;
+    private javax.swing.JComboBox uSearchString;
+    private javax.swing.JComboBox uSearchType;
     // End of variables declaration//GEN-END:variables
 }
