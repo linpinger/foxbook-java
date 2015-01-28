@@ -571,6 +571,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jtaReplaceTar = new javax.swing.JTextArea();
         jButton11 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jSeparator9 = new javax.swing.JToolBar.Separator();
@@ -1099,6 +1100,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
 
+        jButton10.setMnemonic('c');
+        jButton10.setText("清空两框(C)");
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jdFindnReplaceLayout = new javax.swing.GroupLayout(jdFindnReplace.getContentPane());
         jdFindnReplace.getContentPane().setLayout(jdFindnReplaceLayout);
         jdFindnReplaceLayout.setHorizontalGroup(
@@ -1106,29 +1115,37 @@ public class FoxMainFrame extends javax.swing.JFrame {
             .addGroup(jdFindnReplaceLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
                 .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton11)
-                    .addComponent(jButton12))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                    .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton11)
+                            .addComponent(jButton12)))
+                    .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton10)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jdFindnReplaceLayout.setVerticalGroup(
             jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jdFindnReplaceLayout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(30, Short.MAX_VALUE))
                     .addGroup(jdFindnReplaceLayout.createSequentialGroup()
-                        .addGap(62, 62, 62)
+                        .addGap(8, 8, 8)
+                        .addComponent(jButton10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton11)
-                        .addGap(54, 54, 54)
-                        .addComponent(jButton12)))
-                .addContainerGap(30, Short.MAX_VALUE))
+                        .addGap(60, 60, 60)
+                        .addComponent(jButton12)
+                        .addGap(59, 59, 59))))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -2310,6 +2327,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdFindnReplace.setVisible(true);
     }//GEN-LAST:event_mPageFindnReplaceActionPerformed
 
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        jtaReplaceSrc.setText("");
+        jtaReplaceTar.setText("");
+    }//GEN-LAST:event_jButton10ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2397,6 +2419,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser chooseTxt;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton2;
