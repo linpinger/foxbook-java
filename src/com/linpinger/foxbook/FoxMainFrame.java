@@ -435,6 +435,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         // } 编辑章节信息
         
+        // { 查找替换内容
+        jdFindnReplace.setSize(jdFindnReplace.getPreferredSize());
+        jdFindnReplace.setLocationRelativeTo(null);
+        // ESC 退出子窗口
+        jdFindnReplace.getRootPane().registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                jdFindnReplace.dispose();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        // } 查找替换内容
     }
 
     public void refreshBookList() {
@@ -554,8 +564,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jbSavePage = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         jtaPageContent = new javax.swing.JTextArea();
+        jdFindnReplace = new javax.swing.JDialog();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jtaReplaceSrc = new javax.swing.JTextArea();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        jtaReplaceTar = new javax.swing.JTextArea();
+        jButton11 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
+        jSeparator9 = new javax.swing.JToolBar.Separator();
         jButton3 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
@@ -572,6 +590,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBookNew = new javax.swing.JMenuItem();
         mRefreshBookList = new javax.swing.JMenuItem();
         mBookImportFromQidianTxt = new javax.swing.JMenuItem();
+        mPageFindnReplace = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         mBookShowAll = new javax.swing.JMenuItem();
         mBookShowSize = new javax.swing.JMenuItem();
@@ -1051,6 +1070,67 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jdFindnReplace.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        jdFindnReplace.setTitle("查找和替换");
+
+        jtaReplaceSrc.setColumns(20);
+        jtaReplaceSrc.setRows(5);
+        jtaReplaceSrc.setToolTipText("要查找的文本(正则表达式)");
+        jScrollPane6.setViewportView(jtaReplaceSrc);
+
+        jtaReplaceTar.setColumns(20);
+        jtaReplaceTar.setRows(5);
+        jtaReplaceTar.setToolTipText("要替换为的文本");
+        jScrollPane7.setViewportView(jtaReplaceTar);
+
+        jButton11.setMnemonic('f');
+        jButton11.setText("查找(F)");
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
+        jButton12.setMnemonic('h');
+        jButton12.setText("替换(H)");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jdFindnReplaceLayout = new javax.swing.GroupLayout(jdFindnReplace.getContentPane());
+        jdFindnReplace.getContentPane().setLayout(jdFindnReplaceLayout);
+        jdFindnReplaceLayout.setHorizontalGroup(
+            jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
+                .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton11)
+                    .addComponent(jButton12))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jdFindnReplaceLayout.setVerticalGroup(
+            jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jdFindnReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jdFindnReplaceLayout.createSequentialGroup()
+                        .addGap(62, 62, 62)
+                        .addComponent(jButton11)
+                        .addGap(54, 54, 54)
+                        .addComponent(jButton12)))
+                .addContainerGap(30, Short.MAX_VALUE))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Hello");
         setBounds(new java.awt.Rectangle(0, 0, 0, 0));
@@ -1077,6 +1157,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(jButton1);
+        jToolBar1.add(jSeparator9);
 
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/refresh_yellow.png"))); // NOI18N
         jButton3.setMnemonic('d');
@@ -1197,6 +1278,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(mBookImportFromQidianTxt);
+
+        mPageFindnReplace.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
+        mPageFindnReplace.setMnemonic('f');
+        mPageFindnReplace.setText("查找替换所有章节内容(F)");
+        mPageFindnReplace.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPageFindnReplaceActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mPageFindnReplace);
         jMenu1.add(jSeparator2);
 
         mBookShowAll.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.ALT_MASK));
@@ -1339,7 +1430,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-26");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-28");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -2171,7 +2262,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     // 精简章节内容按钮
     private void jbLeanPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbLeanPageActionPerformed
         String pc = jtaPageContent.getText();
-        pc = pc.replaceAll("\r", "").replaceAll("\n\n", "\n").replaceAll("　", "").replaceAll("\n ", "\n");
+        pc = pc.replace("\r", "").replace("\n\n", "\n").replace("　", "").replace("\n ", "\n");
         jtaPageContent.setText(pc);
         jtaPageContent.setCaretPosition(0); // 跳到头部
     }//GEN-LAST:event_jbLeanPageActionPerformed
@@ -2182,6 +2273,42 @@ public class FoxMainFrame extends javax.swing.JFrame {
         oDB.execPreOne("update page set Content=?, name=\"" + jtfPName.getText() + "\", BookID=" + jtfBID.getText() + ", CharCount=" + jtfCharCount.getText()  + ", url=\"" + jtfPURL.getText() + "\" where id=" + pageid, jtaPageContent.getText());
         jdEditPageInfo.dispose();
     }//GEN-LAST:event_jbSavePageActionPerformed
+
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        // 查找
+        String src = jtaReplaceSrc.getText();
+        String tar = jtaReplaceTar.getText();
+        
+        tPage.setRowCount(0);
+        List rsdata = oDB.getList("select page.name as name, page.CharCount as cc, page.ID as id, book.name as bname, page.url as url from book,Page where book.id=page.bookid and page.content like '%" + src + "%' order by page.bookid,page.ID");
+        Iterator itr = rsdata.iterator();
+        while (itr.hasNext()) {
+            HashMap item = (HashMap) itr.next();
+            tPage.addRow(new Object[]{item.get("name"), item.get("cc"), item.get("id"), item.get("bname"), item.get("url")});
+        }
+        msg("★　搜索到的章节数: " + rsdata.size());
+    }//GEN-LAST:event_jButton11ActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        // 替换
+        String src = jtaReplaceSrc.getText();
+        String tar = jtaReplaceTar.getText();
+        
+        tPage.setRowCount(0);
+        List rsdata = oDB.getList("select page.name as name, page.CharCount as cc, page.ID as id, book.name as bname, page.url as url, page.content as pc from book,Page where book.id=page.bookid and page.content like '%" + src + "%' order by page.bookid,page.ID");
+        Iterator itr = rsdata.iterator();
+        while (itr.hasNext()) {
+            HashMap item = (HashMap) itr.next();
+            oDB.execPreOne("update page set content=? where id=" + item.get("id").toString(), item.get("pc").toString().replace(src, tar)); // 替换内容
+            tPage.addRow(new Object[]{item.get("name"), item.get("cc"), item.get("id"), item.get("bname"), item.get("url")});
+        }
+        msg("★　替换的章节数: " + rsdata.size());
+        jdFindnReplace.dispose();
+    }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void mPageFindnReplaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageFindnReplaceActionPerformed
+        jdFindnReplace.setVisible(true);
+    }//GEN-LAST:event_mPageFindnReplaceActionPerformed
 
     /**
      * @param args the command line arguments
@@ -2270,6 +2397,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFileChooser chooseTxt;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -2290,6 +2419,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
@@ -2298,16 +2429,20 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JToolBar.Separator jSeparator8;
+    private javax.swing.JToolBar.Separator jSeparator9;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton jbLeanPage;
     private javax.swing.JButton jbSavePage;
     private javax.swing.JDialog jdEditBookInfo;
     private javax.swing.JDialog jdEditPageInfo;
+    private javax.swing.JDialog jdFindnReplace;
     private javax.swing.JDialog jdSearchBook;
     private javax.swing.JDialog jdShowContent;
     private javax.swing.JLabel jlPID;
     private javax.swing.JTextArea jtaPageContent;
+    private javax.swing.JTextArea jtaReplaceSrc;
+    private javax.swing.JTextArea jtaReplaceTar;
     private javax.swing.JTextField jtfBID;
     private javax.swing.JTextField jtfCharCount;
     private javax.swing.JTextField jtfPName;
@@ -2340,6 +2475,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPageDeleteMulti;
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
     private javax.swing.JMenuItem mPageEditInfo;
+    private javax.swing.JMenuItem mPageFindnReplace;
     private javax.swing.JMenuItem mPageUpdateOne;
     private javax.swing.JMenuItem mPages2Epub;
     private javax.swing.JMenuItem mPages2Mobi;
