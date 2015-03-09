@@ -42,7 +42,7 @@ public class FoxBookDB {
         oDB.execPreOne("insert into book (Name, QidianID, URL) values(?, \"" + sQidianid + "\", \"" + sQidianURL +  "\")", sBookName); // 新增书籍
         String sBookid = oDB.getOneCell("select id from book where qidianid=" + sQidianid); // 获取id
         
-        String txtContent = FoxBookLib.fileRead(txtPath, "GBK").replace("　　", "").replace("<a href=http://www.qidian.com>起点中文网 www.qidian.com 欢迎广大书友光临阅读，最新、最快、最火的连载作品尽在起点原创！</a>", "").replace("<a>手机用户请到m.qidian.com阅读。</a>", "") + "\r\n<end>\r\n" ;
+        String txtContent = site_qidian.qidian_getTextFromPageJS(FoxBookLib.fileRead(txtPath, "GBK")) + "\r\n<end>\r\n" ;
         
         String sql = "insert into page(bookid,name,content,CharCount) values(" + sBookid + ",?,?,?);";
         

@@ -1447,7 +1447,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-01-28");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-03-09");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
