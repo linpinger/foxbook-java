@@ -402,18 +402,20 @@
           <Properties>
             <Property name="maximumRowCount" type="int" value="15"/>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="11">
+              <StringArray count="13">
                 <StringItem index="0" value="S:&#x8d77;&#x70b9;&#x4e2d;&#x6587;"/>
                 <StringItem index="1" value="S:&#x8ffd;&#x4e66;&#x795e;&#x5668;"/>
                 <StringItem index="2" value="S:&#x5feb;&#x8bfb;"/>
                 <StringItem index="3" value="S:&#x5b9c;&#x641c;"/>
                 <StringItem index="4" value="E:SoGou"/>
-                <StringItem index="5" value="E:Yahoo"/>
-                <StringItem index="6" value="E:Bing"/>
-                <StringItem index="7" value="E:soso"/>
-                <StringItem index="8" value="E:baidu"/>
+                <StringItem index="5" value="E:GotoHell"/>
+                <StringItem index="6" value="E:Yahoo"/>
+                <StringItem index="7" value="E:Bing"/>
+                <StringItem index="8" value="E:soso"/>
                 <StringItem index="9" value="E:so"/>
-                <StringItem index="10" value="E:pangusou"/>
+                <StringItem index="10" value="E:ZhongSou"/>
+                <StringItem index="11" value="E:youdao"/>
+                <StringItem index="12" value="E:360"/>
               </StringArray>
             </Property>
           </Properties>
@@ -1014,7 +1016,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="0" red="0" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2015-03-09"/>
+            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2015-03-23"/>
             <Property name="toolTipText" type="java.lang.String" value="&#x2605;&#x3000;&#x54c8;&#x54c8;&#x6211;&#x662f;&#x6d88;&#x606f;&#x680f;&#xff0c;&#x6211;&#x603b;&#x662f;&#x840c;&#x840c;&#x54d2;"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="10"/>

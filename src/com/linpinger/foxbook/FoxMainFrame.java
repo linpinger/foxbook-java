@@ -176,13 +176,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
 
         public void run() {
-            String thName = Thread.currentThread().getName();
+            final String thName = Thread.currentThread().getName();
             Iterator<Map<String, Object>> itr = taskList.iterator();
             HashMap<String, Object> mm;
             int nowID;
             String nowURL;
             int locCount = 0;
-            int allCount = taskList.size();
+            final int allCount = taskList.size();
             String pageLen = "";
             while (itr.hasNext()) {
                 ++locCount;
@@ -192,10 +192,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                 pageLen = FoxBookLib.updatepage(nowID, oDB);
 
-                //               msg.obj = leftThread + ":" + thName + ":" + locCount + " / " + allCount;
                 final Object data[] = new Object[]{mm.get("name"), pageLen, mm.get("id"), thName, mm.get("url")};
+                final int xcount = locCount;
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        msg("★　剩余线程:线程名:页面/页面数　" + leftThread + " : " + thName + " : " + xcount + " / " + allCount);
                         tPage.addRow(data);
                     }
                 });
@@ -204,6 +205,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
             --leftThread;
             if (0 == leftThread) { // 所有线程更新完毕
 //                msg.obj = "已更新完所有空白章节>25";
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+//                        tPage.setRowCount(0);
+                        msg("★　恭喜！理论上多线程更新完毕^_^");
+                    }
+                });
             }
         }
     }
@@ -884,7 +891,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdSearchBook.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         uSearchType.setMaximumRowCount(15);
-        uSearchType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "S:起点中文", "S:追书神器", "S:快读", "S:宜搜", "E:SoGou", "E:Yahoo", "E:Bing", "E:soso", "E:baidu", "E:so", "E:pangusou" }));
+        uSearchType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "S:起点中文", "S:追书神器", "S:快读", "S:宜搜", "E:SoGou", "E:GotoHell", "E:Yahoo", "E:Bing", "E:soso", "E:so", "E:ZhongSou", "E:youdao", "E:360" }));
 
         uSearchString.setEditable(true);
         uSearchString.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "书名", "书名 site:qidian.com" }));
@@ -1447,7 +1454,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-03-09");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-03-23");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -2074,14 +2081,20 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 if (siteType.equalsIgnoreCase("E:soso")) {
                     seURL = "http://www.soso.com/q?w=" + URLEncoder.encode(SearchString, "GB2312");
                 }
-                if (siteType.equalsIgnoreCase("E:baidu")) {
-                    seURL = "http://www.baidu.com/s?wd=" + URLEncoder.encode(SearchString, "UTF-8");
-                }
                 if (siteType.equalsIgnoreCase("E:so")) {
                     seURL = "http://www.so.com/s?q=" + URLEncoder.encode(SearchString, "UTF-8");
                 }
-                if (siteType.equalsIgnoreCase("E:pangusou")) {
-                    seURL = "http://search.panguso.com/pagesearch.htm?q=" + URLEncoder.encode(SearchString, "UTF-8");
+                if (siteType.equalsIgnoreCase("E:ZhongSou")) {
+                    seURL = "http://www.zhongsou.com/third.cgi?w=" + URLEncoder.encode(SearchString, "UTF-8") + "&kid=&y=5&stag=1&dt=0&pt=0&utf=1";
+                }
+                if (siteType.equalsIgnoreCase("E:youdao")) {
+                    seURL = "http://www.youdao.com/search?q=" + URLEncoder.encode(SearchString, "UTF-8") + "&ue=utf8&keyfrom=web.index";
+                }
+                if (siteType.equalsIgnoreCase("E:360")) {
+                    seURL = "http://www.haosou.com/s?ie=utf-8&shb=1&src=360sou_newhome&q=" + URLEncoder.encode(SearchString, "UTF-8");
+                }
+                if (siteType.equalsIgnoreCase("E:GotoHell")) {
+                    seURL = "http://devilfinder.com/search.php?q=" + URLEncoder.encode(SearchString, "UTF-8");
                 }
                 // 下载页面，分析链接
                 html = FoxBookLib.downhtml(seURL);
