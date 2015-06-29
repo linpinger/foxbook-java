@@ -952,7 +952,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jScrollPane2.setBorder(null);
 
         uPageContent.setEditable(false);
-        uPageContent.setFont(new java.awt.Font("文泉驿正黑", 0, 24));
+        uPageContent.setFont(uPageContent.getFont().deriveFont(uPageContent.getFont().getSize()+12f));
         jScrollPane2.setViewportView(uPageContent);
 
         javax.swing.GroupLayout jdShowContentLayout = new javax.swing.GroupLayout(jdShowContent.getContentPane());
@@ -1052,7 +1052,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jScrollPane5.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         jtaPageContent.setColumns(20);
-        jtaPageContent.setFont(new java.awt.Font("宋体", 0, 16)); // NOI18N
+        jtaPageContent.setFont(jtaPageContent.getFont().deriveFont(jtaPageContent.getFont().getSize()+4f));
         jtaPageContent.setLineWrap(true);
         jtaPageContent.setRows(5);
         jScrollPane5.setViewportView(jtaPageContent);
@@ -1454,7 +1454,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-04-16");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-06-29");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
