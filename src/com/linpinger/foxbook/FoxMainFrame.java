@@ -61,12 +61,18 @@ public class FoxMainFrame extends javax.swing.JFrame {
             });
             System.out.println("等待诸多线程...");
 
-            // 使用线程组来确定进度
+            // 使用线程组来确定进度，由于使用循环，使用CPU可能比较频繁，所以加入sleep
             int lastLeftThreadCount = 0;
+            int tmpThreadCount = 0;
             final int allThreadCount = upList.size();
-            while ( true ) {
-                final int nowLeftThreadCount = grpFox.activeCount();
-                if ( nowLeftThreadCount == lastLeftThreadCount ) {
+            while ((tmpThreadCount = grpFox.activeCount()) > 0) {
+                final int nowLeftThreadCount = tmpThreadCount;
+                if (nowLeftThreadCount == lastLeftThreadCount) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        ex.toString();
+                    }
                     continue;
                 } else {
                     lastLeftThreadCount = nowLeftThreadCount;
@@ -78,9 +84,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     }
                 });
 //                System.out.println("剩余更新线程数量: " + nowLeftThreadCount + " / " + allThreadCount);
-                if ( nowLeftThreadCount < 1 ) {
-                    break;
-                }
             }
             
             /*
