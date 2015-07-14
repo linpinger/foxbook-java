@@ -40,16 +40,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
         public void run() {
+            ThreadGroup grpFox = new ThreadGroup("fox"); // 更新线程组
             List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 
             Iterator itr = upList.iterator();
-            List<Thread> threadList = new ArrayList(30);
+//            List<Thread> threadList = new ArrayList(30);
             Thread nowT;
             while (itr.hasNext()) {
                 HashMap item = (HashMap<String, String>) itr.next();
-                nowT = new Thread(new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
-                //       System.out.println("线程 " + nowT.getName() + " 更新:" + (String) item.get("name"));
-                threadList.add(nowT);
+                nowT = new Thread(grpFox, new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
+//              threadList.add(nowT);
                 nowT.start();
             }
 
@@ -61,6 +61,29 @@ public class FoxMainFrame extends javax.swing.JFrame {
             });
             System.out.println("等待诸多线程...");
 
+            // 使用线程组来确定进度
+            int lastLeftThreadCount = 0;
+            final int allThreadCount = upList.size();
+            while ( true ) {
+                final int nowLeftThreadCount = grpFox.activeCount();
+                if ( nowLeftThreadCount == lastLeftThreadCount ) {
+                    continue;
+                } else {
+                    lastLeftThreadCount = nowLeftThreadCount;
+                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        msg("★　总更新线程数量: " + allThreadCount + "  剩余线程数量: " + nowLeftThreadCount);
+                    }
+                });
+//                System.out.println("剩余更新线程数量: " + nowLeftThreadCount + " / " + allThreadCount);
+                if ( nowLeftThreadCount < 1 ) {
+                    break;
+                }
+            }
+            
+            /*
             Iterator itrT = threadList.iterator();
             while (itrT.hasNext()) {
                 nowT = (Thread) itrT.next();
@@ -70,6 +93,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     System.out.println("等待线程错误: " + ex.toString());
                 }
             }
+            */
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -1454,7 +1478,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-06-29");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-07-14");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
