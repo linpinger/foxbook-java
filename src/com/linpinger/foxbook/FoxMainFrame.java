@@ -5,6 +5,7 @@
 package com.linpinger.foxbook;
 
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -780,7 +781,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jdEditBookInfo.setTitle("编辑信息");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), new java.awt.Color(0, 0, 255))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
 
         uBookID.setText("xx");
         uBookID.setToolTipText("BookID");
@@ -996,7 +997,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdEditPageInfo.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jdEditPageInfo.setTitle("编辑章节信息");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), new java.awt.Color(0, 0, 255))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
 
         jlPID.setText("Page");
         jlPID.setToolTipText("PageID");
@@ -1185,6 +1186,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Hello");
         setBounds(new java.awt.Rectangle(0, 0, 0, 0));
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getClassLoader().getResource("com/linpinger/icon/book.png")));
         setLocationByPlatform(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -1480,8 +1482,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        msg.setForeground(new java.awt.Color(0, 0, 255));
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-07-14");
+        msg.setForeground(java.awt.Color.blue);
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-07-24");
         msg.setToolTipText("★　哈哈我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1603,7 +1605,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void mBookUpdateAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAllActionPerformed
         // TODO add your handling code here:
-        msg.setForeground(Color.GREEN);
+        msg.setForeground(Color.red);
         new Thread(new UpdateAllBook()).start();
     }//GEN-LAST:event_mBookUpdateAllActionPerformed
 
@@ -1921,7 +1923,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     
     private void fAll2Mobi() { // 转换为mobi
         tPage.setRowCount(0);
-        msg.setForeground(Color.GREEN);
+        msg.setForeground(Color.red);
         msg("★　开始转换所有章节为 mobi");
         new Thread(new book2ebook(1, 0)).start();
     }
@@ -2036,7 +2038,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        msg.setForeground(Color.GREEN);
+        msg.setForeground(Color.red);
         new Thread(new UpdateAllBook()).start();  // 更新所有
     }//GEN-LAST:event_jButton3ActionPerformed
 
