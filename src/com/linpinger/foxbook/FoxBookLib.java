@@ -101,7 +101,8 @@ public class FoxBookLib {
                 text = site_qreader.qreader_GetContent(pageFullURL);
                 break;
             case 99:
-                String nURL = site_qidian.qidian_toPageURL_FromPageInfoURL(pageFullURL);
+//              String nURL = site_qidian.qidian_toPageURL_FromPageInfoURL(pageFullURL);
+		String nURL = site_qidian.qidian_toTxtURL_FromPageContent(downhtml(pageFullURL)) ; // 2015-11-17: 起点地址变动，只能下载网页后再获取txt地址
                 html = downhtml(nURL);
                 text = site_qidian.qidian_getTextFromPageJS(html);
                 break;
@@ -455,9 +456,11 @@ public class FoxBookLib {
             	conn.setRequestProperty("User-Agent", "ZhuiShuShenQi/3.26 Java/1.6.0_55"); // Android自带头部和IE8头部会导致yahoo搜索结果链接为追踪链接
 			}
             conn.setRequestProperty("Accept", "*/*");
-            if ( ! inURL.contains("files.qidian.com") ) { // 2015-4-16: qidian txt 默认下载.gz会造成使用cdn，然后出现故障
+            if ( ! inURL.contains("files.qidian.com") ) { // 2015-4-16: qidian txt 使用cdn加速，如果头里有gzip就会返回错误的gz数据
                 conn.setRequestProperty("Accept-Encoding", "gzip,deflate");
-            }
+            } else {
+				conn.setRequestProperty("Accept-Encoding", "*"); // Android 会自动加上gzip，真坑，使用*覆盖之，起点CDN就能正确处理了
+			}
             conn.setConnectTimeout(5000);  // 连接超时
             conn.setReadTimeout(15000);    // 读取超时15s
             conn.connect();
