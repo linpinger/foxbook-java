@@ -27,8 +27,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 public class FoxMainFrame extends javax.swing.JFrame {
-    //	private final int SITE_EASOU = 11 ;
+    // GUI: 表格字体大小以及行高, 为win10 平板添加的特性
+    private final int TABLE_FONT_SIZE = 24 ;
+    private final int TABLE_ROW_HEIGHT = 30 ;
 
+    //	private final int SITE_EASOU = 11 ;
     private final int SITE_ZSSQ = 12;
     private final int SITE_KUAIDU = 13;
     public final int downThread = 9;  // 页面下载任务线程数
@@ -414,10 +417,57 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tcmX.getColumn(1).setPreferredWidth(400);
         tcmX.getColumn(2).setPreferredWidth(350);
         
+        // Win10平板里面JAVASE6 显示的是 Windows 8 和 6.2
+        if (System.getProperty("os.name").startsWith("Windows") && (Double.parseDouble(System.getProperty("os.version")) >= 6.2)) {
+            // win10设置字体及行高
+            uBook.setRowHeight(TABLE_ROW_HEIGHT);
+            uBook.setFont(new java.awt.Font(uBook.getFont().getName(), 0, TABLE_FONT_SIZE));
+            uPage.setRowHeight(TABLE_ROW_HEIGHT);
+            uPage.setFont(new java.awt.Font(uPage.getFont().getName(), 0, TABLE_FONT_SIZE));
 
+            // win10右键菜单大小
+            java.awt.Font fn = new java.awt.Font(mBookUpdateOne.getFont().getName(), 0, 4 + TABLE_FONT_SIZE);
 
+            mBookUpdateOne.setFont(fn);
+            mBookUpdateTocOne.setFont(fn);
+            mBookMultiThreadUpdateOne.setFont(fn);
+            mBookInfoEditor.setFont(fn);
+            mBookDelete.setFont(fn);
+            mBook2Mobi.setFont(fn);
+            mBook2Epub.setFont(fn);
+            mBook2Txt.setFont(fn);
+
+            mPageUpdateOne.setFont(fn);
+            mPageEditInfo.setFont(fn);
+            mPageDeleteMulti.setFont(fn);
+            mPageDeleteMultiNotUpdate.setFont(fn);
+            mPages2Mobi.setFont(fn);
+            mPages2Epub.setFont(fn);
+            mPages2txt.setFont(fn);
+
+            // 菜单栏
+            java.awt.Font fmb = new java.awt.Font(jMenu1.getItem(0).getFont().getName(), 0, TABLE_FONT_SIZE);
+            jMenu1.setFont(fmb);
+            for (int i = 0; i < jMenu1.getItemCount(); i++) {
+                if (null != jMenu1.getItem(i)) {
+                    jMenu1.getItem(i).setFont(fmb);
+                }
+            }
+            java.awt.Font fmp = new java.awt.Font(jMenu2.getItem(0).getFont().getName(), 0, TABLE_FONT_SIZE);
+            jMenu2.setFont(fmp);
+            for (int i = 0; i < jMenu2.getItemCount(); i++) {
+                if (null != jMenu2.getItem(i)) {
+                    jMenu2.getItem(i).setFont(fmp);
+                }
+            }
+            msg.setFont(fmp);
+
+            //uPageContent.setFont(uPageContent.getFont().deriveFont(uPageContent.getFont().getSize()+16f));
+            uPageContent.setFont(new java.awt.Font("微软雅黑", 0, uPageContent.getFont().getSize()));
+        }
         // { 显示内容
-        jdShowContent.setSize(jdShowContent.getPreferredSize());
+//        jdShowContent.setSize(jdShowContent.getPreferredSize());
+        jdShowContent.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height - 55);
         jdShowContent.setLocationRelativeTo(null);
 
         // ESC 退出子窗口
@@ -559,8 +609,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mPageUpdateOne = new javax.swing.JMenuItem();
         mPageEditInfo = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
-        mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        mPageDeleteMultiNotUpdate = new javax.swing.JMenuItem();
         mPages2Mobi = new javax.swing.JMenuItem();
         mPages2Epub = new javax.swing.JMenuItem();
         mPages2txt = new javax.swing.JMenuItem();
@@ -607,20 +657,20 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jButton11 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
-        jToolBar1 = new javax.swing.JToolBar();
-        jButton1 = new javax.swing.JButton();
-        jSeparator9 = new javax.swing.JToolBar.Separator();
-        jButton4 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jSeparator8 = new javax.swing.JToolBar.Separator();
-        jButton2 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         uBook = new javax.swing.JTable();
         jScrollPane1 = new javax.swing.JScrollPane();
         uPage = new javax.swing.JTable();
+        jToolBar1 = new javax.swing.JToolBar();
+        jButton1 = new javax.swing.JButton();
+        jSeparator9 = new javax.swing.JToolBar.Separator();
+        jButton4 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jSeparator8 = new javax.swing.JToolBar.Separator();
+        jButton2 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         mBookNew = new javax.swing.JMenuItem();
@@ -629,8 +679,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mPageFindnReplace = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         mBookShowAll = new javax.swing.JMenuItem();
-        mBookShowSize = new javax.swing.JMenuItem();
         mBookShowLessLen = new javax.swing.JMenuItem();
+        mBookShowSize = new javax.swing.JMenuItem();
         mBookUpdateAll = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
         mAll2Mobi = new javax.swing.JMenuItem();
@@ -744,6 +794,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuPage.add(mPageDeleteMulti);
+        jPopupMenuPage.add(jSeparator5);
 
         mPageDeleteMultiNotUpdate.setMnemonic('b');
         mPageDeleteMultiNotUpdate.setText("删除选择的章节并不写入删除列表(B)");
@@ -753,7 +804,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuPage.add(mPageDeleteMultiNotUpdate);
-        jPopupMenuPage.add(jSeparator5);
 
         mPages2Mobi.setText("选中章节转为mobi");
         mPages2Mobi.addActionListener(new java.awt.event.ActionListener() {
@@ -980,7 +1030,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jScrollPane2.setBorder(null);
 
         uPageContent.setEditable(false);
-        uPageContent.setFont(uPageContent.getFont().deriveFont(uPageContent.getFont().getSize()+12f));
+        uPageContent.setFont(uPageContent.getFont().deriveFont(uPageContent.getFont().getSize()+18f));
+        uPageContent.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                uPageContentMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(uPageContent);
 
         javax.swing.GroupLayout jdShowContentLayout = new javax.swing.GroupLayout(jdShowContent.getContentPane());
@@ -1193,90 +1248,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 formWindowClosing(evt);
             }
         });
-
-        jToolBar1.setFloatable(false);
-        jToolBar1.setOrientation(1);
-        jToolBar1.setRollover(true);
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/list.png"))); // NOI18N
-        jButton1.setMnemonic('a');
-        jButton1.setToolTipText("显示所有 (Alt + A)");
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
             }
         });
-        jToolBar1.add(jButton1);
-        jToolBar1.add(jSeparator9);
-
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/sort_up_green.png"))); // NOI18N
-        jButton4.setMnemonic('w');
-        jButton4.setToolTipText("快捷顺序缩小数据库 (Alt + W)");
-        jButton4.setFocusable(false);
-        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton4);
-
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/refresh_yellow.png"))); // NOI18N
-        jButton3.setMnemonic('d');
-        jButton3.setToolTipText("更新所有 (Alt + D)");
-        jButton3.setFocusable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton3);
-
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/sort_down_green.png"))); // NOI18N
-        jButton5.setMnemonic('e');
-        jButton5.setToolTipText("快捷倒序缩小数据库 (Alt + E)");
-        jButton5.setFocusable(false);
-        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton5);
-
-        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/database_refresh.png"))); // NOI18N
-        jButton6.setMnemonic('s');
-        jButton6.setToolTipText("切换数据库 (Alt + S)");
-        jButton6.setFocusable(false);
-        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton6);
-        jToolBar1.add(jSeparator8);
-
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/mixx.png"))); // NOI18N
-        jButton2.setMnemonic('m');
-        jButton2.setToolTipText("所有转为Mobi (Alt + M)");
-        jButton2.setFocusable(false);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton2);
 
         jSplitPane1.setDividerLocation(250);
 
@@ -1301,6 +1277,102 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jScrollPane1.setViewportView(uPage);
 
         jSplitPane1.setRightComponent(jScrollPane1);
+
+        jToolBar1.setFloatable(false);
+        jToolBar1.setOrientation(1);
+        jToolBar1.setRollover(true);
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/list.png"))); // NOI18N
+        jButton1.setMnemonic('a');
+        jButton1.setText("显示所有");
+        jButton1.setToolTipText("显示所有 (Alt + A)");
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setPreferredSize(new java.awt.Dimension(64, 64));
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton1);
+        jToolBar1.add(jSeparator9);
+
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/sort_up_green.png"))); // NOI18N
+        jButton4.setMnemonic('w');
+        jButton4.setText("顺序缩小");
+        jButton4.setToolTipText("快捷顺序缩小数据库 (Alt + W)");
+        jButton4.setFocusable(false);
+        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton4.setPreferredSize(new java.awt.Dimension(64, 64));
+        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton4);
+
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/refresh_yellow.png"))); // NOI18N
+        jButton3.setMnemonic('d');
+        jButton3.setText("更新所有");
+        jButton3.setToolTipText("更新所有 (Alt + D)");
+        jButton3.setFocusable(false);
+        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton3.setPreferredSize(new java.awt.Dimension(64, 64));
+        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton3);
+
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/database_refresh.png"))); // NOI18N
+        jButton6.setMnemonic('s');
+        jButton6.setText("切换DB");
+        jButton6.setToolTipText("切换数据库 (Alt + S)");
+        jButton6.setFocusable(false);
+        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton6.setPreferredSize(new java.awt.Dimension(64, 64));
+        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton6);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/sort_down_green.png"))); // NOI18N
+        jButton5.setMnemonic('e');
+        jButton5.setText("倒序缩小");
+        jButton5.setToolTipText("快捷倒序缩小数据库 (Alt + E)");
+        jButton5.setFocusable(false);
+        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton5.setPreferredSize(new java.awt.Dimension(64, 64));
+        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton5);
+        jToolBar1.add(jSeparator8);
+
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/mixx.png"))); // NOI18N
+        jButton2.setMnemonic('m');
+        jButton2.setText("转Mobi");
+        jButton2.setToolTipText("所有转为Mobi (Alt + M)");
+        jButton2.setFocusable(false);
+        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2.setPreferredSize(new java.awt.Dimension(64, 64));
+        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton2);
 
         jMenu1.setMnemonic('B');
         jMenu1.setText("书籍(B)");
@@ -1352,15 +1424,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(mBookShowAll);
 
-        mBookShowSize.setMnemonic('z');
-        mBookShowSize.setText("显示书籍占用空间(Z)");
-        mBookShowSize.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBookShowSizeActionPerformed(evt);
-            }
-        });
-        jMenu1.add(mBookShowSize);
-
         mBookShowLessLen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, java.awt.event.InputEvent.CTRL_MASK));
         mBookShowLessLen.setText("显示字数过少章节");
         mBookShowLessLen.addActionListener(new java.awt.event.ActionListener() {
@@ -1369,6 +1432,15 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(mBookShowLessLen);
+
+        mBookShowSize.setMnemonic('z');
+        mBookShowSize.setText("显示书籍占用空间(Z)");
+        mBookShowSize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mBookShowSizeActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mBookShowSize);
 
         mBookUpdateAll.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.ALT_MASK));
         mBookUpdateAll.setText("更新所有");
@@ -1483,7 +1555,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-11-17");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-12-20");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1495,15 +1567,15 @@ public class FoxMainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 801, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 812, Short.MAX_VALUE))
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
         );
 
         pack();
@@ -1514,7 +1586,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void uBookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uBookMouseClicked
-        if (2 == evt.getClickCount()) {
+        if (2 == evt.getClickCount() || ( 1 == evt.getClickCount() && 1 == uBook.getSelectedColumn() ) ) { // 单击第2个Cell和双击效果一样
             int nRow = uBook.getSelectedRow();
             msg("★　" + uBook.getValueAt(nRow, 0) + "　" + uBook.getValueAt(nRow, 3));
             tPage.setRowCount(0);
@@ -1534,7 +1606,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     private void uPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageMouseClicked
         // TODO add your handling code here:
-        if (2 == evt.getClickCount()) {
+        if (2 == evt.getClickCount() || ( 1 == evt.getClickCount() && 1 == uPage.getSelectedColumn() ) ) { // 单击第2个Cell和双击效果一样
             int nRow = uPage.getSelectedRow();
             if (Integer.valueOf(uPage.getValueAt(nRow, 2).toString()) < 1) {
                 return;
@@ -2373,6 +2445,20 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jtaReplaceSrc.setText("");
         jtaReplaceTar.setText("");
     }//GEN-LAST:event_jButton10ActionPerformed
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        jSplitPane1.setDividerLocation((int)(( evt.getComponent().getWidth() - 50 ) * 0.31)); // 自动调整分割栏    
+    }//GEN-LAST:event_formComponentResized
+
+    private void uPageContentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageContentMouseClicked
+        // 以纵向30%为分割线，上面的区域向上翻页，下面的区域向下翻页
+        JScrollBar ss = jScrollPane2.getVerticalScrollBar();
+        if (jScrollPane2.getMousePosition().getY() > jScrollPane2.getHeight() * 0.3) { // 下一屏
+            ss.setValue(ss.getValue() + ss.getBlockIncrement(JScrollBar.VERTICAL) - 25);
+        } else { // 上一屏
+            ss.setValue(ss.getValue() - ss.getBlockIncrement(JScrollBar.VERTICAL) + 25);
+        }
+    }//GEN-LAST:event_uPageContentMouseClicked
 
     /**
      * @param args the command line arguments
