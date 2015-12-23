@@ -225,8 +225,16 @@ public class FoxBookLib {
         } else {
             html = html.replaceAll("(?smi).*?</head>(.*)", "$1"); // 获取正文
         }
-        html = html.replaceAll("(?smi)<span[^>]*>", ""); // 起点<a></a>之间有span标签
-        html = html.replace("</span>", "");
+        
+        if (html.indexOf("http://read.qidian.com/BookReader/") > -1) { // 处理起点页面
+            if (html.indexOf("vipreader.qidian.com/BookReader/") > -1) { // VIP
+                html = html.replaceAll("(?smi).*<div id=\"content\">(.*)VIP卷.*", "$1"); // 获取列表
+            } else {
+                html = html.replaceAll("(?smi).*<div id=\"content\">(.*)<div class=\"book_opt\">.*", "$1"); // 获取列表
+            }
+            html = html.replaceAll("(?smi)<span[^>]*>", ""); // 起点<a></a>之间有span标签
+            html = html.replace("</span>", "");
+        }
 
         // 获取链接 并存入结构中
         Matcher mat = Pattern.compile(
@@ -234,8 +242,9 @@ public class FoxBookLib {
                 .matcher(html);
         while (mat.find()) {
             if (2 == mat.groupCount()) {
-				if ( ((String)mat.group(1)).contains("javascript:") ) continue ; // 过滤js链接
-                // System.out.println(mat.group(1) + "|" + mat.group(2)) ;
+                if (((String) mat.group(1)).contains("javascript:")) {
+                    continue; // 过滤js链接
+                }
                 item = new HashMap<String, Object>();
                 item.put("url", mat.group(1));
                 item.put("name", mat.group(2));
@@ -264,49 +273,72 @@ public class FoxBookLib {
                 maxurllen = (Integer) key;
             }
         }
-		int maxurllensma = maxurllen - 1;
-        int maxurllenbig = maxurllen + 1;
+//        System.out.println("MaxURLLen:" + maxurllen);
 
-        List<Map<String, Object>> od = new ArrayList<Map<String, Object>>(100);
-        Map<String, Object> oi;
+        int minLen = maxurllen - 2; // 最小长度值，这个值可以调节
+        int maxLen = maxurllen + 2; // 最大长度值，这个值可以调节
 
-        // 筛选符合条件的链接
-        int nowlen = 0;
-        Iterator<Map<String, Object>> itr = ldata.iterator();
-        while (itr.hasNext()) {
-            HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
-            nowlen = (Integer) mm.get("len");
-			if (maxurllensma == nowlen || maxurllen == nowlen || maxurllenbig == nowlen) {
-                oi = new HashMap<String, Object>();
-                oi.put("url", (String) mm.get("url"));
-                oi.put("name", (String) mm.get("name"));
-                // oi.put("len", mm.get("len"));
-                od.add(oi);
-            }
-        }
+        int ldataSize = ldata.size();
+        int halfLink = (int) (ldataSize / 2);
 
-        if (lastNpage > 0) { // 截取后一部分
-            int chaptercount = od.size();
-            if (chaptercount > lastNpage) {
-                int startnum = chaptercount - lastNpage;
-                // 筛选符合数量的链接
-                List<Map<String, Object>> odn = new ArrayList<Map<String, Object>>(100);
-                Iterator<Map<String, Object>> itr1 = od.iterator();
-                int ncountx = 0;
-                while (itr1.hasNext()) {
-                    ++ncountx;
-                    if (ncountx <= startnum) {
-                        itr1.next();
-                        continue;
-                    } else {
-                        odn.add(itr1.next());
-                    }
+        int startDelRowNum = 0;      // 开始删除的行
+        int endDelRowNum = 9 + ldataSize;  // 结束删除的行
+        // 只找链接的一半，前半是找开始行，后半是找结束行
+        // 找开始
+        Integer nowLen = 0;
+        Integer nextLen = 0;
+        for (int nowIdx = 0; nowIdx < halfLink; nowIdx++) {
+            nowLen = (Integer) (((HashMap<String, Object>) (ldata.get(nowIdx))).get("len"));
+            if ((nowLen > maxLen) || (nowLen < minLen)) {
+                startDelRowNum = nowIdx;
+            } else {
+                nextLen = (Integer) (((HashMap<String, Object>) (ldata.get(nowIdx + 1))).get("len"));
+                if ((nextLen - nowLen > 1) || (nextLen - nowLen < 0)) {
+                    startDelRowNum = nowIdx;
                 }
-                return odn;
             }
         }
+//        System.out.println("startDelRowNum:" + startDelRowNum);
+        // 找结束 nextLen means PrevLen here
+        for (int nowIdx = ldataSize - 1; nowIdx > halfLink; nowIdx--) {
+            nowLen = (Integer) (((HashMap<String, Object>) (ldata.get(nowIdx))).get("len"));
+            if ((nowLen > maxLen) || (nowLen < minLen)) {
+                endDelRowNum = nowIdx;
+            } else {
+                nextLen = (Integer) (((HashMap<String, Object>) (ldata.get(nowIdx - 1))).get("len"));
+                if ((nowLen - nextLen > 1) || (nowLen - nextLen < 0)) {
+                    endDelRowNum = nowIdx;
+                }
+            }
+        }
+//        System.out.println("endDelRowNum:" + endDelRowNum + " ldataSize:" + ldataSize);
 
-        return od;
+        // 倒着删元素
+        if (endDelRowNum < ldataSize) {
+            for (int nowIdx = ldataSize - 1; nowIdx >= endDelRowNum; nowIdx--) {
+                ldata.remove(nowIdx);
+            }
+        }
+        if (startDelRowNum >= 0) {
+            for (int nowIdx = startDelRowNum; nowIdx >= 0; nowIdx--) {
+                ldata.remove(nowIdx);
+            }
+        }
+        
+        return getLastNPage(ldata, lastNpage); // 截取后一部分
+    }
+ 
+    // 取倒数几个元素，被上面这个调用
+    private static List<Map<String, Object>> getLastNPage(List<Map<String, Object>> inArrayList, int lastNpage) {
+        int aSize = inArrayList.size();
+        if ( aSize <= lastNpage || lastNpage <= 0 ) {
+            return inArrayList;
+        }
+        List<Map<String, Object>> outList = new ArrayList<Map<String, Object>>(100);
+        for (int nowIdx = aSize - lastNpage; nowIdx < aSize; nowIdx++) {
+            outList.add((HashMap<String, Object>) (inArrayList.get(nowIdx)));
+        }
+        return outList;
     }
 
     // 将page页的html转换为文本，通用规则
@@ -450,7 +482,7 @@ public class FoxBookLib {
 //				conn.setInstanceFollowRedirects(true);
             }
 
-            if ( inURL.contains(".qqxs.") ) {
+            if ( inURL.contains(".13xs.") ) {
             	conn.setRequestProperty("User-Agent", "ZhuiShuShenQi/3.26"); // 2015-10-27: qqxs使用加速宝，带Java的头会被和谐
 			} else {
             	conn.setRequestProperty("User-Agent", "ZhuiShuShenQi/3.26 Java/1.6.0_55"); // Android自带头部和IE8头部会导致yahoo搜索结果链接为追踪链接

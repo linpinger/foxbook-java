@@ -36,6 +36,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private final int SITE_KUAIDU = 13;
     public final int downThread = 9;  // 页面下载任务线程数
     public int leftThread = downThread;
+    private int DragStartY = 0 ; // 阅读页面拖动起始Y坐标
 
     private void msg(String inMsg) {
         msg.setText(inMsg);
@@ -462,8 +463,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
             msg.setFont(fmp);
 
-            //uPageContent.setFont(uPageContent.getFont().deriveFont(uPageContent.getFont().getSize()+16f));
-            uPageContent.setFont(new java.awt.Font("微软雅黑", 0, uPageContent.getFont().getSize()));
+            uPageContent.setFocusable(false);
+            uPageContent.setFont(new java.awt.Font("微软雅黑", 0, 4 + uPageContent.getFont().getSize()));
         }
         // { 显示内容
 //        jdShowContent.setSize(jdShowContent.getPreferredSize());
@@ -831,7 +832,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jdEditBookInfo.setTitle("编辑信息");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
 
         uBookID.setText("xx");
         uBookID.setToolTipText("BookID");
@@ -1035,6 +1036,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 uPageContentMouseClicked(evt);
             }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                uPageContentMousePressed(evt);
+            }
+        });
+        uPageContent.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                uPageContentMouseDragged(evt);
+            }
         });
         jScrollPane2.setViewportView(uPageContent);
 
@@ -1052,7 +1061,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdEditPageInfo.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jdEditPageInfo.setTitle("编辑章节信息");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
 
         jlPID.setText("Page");
         jlPID.setToolTipText("PageID");
@@ -1555,7 +1564,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-12-20");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-12-23");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -2451,14 +2460,30 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formComponentResized
 
     private void uPageContentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageContentMouseClicked
-        // 以纵向30%为分割线，上面的区域向上翻页，下面的区域向下翻页
+        // 以纵向30%为分割线，上面的区域向上翻页，下面的区域向下翻页，翻页高度=一屏-字体大小
         JScrollBar ss = jScrollPane2.getVerticalScrollBar();
+        int scrollHeight = jScrollPane2.getHeight() - uPageContent.getFont().getSize();
+//      System.out.println(ss.getBlockIncrement(JScrollBar.VERTICAL) + "==" + uPageContent.getVisibleRect().height + "==" + jScrollPane2.getHeight() + "  Font:" + uPageContent.getFont().getSize());
         if (jScrollPane2.getMousePosition().getY() > jScrollPane2.getHeight() * 0.3) { // 下一屏
-            ss.setValue(ss.getValue() + ss.getBlockIncrement(JScrollBar.VERTICAL) - 25);
+//          System.out.println(ss.getValue() + "+" + scrollHeight + "=" + (ss.getValue() + scrollHeight));
+            ss.setValue(ss.getValue() + scrollHeight);
+//          uPageContent.setFont(new java.awt.Font("微软雅黑", 0, uPageContent.getFont().getSize() + 1));
         } else { // 上一屏
-            ss.setValue(ss.getValue() - ss.getBlockIncrement(JScrollBar.VERTICAL) + 25);
+//          System.out.println(ss.getValue() + "-" + scrollHeight + "=" + (ss.getValue() - scrollHeight));
+            ss.setValue(ss.getValue() - scrollHeight);
         }
+        // 以上的输出真的是个奇葩问题，在win10平板上 鼠标点击和手指点击的计算结果不同
     }//GEN-LAST:event_uPageContentMouseClicked
+
+    private void uPageContentMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageContentMouseDragged
+        // 页面拖动效果
+        jScrollPane2.getVerticalScrollBar().setValue(jScrollPane2.getVerticalScrollBar().getValue() - evt.getY() + DragStartY);
+    }//GEN-LAST:event_uPageContentMouseDragged
+
+    private void uPageContentMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageContentMousePressed
+        // 页面拖动起点
+        DragStartY = evt.getY();
+    }//GEN-LAST:event_uPageContentMousePressed
 
     /**
      * @param args the command line arguments
