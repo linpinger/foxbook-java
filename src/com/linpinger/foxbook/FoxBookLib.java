@@ -213,6 +213,10 @@ public class FoxBookLib {
     }
 
     public static List<Map<String, Object>> tocHref(String html, int lastNpage) {
+        if (html.length() < 100) { //网页木有下载下来
+            return new ArrayList<Map<String, Object>>(1);
+        }
+
         List<Map<String, Object>> ldata = new ArrayList<Map<String, Object>>(100);
         Map<String, Object> item;
         int nowurllen = 0;
