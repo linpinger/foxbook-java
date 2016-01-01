@@ -96,6 +96,35 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mPageUpdateOneActionPerformed"/>
           </Events>
         </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator10">
+        </Component>
+        <MenuItem class="javax.swing.JMenuItem" name="mPageSelectAll">
+          <Properties>
+            <Property name="mnemonic" type="int" value="97"/>
+            <Property name="text" type="java.lang.String" value="&#x9009;&#x62e9;&#x6240;&#x6709;(A)"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mPageSelectAllActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="mPageSelectUp">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&#x9009;&#x62e9;&#x672c;&#x7ae0;&#x8282;&#x53ca;&#x4ee5;&#x4e0a;"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mPageSelectUpActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="mPageSelectDown">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&#x9009;&#x62e9;&#x672c;&#x7ae0;&#x8282;&#x53ca;&#x4ee5;&#x4e0b;"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mPageSelectDownActionPerformed"/>
+          </Events>
+        </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator11">
+        </Component>
         <MenuItem class="javax.swing.JMenuItem" name="mPageEditInfo">
           <Properties>
             <Property name="mnemonic" type="int" value="101"/>
@@ -1025,7 +1054,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2015-12-24"/>
+            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2016-01-01"/>
             <Property name="toolTipText" type="java.lang.String" value="&#x2605;&#x3000;&#x6211;&#x662f;&#x6d88;&#x606f;&#x680f;&#xff0c;&#x6211;&#x603b;&#x662f;&#x840c;&#x840c;&#x54d2;"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="10"/>
@@ -1070,7 +1099,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jSplitPane1" pref="801" max="32767" attributes="0"/>
+              <Component id="jSplitPane1" pref="828" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jToolBar1" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -1078,8 +1107,8 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jToolBar1" max="32767" attributes="0"/>
-          <Component id="jSplitPane1" alignment="0" pref="448" max="32767" attributes="0"/>
+          <Component id="jToolBar1" pref="0" max="32767" attributes="0"/>
+          <Component id="jSplitPane1" alignment="0" pref="479" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -1173,6 +1202,66 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton13">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/com/linpinger/icon/delete.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="&#x5220;&#x9664;&#x9009;&#x5b9a;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x5220;&#x9664;&#x9009;&#x5b9a;&#x7ae0;&#x8282;&#x5e76;&#x5199;&#x5165;&#x6570;&#x636e;&#x5e93;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton13ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton14">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/com/linpinger/icon/select_UP.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="&#x9009;&#x62e9;&#x4ee5;&#x4e0a;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x9009;&#x62e9;&#x672c;&#x7ae0;&#x53ca;&#x4ee5;&#x4e0a;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton14ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton15">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/com/linpinger/icon/select_all.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="&#x9009;&#x62e9;&#x5168;&#x90e8;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x9009;&#x62e9;&#x5168;&#x90e8;&#x7ae0;&#x8282;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton15ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton16">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/com/linpinger/icon/select_Down.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="&#x9009;&#x62e9;&#x4ee5;&#x4e0b;"/>
+            <Property name="toolTipText" type="java.lang.String" value="&#x9009;&#x62e9;&#x672c;&#x7ae0;&#x53ca;&#x4ee5;&#x4e0b;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton16ActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JToolBar$Separator" name="jSeparator9">

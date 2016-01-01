@@ -16,17 +16,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.KeyStroke;
+import javax.swing.MenuElement;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 public class FoxMainFrame extends javax.swing.JFrame {
+    public Properties config = new Properties();  // 配置文件
     // GUI: 表格字体大小以及行高, 为win10 平板添加的特性
     private final int TABLE_FONT_SIZE = 24 ;
     private final int TABLE_ROW_HEIGHT = 30 ;
@@ -399,7 +403,27 @@ public class FoxMainFrame extends javax.swing.JFrame {
     public FoxMainFrame() {
         FoxInit();
         initComponents();
-        this.setLocationRelativeTo(null); // 屏幕居中显示
+        
+        // 读取jar中的配置文件
+        try {
+            config.load(ClassLoader.getSystemResourceAsStream("com/linpinger/foxbook/foxbook.properties"));
+        } catch (Exception ex) {
+            System.out.println("配置文件 com/linpinger/foxbook/foxbook.properties 不存在或读取错误");
+            System.out.println(ex.toString());
+        }
+
+        if (Boolean.parseBoolean(config.getProperty("UI.ShowInScreenCenter", "true")) )
+            this.setLocationRelativeTo(null); // 屏幕居中显示
+        
+        if (Boolean.parseBoolean(config.getProperty("UI.MaximizeMainFrame", "false")) )
+            this.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH); // 最大化
+        
+        // 隐藏章节选择，删除按钮
+        boolean bShowSelectButtonOnInit = Boolean.parseBoolean(config.getProperty("UI.ShowSelectButtonOnInit", "false"));
+        jButton13.setVisible(bShowSelectButtonOnInit);
+        jButton14.setVisible(bShowSelectButtonOnInit);
+        jButton15.setVisible(bShowSelectButtonOnInit);
+        jButton16.setVisible(bShowSelectButtonOnInit);
 
         // 设置LV列宽度
         TableColumnModel tcmL = uBook.getTableHeader().getColumnModel();
@@ -418,57 +442,74 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tcmX.getColumn(1).setPreferredWidth(400);
         tcmX.getColumn(2).setPreferredWidth(350);
         
-        // Win10平板里面JAVASE6 显示的是 Windows 8 和 6.2
-        if (System.getProperty("os.name").startsWith("Windows") && (Double.parseDouble(System.getProperty("os.version")) >= 6.2)) {
+        boolean bUseBigFont = false;
+        if ( Boolean.parseBoolean(config.getProperty("OS.AutoDetectVersion", "false")) ) {
+            // Win10平板里面JAVASE6 显示的是 Windows 8 和 6.2
+            if (System.getProperty("os.name").startsWith("Windows") && (Double.parseDouble(System.getProperty("os.version")) >= 6.2)) {
+                bUseBigFont = true;
+            }
+        } else {
+            bUseBigFont = Boolean.parseBoolean(config.getProperty("UI.UseBigFont", "false"));
+        }
+        
+        if (bUseBigFont) {
             // win10设置字体及行高
-            uBook.setRowHeight(TABLE_ROW_HEIGHT);
-            uBook.setFont(new java.awt.Font(uBook.getFont().getName(), 0, TABLE_FONT_SIZE));
-            uPage.setRowHeight(TABLE_ROW_HEIGHT);
-            uPage.setFont(new java.awt.Font(uPage.getFont().getName(), 0, TABLE_FONT_SIZE));
+            java.awt.Font ft = new java.awt.Font(uBook.getFont().getName(), 0, TABLE_FONT_SIZE);
+            int frht = TABLE_ROW_HEIGHT;
+            if (Boolean.parseBoolean(config.getProperty("UI.UseMyTableFont", "false"))) {
+                ft = new java.awt.Font(config.getProperty("UI.TableFontName", "微软雅黑"), 0, Integer.parseInt(config.getProperty("UI.TableFontSize", "24")));
+                frht = Integer.parseInt(config.getProperty("UI.TableRowHeight", "30"));
+            }
+            uBook.setRowHeight(frht);
+            uBook.setFont(ft);
+            uPage.setRowHeight(frht);
+            uPage.setFont(ft);
+            
+            // { win10 菜单大小
+            int menuFontSize = TABLE_FONT_SIZE ;
+            String menuFontName = mBookUpdateOne.getFont().getName();
+            if ( Boolean.parseBoolean(config.getProperty("UI.UseMyMenuFontName", "false")) )
+                menuFontName = config.getProperty("UI.MenuFontName", "微软雅黑");
+            if ( Boolean.parseBoolean(config.getProperty("UI.UseMyMenuFontSize", "false")) )
+                menuFontSize = Integer.parseInt(config.getProperty("UI.MenuFontSize", "30"));
+                
+            java.awt.Font fn = new java.awt.Font(menuFontName, 0, menuFontSize);
 
-            // win10右键菜单大小
-            java.awt.Font fn = new java.awt.Font(mBookUpdateOne.getFont().getName(), 0, 4 + TABLE_FONT_SIZE);
-
-            mBookUpdateOne.setFont(fn);
-            mBookUpdateTocOne.setFont(fn);
-            mBookMultiThreadUpdateOne.setFont(fn);
-            mBookInfoEditor.setFont(fn);
-            mBookDelete.setFont(fn);
-            mBook2Mobi.setFont(fn);
-            mBook2Epub.setFont(fn);
-            mBook2Txt.setFont(fn);
-
-            mPageUpdateOne.setFont(fn);
-            mPageEditInfo.setFont(fn);
-            mPageDeleteMulti.setFont(fn);
-            mPageDeleteMultiNotUpdate.setFont(fn);
-            mPages2Mobi.setFont(fn);
-            mPages2Epub.setFont(fn);
-            mPages2txt.setFont(fn);
+            // 右键弹出菜单
+            MenuElement subBook[] = jPopupMenuBook.getSubElements();
+            for (int i = 0; i < subBook.length; i++) {
+                ((JMenuItem) subBook[i]).setFont(fn);
+            }
+            MenuElement subPage[] = jPopupMenuPage.getSubElements();
+            for (int i = 0; i < subPage.length; i++) {
+                ((JMenuItem) subPage[i]).setFont(fn);
+            }
 
             // 菜单栏
-            java.awt.Font fmb = new java.awt.Font(jMenu1.getItem(0).getFont().getName(), 0, TABLE_FONT_SIZE);
-            jMenu1.setFont(fmb);
+            jMenu1.setFont(fn);
             for (int i = 0; i < jMenu1.getItemCount(); i++) {
                 if (null != jMenu1.getItem(i)) {
-                    jMenu1.getItem(i).setFont(fmb);
+                    jMenu1.getItem(i).setFont(fn);
                 }
             }
-            java.awt.Font fmp = new java.awt.Font(jMenu2.getItem(0).getFont().getName(), 0, TABLE_FONT_SIZE);
-            jMenu2.setFont(fmp);
+            jMenu2.setFont(fn);
             for (int i = 0; i < jMenu2.getItemCount(); i++) {
                 if (null != jMenu2.getItem(i)) {
-                    jMenu2.getItem(i).setFont(fmp);
+                    jMenu2.getItem(i).setFont(fn);
                 }
             }
-            msg.setFont(fmp);
+            msg.setFont(fn);
+            // } win10 菜单大小
 
             uPageContent.setFocusable(false);
-            uPageContent.setFont(new java.awt.Font("微软雅黑", 0, 4 + uPageContent.getFont().getSize()));
+            if ( Boolean.parseBoolean(config.getProperty("UI.UseMyPageContentFont", "false")) ) {
+                uPageContent.setFont(new java.awt.Font(config.getProperty("UI.PageContentFontName"),0, Integer.parseInt(config.getProperty("UI.PageContentFontSize"))));
+            } else {
+                uPageContent.setFont(new java.awt.Font("微软雅黑", 0, 4 + uPageContent.getFont().getSize()));
+            }
         }
         // { 显示内容
-//        jdShowContent.setSize(jdShowContent.getPreferredSize());
-        jdShowContent.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height - 55);
+        jdShowContent.setSize(Toolkit.getDefaultToolkit().getScreenSize().width - Integer.parseInt(config.getProperty("UI.PageWinSubWidth")), Toolkit.getDefaultToolkit().getScreenSize().height - Integer.parseInt(config.getProperty("UI.PageWinSubHeight")));
         jdShowContent.setLocationRelativeTo(null);
 
         // ESC 退出子窗口
@@ -608,6 +649,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
         mBook2Txt = new javax.swing.JMenuItem();
         jPopupMenuPage = new javax.swing.JPopupMenu();
         mPageUpdateOne = new javax.swing.JMenuItem();
+        jSeparator10 = new javax.swing.JPopupMenu.Separator();
+        mPageSelectAll = new javax.swing.JMenuItem();
+        mPageSelectUp = new javax.swing.JMenuItem();
+        mPageSelectDown = new javax.swing.JMenuItem();
+        jSeparator11 = new javax.swing.JPopupMenu.Separator();
         mPageEditInfo = new javax.swing.JMenuItem();
         mPageDeleteMulti = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
@@ -665,6 +711,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
         uPage = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
         jSeparator9 = new javax.swing.JToolBar.Separator();
         jButton4 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -777,6 +827,33 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jPopupMenuPage.add(mPageUpdateOne);
+        jPopupMenuPage.add(jSeparator10);
+
+        mPageSelectAll.setMnemonic('a');
+        mPageSelectAll.setText("选择所有(A)");
+        mPageSelectAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPageSelectAllActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPageSelectAll);
+
+        mPageSelectUp.setText("选择本章节及以上");
+        mPageSelectUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPageSelectUpActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPageSelectUp);
+
+        mPageSelectDown.setText("选择本章节及以下");
+        mPageSelectDown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mPageSelectDownActionPerformed(evt);
+            }
+        });
+        jPopupMenuPage.add(mPageSelectDown);
+        jPopupMenuPage.add(jSeparator11);
 
         mPageEditInfo.setMnemonic('e');
         mPageEditInfo.setText("编辑本章(E)");
@@ -832,7 +909,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jdEditBookInfo.setTitle("编辑信息");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
 
         uBookID.setText("xx");
         uBookID.setToolTipText("BookID");
@@ -1061,7 +1138,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdEditPageInfo.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jdEditPageInfo.setTitle("编辑章节信息");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
 
         jlPID.setText("Page");
         jlPID.setToolTipText("PageID");
@@ -1305,6 +1382,58 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(jButton1);
+
+        jButton13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/delete.png"))); // NOI18N
+        jButton13.setText("删除选定");
+        jButton13.setToolTipText("删除选定章节并写入数据库");
+        jButton13.setFocusable(false);
+        jButton13.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton13.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton13);
+
+        jButton14.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/select_UP.png"))); // NOI18N
+        jButton14.setText("选择以上");
+        jButton14.setToolTipText("选择本章及以上");
+        jButton14.setFocusable(false);
+        jButton14.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton14.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton14);
+
+        jButton15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/select_all.png"))); // NOI18N
+        jButton15.setText("选择全部");
+        jButton15.setToolTipText("选择全部章节");
+        jButton15.setFocusable(false);
+        jButton15.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton15.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton15);
+
+        jButton16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/select_Down.png"))); // NOI18N
+        jButton16.setText("选择以下");
+        jButton16.setToolTipText("选择本章及以下");
+        jButton16.setFocusable(false);
+        jButton16.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton16.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(jButton16);
         jToolBar1.add(jSeparator9);
 
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/linpinger/icon/sort_up_green.png"))); // NOI18N
@@ -1564,7 +1693,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2015-12-24");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-01-01");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1577,14 +1706,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 801, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 828, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
         );
 
         pack();
@@ -1595,7 +1724,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void uBookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uBookMouseClicked
-        if (2 == evt.getClickCount() || ( 1 == evt.getClickCount() && 1 == uBook.getSelectedColumn() ) ) { // 单击第2个Cell和双击效果一样
+        if (2 == evt.getClickCount() || ( 1 == evt.getClickCount() && 1 == uBook.getSelectedColumn() && java.awt.event.MouseEvent.BUTTON1 == evt.getButton() ) ) { // 单击第2个Cell和双击效果一样
             int nRow = uBook.getSelectedRow();
             msg("★　" + uBook.getValueAt(nRow, 0) + "　" + uBook.getValueAt(nRow, 3));
             tPage.setRowCount(0);
@@ -1614,8 +1743,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_uBookMouseClicked
 
     private void uPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageMouseClicked
-        // TODO add your handling code here:
-        if (2 == evt.getClickCount() || ( 1 == evt.getClickCount() && 1 == uPage.getSelectedColumn() ) ) { // 单击第2个Cell和双击效果一样
+        if (2 == evt.getClickCount() || ( 1 == evt.getClickCount() && 1 == uPage.getSelectedColumn() && java.awt.event.MouseEvent.BUTTON1 == evt.getButton() ) ) { // 单击第2个Cell和双击效果一样
             int nRow = uPage.getSelectedRow();
             if (Integer.valueOf(uPage.getValueAt(nRow, 2).toString()) < 1) {
                 return;
@@ -1648,6 +1776,19 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     // 显示所有章节
     private void fShowAllPages() {
+        if (Boolean.parseBoolean(config.getProperty("UI.SwitchOnClickShowAllButton", "false"))) {
+            if (jButton13.isVisible()) {
+                jButton13.setVisible(false);
+                jButton14.setVisible(false);
+                jButton15.setVisible(false);
+                jButton16.setVisible(false);
+            } else {
+                jButton13.setVisible(true);
+                jButton14.setVisible(true);
+                jButton15.setVisible(true);
+                jButton16.setVisible(true);
+            }
+        }
         tPage.setRowCount(0);
         List rsdata = oDB.getList("select page.name as name, page.CharCount as cc, page.ID as id, book.name as bname, page.url as url from book,Page where book.id=page.bookid order by page.bookid,page.ID");
         Iterator itr = rsdata.iterator();
@@ -1663,8 +1804,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBookShowAllActionPerformed
 
     private void mBookUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateOneActionPerformed
-        // TODO add your handling code here:
-        int nRow = uBook.getSelectedRow();
+       int nRow = uBook.getSelectedRow();
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
         String nURL = uBook.getValueAt(nRow, 3).toString();
@@ -1674,7 +1814,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBookUpdateOneActionPerformed
 
     private void mPageUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageUpdateOneActionPerformed
-        // TODO add your handling code here:
         int nRow = uPage.getSelectedRow();
         String nPageName = uPage.getValueAt(nRow, 0).toString();
         String nPageID = uPage.getValueAt(nRow, 2).toString();
@@ -1685,7 +1824,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mPageUpdateOneActionPerformed
 
     private void mBookUpdateAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateAllActionPerformed
-        // TODO add your handling code here:
         msg.setForeground(Color.red);
         new Thread(new UpdateAllBook()).start();
     }//GEN-LAST:event_mBookUpdateAllActionPerformed
@@ -1711,29 +1849,24 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }
 
     private void mPageDeleteMultiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageDeleteMultiActionPerformed
-        // TODO add your handling code here:
-        deleteSelectedPages(true);
+         deleteSelectedPages(true);
     }//GEN-LAST:event_mPageDeleteMultiActionPerformed
 
     private void mPageDeleteMultiNotUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageDeleteMultiNotUpdateActionPerformed
-        // TODO add your handling code here:
         deleteSelectedPages(false);
     }//GEN-LAST:event_mPageDeleteMultiNotUpdateActionPerformed
 
     private void mDBSortDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSortDescActionPerformed
-        // TODO add your handling code here:
         FoxBookDB.regenID(2, oDB);
         refreshBookList();
     }//GEN-LAST:event_mDBSortDescActionPerformed
 
     private void mDBSortAscActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSortAscActionPerformed
-        // TODO add your handling code here:
         FoxBookDB.regenID(1, oDB);
         refreshBookList();
     }//GEN-LAST:event_mDBSortAscActionPerformed
 
     private void mDBRegenPageIDsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBRegenPageIDsActionPerformed
-        // TODO add your handling code here:
         FoxBookDB.regenID(9, oDB);
         tPage.setRowCount(0); // 清空uPage
         refreshBookList();
@@ -1741,14 +1874,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mDBRegenPageIDsActionPerformed
 
     private void mDBVacuumActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBVacuumActionPerformed
-        // TODO add your handling code here:
         tPage.setRowCount(0);
         double subSize = oDB.vacuumDB();
         msg("★　已缩小数据库: " + subSize + " K");
     }//GEN-LAST:event_mDBVacuumActionPerformed
 
     private void mBookUpdateTocOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookUpdateTocOneActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
@@ -1759,7 +1890,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBookUpdateTocOneActionPerformed
 
     private void mBookMultiThreadUpdateOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookMultiThreadUpdateOneActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
@@ -1797,12 +1927,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBookNewActionPerformed
 
     private void mRefreshBookListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRefreshBookListActionPerformed
-        // TODO add your handling code here:
         refreshBookList();
     }//GEN-LAST:event_mRefreshBookListActionPerformed
 
     private void mBookDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBookDeleteActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         //       String nBookName = uBook.getValueAt(nRow, 0).toString();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
@@ -1924,7 +2052,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
     }
     private void mBook2TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2TxtActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
@@ -1934,7 +2061,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBook2TxtActionPerformed
 
     private void mPages2txtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2txtActionPerformed
-        // TODO add your handling code here:
         int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
 
         StringBuilder ids = new StringBuilder(10240);
@@ -1951,7 +2077,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mPages2txtActionPerformed
 
     private void mBook2MobiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2MobiActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
@@ -1961,7 +2086,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBook2MobiActionPerformed
 
     private void mPages2MobiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2MobiActionPerformed
-        // TODO add your handling code here:
         int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
 
         StringBuilder ids = new StringBuilder(10240);
@@ -1978,7 +2102,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mPages2MobiActionPerformed
 
     private void mBook2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBook2EpubActionPerformed
-        // TODO add your handling code here:
         int nRow = uBook.getSelectedRow();
         String nBookID = uBook.getValueAt(nRow, 2).toString();
 
@@ -1988,7 +2111,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mBook2EpubActionPerformed
 
     private void mPages2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPages2EpubActionPerformed
-        // TODO add your handling code here:
         int[] nRow = uPage.getSelectedRows(); // 选中的所有行号
 
         StringBuilder ids = new StringBuilder(10240);
@@ -2014,14 +2136,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mAll2MobiActionPerformed
 
     private void mAll2EpubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2EpubActionPerformed
-        // TODO add your handling code here:
         tPage.setRowCount(0);
         msg("★　开始转换所有章节为 epub");
         new Thread(new book2ebook(2, 0)).start();
     }//GEN-LAST:event_mAll2EpubActionPerformed
 
     private void mAll2TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mAll2TxtActionPerformed
-        // TODO add your handling code here:
         tPage.setRowCount(0);
         msg("★　开始转换所有章节为 txt");
         new Thread(new book2ebook(9, 0)).start();
@@ -2171,7 +2291,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void uSearchItActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uSearchItActionPerformed
-        // TODO add your handling code here:
         String siteType = uSearchType.getSelectedItem().toString();
         String SearchString = uSearchString.getSelectedItem().toString();
 
@@ -2282,7 +2401,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_uSearchItActionPerformed
 
     private void uListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uListMouseClicked
-        // TODO add your handling code here:
         String RootURL = "" ;
         
         if (2 == evt.getClickCount()) {
@@ -2485,6 +2603,34 @@ public class FoxMainFrame extends javax.swing.JFrame {
         DragStartY = evt.getY();
     }//GEN-LAST:event_uPageContentMousePressed
 
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        deleteSelectedPages(true); // 删除选定章节
+    }//GEN-LAST:event_jButton13ActionPerformed
+
+    private void mPageSelectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageSelectAllActionPerformed
+        uPage.selectAll();
+    }//GEN-LAST:event_mPageSelectAllActionPerformed
+
+    private void mPageSelectUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageSelectUpActionPerformed
+        uPage.setRowSelectionInterval(0, uPage.getSelectedRow());
+    }//GEN-LAST:event_mPageSelectUpActionPerformed
+
+    private void mPageSelectDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPageSelectDownActionPerformed
+        uPage.setRowSelectionInterval(uPage.getSelectedRow(), uPage.getRowCount()-1);
+    }//GEN-LAST:event_mPageSelectDownActionPerformed
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        uPage.setRowSelectionInterval(0, uPage.getSelectedRow());
+    }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        uPage.selectAll();
+    }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+        uPage.setRowSelectionInterval(uPage.getSelectedRow(), uPage.getRowCount()-1);
+    }//GEN-LAST:event_jButton16ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2575,6 +2721,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -2598,6 +2748,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator10;
+    private javax.swing.JPopupMenu.Separator jSeparator11;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
@@ -2652,6 +2804,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem mPageDeleteMultiNotUpdate;
     private javax.swing.JMenuItem mPageEditInfo;
     private javax.swing.JMenuItem mPageFindnReplace;
+    private javax.swing.JMenuItem mPageSelectAll;
+    private javax.swing.JMenuItem mPageSelectDown;
+    private javax.swing.JMenuItem mPageSelectUp;
     private javax.swing.JMenuItem mPageUpdateOne;
     private javax.swing.JMenuItem mPages2Epub;
     private javax.swing.JMenuItem mPages2Mobi;
