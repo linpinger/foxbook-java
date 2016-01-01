@@ -436,7 +436,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         tcmR.getColumn(3).setPreferredWidth(150);
  
  
-        // 设置宽度
+        // 设置搜索表格宽度
         TableColumnModel tcmX = uList.getTableHeader().getColumnModel();
         tcmX.getColumn(0).setPreferredWidth(60);
         tcmX.getColumn(1).setPreferredWidth(400);
@@ -453,18 +453,30 @@ public class FoxMainFrame extends javax.swing.JFrame {
         }
         
         if (bUseBigFont) {
-            // win10设置字体及行高
+            // win10设置表格字体及行高
             java.awt.Font ft = new java.awt.Font(uBook.getFont().getName(), 0, TABLE_FONT_SIZE);
             int frht = TABLE_ROW_HEIGHT;
             if (Boolean.parseBoolean(config.getProperty("UI.UseMyTableFont", "false"))) {
-                ft = new java.awt.Font(config.getProperty("UI.TableFontName", "微软雅黑"), 0, Integer.parseInt(config.getProperty("UI.TableFontSize", "24")));
-                frht = Integer.parseInt(config.getProperty("UI.TableRowHeight", "30"));
+                ft = new java.awt.Font(config.getProperty("UI.TableFontName", "微软雅黑"), 0, Integer.parseInt(config.getProperty("UI.TableFontSize", "30")));
+                frht = Integer.parseInt(config.getProperty("UI.TableRowHeight", "42"));
             }
             uBook.setRowHeight(frht);
             uBook.setFont(ft);
             uPage.setRowHeight(frht);
             uPage.setFont(ft);
-            
+            // 设置表格列宽度
+            if (Boolean.parseBoolean(config.getProperty("UI.UseMyColumWidth", "false"))) {
+                tcmL.getColumn(0).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TableBookCol0")));
+                tcmL.getColumn(1).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TableBookCol1")));
+                tcmL.getColumn(2).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TableBookCol2")));
+                tcmL.getColumn(3).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TableBookCol3")));
+                tcmR.getColumn(0).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TablePageCol0")));
+                tcmR.getColumn(1).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TablePageCol1")));
+                tcmR.getColumn(2).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TablePageCol2")));
+                tcmR.getColumn(3).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TablePageCol3")));
+                tcmR.getColumn(4).setPreferredWidth(Integer.parseInt(config.getProperty("UI.TablePageCol4")));
+                // uPage.getColumnModel().getColumn(0).setPreferredWidth(500);
+            }
             // { win10 菜单大小
             int menuFontSize = TABLE_FONT_SIZE ;
             String menuFontName = mBookUpdateOne.getFont().getName();
@@ -2574,7 +2586,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        jSplitPane1.setDividerLocation((int)(( evt.getComponent().getWidth() - 50 ) * 0.31)); // 自动调整分割栏    
+        
+        jSplitPane1.setDividerLocation((int)(( evt.getComponent().getWidth() - 75 ) * Float.parseFloat(config.getProperty("UI.DiverderLocPer", "0.31")))); // 自动调整分割栏    
     }//GEN-LAST:event_formComponentResized
 
     private void uPageContentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uPageContentMouseClicked
