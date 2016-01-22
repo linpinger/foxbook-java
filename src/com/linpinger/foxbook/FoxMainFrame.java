@@ -35,6 +35,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private final int TABLE_FONT_SIZE = 24 ;
     private final int TABLE_ROW_HEIGHT = 30 ;
 
+    private final int SITE_QIDIAN_MOBILE = 16;
     //	private final int SITE_EASOU = 11 ;
     private final int SITE_ZSSQ = 12;
     private final int SITE_KUAIDU = 13;
@@ -284,6 +285,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
             if (bookUrl.indexOf(".qreader.") > -1) {
                 site_type = SITE_KUAIDU;
             }
+            if (bookUrl.indexOf("3g.if.qidian.com") > -1) {
+                site_type = SITE_QIDIAN_MOBILE ;
+            }
 
             String html = "";
             List<Map<String, Object>> lData;
@@ -301,6 +305,14 @@ public class FoxMainFrame extends javax.swing.JFrame {
                         lData = site_zssq.json2PageList(html, 55, 1); // 更新模式  最后55章
                     } else {
                         lData = site_zssq.json2PageList(html, 0, 1); // 更新模式
+                    }
+                    break;
+                case SITE_QIDIAN_MOBILE:
+                    html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
+                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
+                        lData = site_qidian.json2PageList(html); // 更新模式  最后55章
+                    } else {
+                        lData = site_qidian.json2PageList(html); // 更新模式
                     }
                     break;
                 default:
@@ -1059,7 +1071,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdSearchBook.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         uSearchType.setMaximumRowCount(15);
-        uSearchType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "S:起点中文", "S:追书神器", "S:快读", "S:宜搜", "E:SoGou", "E:GotoHell", "E:Yahoo", "E:Bing", "E:soso", "E:so", "E:ZhongSou", "E:youdao", "E:360" }));
+        uSearchType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "S:起点中文手机", "S:快读", "S:宜搜", "S:追书神器", "E:SoGou", "E:GotoHell", "E:Yahoo", "E:Bing", "E:soso", "E:so", "E:ZhongSou", "E:youdao", "E:360" }));
 
         uSearchString.setEditable(true);
         uSearchString.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "书名", "书名 site:qidian.com" }));
@@ -1705,7 +1717,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-01-08");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-01-22");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -2352,7 +2364,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         }
         if (siteType.contains("S:")) {  // 特殊站点
-            if (siteType.equalsIgnoreCase("S:起点中文")) {
+            if (siteType.equalsIgnoreCase("S:起点中文手机")) {
                 seURL = site_qidian.qidian_getSearchURL_Mobile(SearchString);
                 String json = FoxBookLib.downhtml(seURL, "utf-8");
                 List<Map<String, Object>> qds = site_qidian.json2BookList(json);
@@ -2361,7 +2373,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 Iterator<Map<String, Object>> itr = qds.iterator();
                 while (itr.hasNext()) {
                     HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
-                    tList.addRow(new Object[]{TYPE_SE_SITE_LIST, mm.get("url"), mm.get("name")});
+                    tList.addRow(new Object[]{TYPE_QIDIAN_MOBILE_INDEX_LIST, mm.get("url"), mm.get("name")});
                 }
             }
             if (siteType.equalsIgnoreCase("S:追书神器")) {
@@ -2447,6 +2459,28 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 }
             }
 
+            if (nowResultType.equalsIgnoreCase(TYPE_QIDIAN_MOBILE_INDEX_LIST)) { // 处理: 起点 站点列表
+                uSearchBookURL.setText(nowURL);
+                uBookURL.setText(nowURL);
+                uQidianID.setText(String.valueOf(site_qidian.qidian_getBookID_FromURL(nowURL))); // 设置QiDianID
+                html = FoxBookLib.downhtml(nowURL, "utf-8");
+                List<Map<String, Object>> dtl = site_qidian.json2PageList(html);
+                // 输出到列表
+                tList.setRowCount(0); // 清空列表
+                Iterator<Map<String, Object>> itr = dtl.iterator();
+                while (itr.hasNext()) {
+                    HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                    tList.addRow(new Object[]{TYPE_QIDIAN_MOBILE_PAGE_LIST, mm.get("url"), mm.get("name")});
+                }
+            }
+            if (nowResultType.equalsIgnoreCase(TYPE_QIDIAN_MOBILE_PAGE_LIST)) { // 处理: 起点 内容
+                html = FoxBookLib.downhtml(nowURL, "GBK");
+                html = site_qidian.qidian_getTextFromPageJS(html);
+                if (html != null && html.length() > 200) {
+                    JOptionPane.showMessageDialog(null, html.substring(0, 200));
+                }
+            }
+            
             if (nowResultType.equalsIgnoreCase(TYPE_ZSSQ_SITE_LIST)) { // 处理: 追书神器 站点列表
                 String oldBID = uBookURL.getText();
                 if (oldBID.contains("&bid=")) {
@@ -2723,6 +2757,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private javax.swing.table.DefaultTableModel tList;  // 搜索结果列表
     final String TYPE_SE_SITE_LIST = "ES";  // 搜索结果类型
     final String TYPE_SE_PAGE_LIST = "EL";
+    final String TYPE_QIDIAN_MOBILE_INDEX_LIST = "SQDM" ; //起点移动目录页
+    final String TYPE_QIDIAN_MOBILE_PAGE_LIST = "SQDPM" ; //起点移动目录页
     final String TYPE_ZSSQ_SITE_LIST = "SZS";
     final String TYPE_ZSSQ_PAGE_LIST = "SZL";
     final String TYPE_QREADER_PAGE_LIST = "SKL";
