@@ -53,6 +53,7 @@
 
 **更新日志:**
 
+- 2016-03-09: 整理: Swing-Android部分使用同一文件(文件编码不同):FoxBookLib/FoxEpub/site_*
 - 2016-01-22: 添加: 起点手机站地址支持
 - 2016-01-08: 修正: 起点目录处理错误
 - 2016-01-01: 添加: 配置文件 修改jar包(zip压缩文件)中的 com/linpinger/foxbook/foxbook.properties

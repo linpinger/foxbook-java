@@ -5,8 +5,11 @@
 package com.linpinger.foxbook;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,7 +27,7 @@ import java.util.regex.Pattern;
  *
  * @author guanli
  */
-public class FoxBookDB {
+public class FoxDBHelper {
     public static void importQidianTxt(String txtPath, FoxDB oDB) {
         File ttt = new File(txtPath);
         
@@ -42,7 +45,7 @@ public class FoxBookDB {
         oDB.execPreOne("insert into book (Name, QidianID, URL) values(?, \"" + sQidianid + "\", \"" + sQidianURL +  "\")", sBookName); // 新增书籍
         String sBookid = oDB.getOneCell("select id from book where qidianid=" + sQidianid); // 获取id
         
-        String txtContent = site_qidian.qidian_getTextFromPageJS(FoxBookLib.fileRead(txtPath, "GBK")) + "\r\n<end>\r\n" ;
+        String txtContent = site_qidian.qidian_getTextFromPageJS(FoxBookLib.readText(txtPath, "GBK")) + "\r\n<end>\r\n" ;
         
         String sql = "insert into page(bookid,name,content,CharCount) values(" + sBookid + ",?,?,?);";
         
@@ -215,7 +218,7 @@ public class FoxBookDB {
     public static String getSiteType(FoxDB oDB) {
         String sitetype = "unknown";
         String urls = oDB.getOneCell("select URL from book where ( isEnd isnull or isEnd < 1 )");
-        Matcher mat = Pattern.compile("(?i)http[s]?://[0-9a-z]*[\\.]?([^\\.]+)\\.(com|net|org|se|me|cc|cn|net\\.cn|com\\.cn|org\\.cn)/").matcher(urls);
+        Matcher mat = Pattern.compile("(?i)http[s]?://[0-9a-z]*[\\.]?([^\\.]+)\\.(com|net|org|se|me|cc|cn|net\\.cn|com\\.cn|org\\.cn|com\\.tw)/").matcher(urls);
         while (mat.find()) {
             sitetype = mat.group(1);
         }
@@ -231,4 +234,107 @@ public class FoxBookDB {
         }
      }
     
+        public static String updatepage(int pageid, FoxDB oDB) {
+        ArrayList<Map<String, String>> xx = (ArrayList<Map<String, String>>) oDB.getList("select book.url as bu,page.url as pu from book,page where page.id=" + String.valueOf(pageid) + " and  book.id in (select bookid from page where id=" + String.valueOf(pageid) + ")");
+        String fullPageURL = FoxBookLib.getFullURL(xx.get(0).get("bu"), xx.get(0).get("pu"));		// 获取bookurl, pageurl 合成得到url
+
+        return updatepage(fullPageURL, pageid, oDB);
+    }
+
+    public static String updatepage(String pageFullURL, int pageid, FoxDB oDB) {
+        String text = "";
+        String html = "";
+        int site_type = 0; // 特殊页面处理 
+
+        if (pageFullURL.contains(".qidian.com")) {
+            site_type = 99;
+        }
+        if (pageFullURL.contains("files.qidian.com")) {  // 起点手机站直接用txt地址好了
+            site_type = 16;
+        }
+        if (pageFullURL.contains(".qreader.")) {
+            site_type = 13;
+        }
+        if (pageFullURL.contains("zhuishushenqi.com")) {
+            site_type = 12;
+        } // 这个得放在qidian后面，因为有时候zssq地址会包含起点的url
+
+        switch (site_type) {
+            case 12:
+                String json = FoxBookLib.downhtml(pageFullURL, "utf-8"); // 下载json
+                text = site_zssq.json2Text(json);
+                break;
+            case 13:
+                text = site_qreader.qreader_GetContent(pageFullURL);
+                break;
+            case 16:
+                html = FoxBookLib.downhtml(pageFullURL, "GBK"); // 下载json
+                text = site_qidian.qidian_getTextFromPageJS(html);
+                break;
+            case 99:
+//              String nURL = site_qidian.qidian_toPageURL_FromPageInfoURL(pageFullURL);
+		String nURL = site_qidian.qidian_toTxtURL_FromPageContent(FoxBookLib.downhtml(pageFullURL)) ; // 2015-11-17: 起点地址变动，只能下载网页后再获取txt地址
+                html = FoxBookLib.downhtml(nURL);
+                text = site_qidian.qidian_getTextFromPageJS(html);
+                break;
+            default:
+                html = FoxBookLib.downhtml(pageFullURL); // 下载url
+                text = FoxBookLib.pagetext(html);   	// 分析得到text
+        }
+
+        if (pageid > 0) { // 当pageid小于0时不写入数据库，主要用于在线查看
+            FoxDBHelper.setPageContent(pageid, text, oDB); // 写入数据库
+            return String.valueOf(text.length());
+        } else {
+            return text;
+        }
+    }
+
+    // data包含的hashmap中需包含三个必要key: bookname,title,content
+    public static void all2txt(ArrayList<HashMap<String, String>> data, boolean bOneBook) { // 所有书籍转为txt
+        // select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=1 order by p.bookid,p.id
+        String txtPath = "foxbook.txt";
+        File saveDir = new File("c:/etc") ;
+        if ( saveDir.exists() && saveDir.isDirectory() )
+            txtPath = "c:/etc/foxbook.txt";
+        
+        StringBuilder txt = new StringBuilder(512000) ;
+        Iterator<HashMap<String, String>> itr = data.iterator();
+        HashMap<String, String> mm ;
+        
+        if (bOneBook) {
+            txt.append(data.get(0).get("bookname")).append("\n\n");
+            while (itr.hasNext()) {
+                mm = itr.next();
+                txt.append(mm.get("title")).append("\n\n").append(mm.get("content")).append("\n\n\n");
+            }
+        } else {
+            while (itr.hasNext()) {
+                mm = itr.next();
+                txt.append("●").append(mm.get("bookname")).append("●").append(mm.get("title")).append("\n\n").append(mm.get("content")).append("\n\n\n");
+            }
+        }
+
+        try {
+            BufferedWriter bw1 = new BufferedWriter(new FileWriter(txtPath, false));
+            bw1.write(txt.toString());
+            bw1.flush();
+            bw1.close();
+        } catch (IOException e) {
+            e.toString();
+        }
+    }
+    
+    public static void all2Epub(ArrayList<HashMap<String, String>> data, String inBookName, String inSavePath) {
+        Iterator<HashMap<String, String>> itr = data.iterator();
+        HashMap<String, String> mm;
+
+        FoxEpub oEpub = new FoxEpub(inBookName, inSavePath);
+        while (itr.hasNext()) {
+            mm = itr.next();
+            oEpub.AddChapter(mm.get("title"), mm.get("content"), -1);
+         }
+        oEpub.SaveTo();
+    }
+
 }

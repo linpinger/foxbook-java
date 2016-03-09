@@ -227,7 +227,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                 nowID = (Integer) mm.get("id");
                 nowURL = (String) mm.get("url");
 
-                pageLen = FoxBookLib.updatepage(nowID, oDB);
+                pageLen = FoxDBHelper.updatepage(nowID, oDB);
 
                 final Object data[] = new Object[]{mm.get("name"), pageLen, mm.get("id"), thName, mm.get("url")};
                 final int xcount = locCount;
@@ -276,7 +276,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         @Override
         public void run() {
-            String existList = FoxBookDB.getPageListStr(Integer.valueOf(bookID), oDB);
+            String existList = FoxDBHelper.getPageListStr(Integer.valueOf(bookID), oDB);
 
             int site_type = 0;
             if (bookUrl.indexOf("zhuishushenqi.com") > -1) {
@@ -327,7 +327,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             // 比较，得到新章节
             lData = FoxBookLib.compare2GetNewPages(lData, existList);
             if (lData.size() > 0) { // 有新章节才写入数据库
-                FoxBookDB.inserNewPages(lData, bookID, oDB); //写入数据库
+                FoxDBHelper.inserNewPages(lData, bookID, oDB); //写入数据库
                 lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )"); // 获取新增章节
             }
 
@@ -380,7 +380,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                         ++nowCount;
 
-                        pageLen = FoxBookLib.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
+                        pageLen = FoxDBHelper.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
 
                         final Object data[] = new Object[]{nn.get("name"), pageLen, nn.get("id"), bookName, nn.get("url")};
                         SwingUtilities.invokeLater(new Runnable() {
@@ -645,8 +645,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         };
 
-
-        
         oDB = new FoxDB();
         refreshBookList();
     }
@@ -1717,7 +1715,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-01-22");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-03-09");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1843,7 +1841,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         String nPageID = uPage.getValueAt(nRow, 2).toString();
         String nPageURL = uPage.getValueAt(nRow, 4).toString();
 
-        FoxBookLib.updatepage(Integer.valueOf(nPageID), oDB);
+        FoxDBHelper.updatepage(Integer.valueOf(nPageID), oDB);
         System.out.println("更新: " + nPageName + " : " + nPageURL);
     }//GEN-LAST:event_mPageUpdateOneActionPerformed
 
@@ -1860,7 +1858,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         for (int n = 0; n < nRow.length; n++) {  // 删除数据库，并更新dellist
             nPageName = uPage.getValueAt(nRow[n], 0).toString();
             nPageID = Integer.valueOf(uPage.getValueAt(nRow[n], 2).toString());
-            FoxBookDB.deletePage(nPageID, bUpdateDelList, oDB);
+            FoxDBHelper.deletePage(nPageID, bUpdateDelList, oDB);
 //            System.out.println("已删除章节: " + nPageName);
         }
 
@@ -1881,17 +1879,17 @@ public class FoxMainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_mPageDeleteMultiNotUpdateActionPerformed
 
     private void mDBSortDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSortDescActionPerformed
-        FoxBookDB.regenID(2, oDB);
+        FoxDBHelper.regenID(2, oDB);
         refreshBookList();
     }//GEN-LAST:event_mDBSortDescActionPerformed
 
     private void mDBSortAscActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSortAscActionPerformed
-        FoxBookDB.regenID(1, oDB);
+        FoxDBHelper.regenID(1, oDB);
         refreshBookList();
     }//GEN-LAST:event_mDBSortAscActionPerformed
 
     private void mDBRegenPageIDsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBRegenPageIDsActionPerformed
-        FoxBookDB.regenID(9, oDB);
+        FoxDBHelper.regenID(9, oDB);
         tPage.setRowCount(0); // 清空uPage
         refreshBookList();
         msg("★　已重新生成页面ID");
@@ -2021,7 +2019,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             String fBookName = bookname;
 			if ( transType != 9 ) {
             if (transMode != 2 ) { // 0:all pages 1:selected pages 2:one book
-                String sst = FoxBookDB.getSiteType(oDB);
+                String sst = FoxDBHelper.getSiteType(oDB);
                 oBookName = bookname + "_" + sst;
                 fBookName = "all_" + sst;
 
@@ -2053,16 +2051,16 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
             switch (transType) { // 1:mobi 2:epub 9:txt
                 case 1:
-                    FoxBookLib.all2Epub(data, oBookName, outDir + fBookName + ".mobi");
+                    FoxDBHelper.all2Epub(data, oBookName, outDir + fBookName + ".mobi");
                     break;
                 case 2:
-                    FoxBookLib.all2Epub(data, oBookName, outDir + fBookName + ".epub");
+                    FoxDBHelper.all2Epub(data, oBookName, outDir + fBookName + ".epub");
                     break;
                 case 9:
                     if (transMode == 2) {
-                        FoxBookLib.all2txt(data, true);
+                        FoxDBHelper.all2txt(data, true);
                     } else {
-                        FoxBookLib.all2txt(data, false);
+                        FoxDBHelper.all2txt(data, false);
                     }
                     break;
             }
@@ -2174,13 +2172,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private void fQuickDBDesc() { // 快捷: 顺序排序并压缩
          long sTime = System.currentTimeMillis();
         msg("★　开始倒序所有书籍...");
-        FoxBookDB.regenID(2, oDB);
+        FoxDBHelper.regenID(2, oDB);
         refreshBookList();
         tPage.setRowCount(0);
         msg("★　开始重新生成pageID");
-        FoxBookDB.regenID(9, oDB);
+        FoxDBHelper.regenID(9, oDB);
         msg("★　开始精简所有DelList");
-        FoxBookDB.simplifyAllDelList(oDB);
+        FoxDBHelper.simplifyAllDelList(oDB);
         msg("★　开始缩小数据库...");
         double subSize = oDB.vacuumDB();
         long eTime = System.currentTimeMillis() - sTime;
@@ -2193,7 +2191,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private void mDBSimpAllDelListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mDBSimpAllDelListActionPerformed
         msg("★　开始精简所有DelList");
         long sTime = System.currentTimeMillis();
-        FoxBookDB.simplifyAllDelList(oDB);
+        FoxDBHelper.simplifyAllDelList(oDB);
         long eTime = System.currentTimeMillis() - sTime;
         msg("★　已精简所有DelList   耗时(ms): " + eTime);
     }//GEN-LAST:event_mDBSimpAllDelListActionPerformed
@@ -2201,13 +2199,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private void fQuickDBAsc() { // 快捷: 顺序排序并压缩
          long sTime = System.currentTimeMillis();
         msg("★　开始顺序所有书籍...");
-        FoxBookDB.regenID(1, oDB);
+        FoxDBHelper.regenID(1, oDB);
         refreshBookList();
         tPage.setRowCount(0);
         msg("★　开始重新生成pageID");
-        FoxBookDB.regenID(9, oDB);
+        FoxDBHelper.regenID(9, oDB);
         msg("★　开始精简所有DelList");
-        FoxBookDB.simplifyAllDelList(oDB);
+        FoxDBHelper.simplifyAllDelList(oDB);
         msg("★　开始缩小数据库...");
         double subSize = oDB.vacuumDB();
         long eTime = System.currentTimeMillis() - sTime;
@@ -2248,7 +2246,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             String txtPath = chooseTxt.getSelectedFile().getAbsolutePath();
             msg("★　开始导入起点Txt文件: " + txtPath);
-            FoxBookDB.importQidianTxt(txtPath, oDB);
+            FoxDBHelper.importQidianTxt(txtPath, oDB);
             msg("★　导入起点Txt文件完毕: " + txtPath);
             refreshBookList();
         }
@@ -2682,6 +2680,37 @@ public class FoxMainFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        // 程序最先走这里，然后GUI开始
+/*
+        int argc = java.lang.reflect.Array.getLength(args);
+        if ( argc > 0 ) { // 参数大于0时，为命令行模式
+            isGUI = false ;
+            String helpMsg = "命令行用法:\n"
+                    + " -h  本帮助\n"
+                    + "-----以下还未实现-------\n"
+                    + " -s  [端口] HTTP服务器模式\n"
+                    + " -up [数据库路径] 更新该数据库\n"
+                    + "";
+            if ( args[0].equalsIgnoreCase("-h") ) {
+                System.out.println(helpMsg);
+            } else if ( args[0].equalsIgnoreCase("-s") ) {
+                if ( argc == 2 )
+                    System.out.println("启动服务器，端口: " + args[1] );
+                else
+                    System.out.println("启动服务器，端口: 8888");
+            } else if ( args[0].equalsIgnoreCase("-up") ) {
+                if ( argc == 2 )
+                    System.out.println("更新所有章节 in: " + args[1] );
+                else
+                    System.out.println("更新所有章节 in: FoxBook.db3");
+            } else {
+                System.out.println("未知命令: " + args[0] + "\n\n" + helpMsg);
+            }
+            System.out.println("isGUI : " + isGUI );
+            return ;
+        }
+        System.out.println("isGUI : " + isGUI);
+*/
     /* Set the Nimbus look and feel */
         /*
          private static Set<String> NIMBUS_PRIMARY_COLORS = new HashSet<String>(Arrays.asList(
@@ -2751,6 +2780,8 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         });
     }
+    
+//    private static boolean isGUI = true;
     private FoxDB oDB;
     private javax.swing.table.DefaultTableModel tBook;
     private javax.swing.table.DefaultTableModel tPage;
