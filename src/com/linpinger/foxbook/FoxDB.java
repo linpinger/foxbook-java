@@ -35,7 +35,7 @@ public class FoxDB {
                 statR.executeUpdate("CREATE TABLE Book (ID integer primary key, Name Text, URL text, DelURL text, DisOrder integer, isEnd integer, QiDianID text, LastModified text);");
                 statR.executeUpdate("CREATE TABLE Page (ID integer primary key, BookID integer, Name text, URL text, CharCount integer, Content text, DisOrder integer, DownTime integer, Mark text);");
                 statR.executeUpdate("CREATE TABLE config (ID integer primary key, Site text, ListRangeRE text, ListDelStrList text, PageRangeRE text, PageDelStrList text, cookie text);");
-                statR.executeUpdate("INSERT INTO Book (Name, URL, QiDianID) VALUES ('狐闹大唐', 'http://read.qidian.com/BookReader/1939238.aspx', '1939238');");
+                statR.executeUpdate("INSERT INTO Book (Name, URL, QiDianID) VALUES ('狐闹大唐', 'http://msn.qidian.com/ReadBook.aspx?bookid=1939238', '1939238');");
                 statR.close();
                 conn.close();
             } catch (Exception ex) {
