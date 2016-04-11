@@ -510,7 +510,7 @@ public class FoxBookLib {
             URL url = new URL(inURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             if ("GET" != PostData) {
-                System.out.println("I am Posting ...");
+//                System.out.println("I am Posting ...");
                 conn.setDoOutput(true);
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "text/plain; charset=UTF-8");

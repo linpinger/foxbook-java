@@ -24,7 +24,9 @@ public class FoxDB {
     private Connection conn;
     private boolean bFirstOpen = true;
 
-    public FoxDB() {
+    public FoxDB(String iDBPath) {
+        this.dbPath = iDBPath;
+        this.prev_dbPath = iDBPath;
         File fDB = new File(this.dbPath);
         if (!fDB.exists()) { // 数据库文件不存在，创建
             try {

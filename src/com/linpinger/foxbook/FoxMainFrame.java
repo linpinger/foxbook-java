@@ -645,7 +645,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
         };
 
-        oDB = new FoxDB();
+        oDB = new FoxDB("FoxBook.db3");
         refreshBookList();
     }
 
@@ -1715,7 +1715,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-03-12");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-04-11");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
@@ -1973,96 +1973,30 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     public class book2ebook implements Runnable {
 
+        private int funcType = 0 ; 
         private int transType = 0; // 1:mobi 2:epub 9:txt
-        private int transMode = 9; // 0:all pages 1:selected pages 2:one book
         private int bookid = 0;
         private String pageids = "";
 
         book2ebook(int inTransType, int inBookIDorMode) {
+            this.funcType = 1 ;
             this.transType = inTransType;
-            if (inBookIDorMode == 0) {
-                this.transMode = 0;
-            } else {
-                this.transMode = 2;
-                this.bookid = inBookIDorMode;
-            }
+            this.bookid = inBookIDorMode;
         }
 
         book2ebook(int inTransType, String inPageIDs) {
+            this.funcType = 2 ;
             this.transType = inTransType;
-            this.transMode = 1;
             this.pageids = inPageIDs;
         }
 
         public void run() {
             long sTime = System.currentTimeMillis();
-            String sql = "";
-            switch (transMode) {
-                case 0:
-                    sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid order by p.bookid,p.id";
-                    break;
-                case 2:
-                    sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=" + bookid + " order by p.bookid,p.id";
-                    break;
-                case 1:
-                    sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and p.id in (" + pageids + ") order by p.bookid,p.id";
-                    break;
+            if ( 1 == funcType ) {
+                FoxDBHelper.all2Ebook(transType, bookid, oDB);
             }
-            ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>) oDB.getList(sql);
-            String bookname = data.get(0).get("bookname");
-            String outDir = "./";
-            File saveDir = new File("c:/etc");
-            if (saveDir.exists() && saveDir.isDirectory()) {
-                outDir = "c:/etc/";
-            }
-            String oBookName = bookname;
-            String fBookName = bookname;
-			if ( transType != 9 ) {
-            if (transMode != 2 ) { // 0:all pages 1:selected pages 2:one book
-                String sst = FoxDBHelper.getSiteType(oDB);
-                oBookName = bookname + "_" + sst;
-                fBookName = "all_" + sst;
-
-                //处理章节名 内容
-                String preBName = "";
-                String nowBName = "";
-                HashMap<String, String> mm;
-                int cData = data.size();
-                for (int i = 0; i < cData; i++) {
-                    mm = data.get(i);
-                    nowBName = mm.get("bookname");
-                    mm.put("content", "\n　　" + mm.get("content").replace("\n", "<br/>\n　　"));
-                    if (!preBName.equals(nowBName)) { // 书名和上一条的不同，修改本条
-                        mm.put("title", "●" + nowBName + "●" + mm.get("title"));
-                        data.set(i, mm);
-                        preBName = nowBName;
-                    }
-                }
-            } else { // 处理txt -> html
-                HashMap<String, String> mm;
-                int cData = data.size();
-                for (int i = 0; i < cData; i++) {
-                    mm = data.get(i);
-                    mm.put("content", "\n　　" + mm.get("content").replace("\n", "<br/>\n　　"));
-                    data.set(i, mm);
-                }
-            }
-			}
-
-            switch (transType) { // 1:mobi 2:epub 9:txt
-                case 1:
-                    FoxDBHelper.all2Epub(data, oBookName, outDir + fBookName + ".mobi");
-                    break;
-                case 2:
-                    FoxDBHelper.all2Epub(data, oBookName, outDir + fBookName + ".epub");
-                    break;
-                case 9:
-                    if (transMode == 2) {
-                        FoxDBHelper.all2txt(data, true);
-                    } else {
-                        FoxDBHelper.all2txt(data, false);
-                    }
-                    break;
+            if ( 2 == funcType ) {
+                FoxDBHelper.all2Ebook(transType, pageids, oDB);
             }
             final long eTime = System.currentTimeMillis() - sTime;
             SwingUtilities.invokeLater(new Runnable() {
@@ -2681,36 +2615,11 @@ public class FoxMainFrame extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         // 程序最先走这里，然后GUI开始
-/*
-        int argc = java.lang.reflect.Array.getLength(args);
-        if ( argc > 0 ) { // 参数大于0时，为命令行模式
-            isGUI = false ;
-            String helpMsg = "命令行用法:\n"
-                    + " -h  本帮助\n"
-                    + "-----以下还未实现-------\n"
-                    + " -s  [端口] HTTP服务器模式\n"
-                    + " -up [数据库路径] 更新该数据库\n"
-                    + "";
-            if ( args[0].equalsIgnoreCase("-h") ) {
-                System.out.println(helpMsg);
-            } else if ( args[0].equalsIgnoreCase("-s") ) {
-                if ( argc == 2 )
-                    System.out.println("启动服务器，端口: " + args[1] );
-                else
-                    System.out.println("启动服务器，端口: 8888");
-            } else if ( args[0].equalsIgnoreCase("-up") ) {
-                if ( argc == 2 )
-                    System.out.println("更新所有章节 in: " + args[1] );
-                else
-                    System.out.println("更新所有章节 in: FoxBook.db3");
-            } else {
-                System.out.println("未知命令: " + args[0] + "\n\n" + helpMsg);
-            }
-            System.out.println("isGUI : " + isGUI );
-            return ;
+        if (args.length > 0) { // 参数数大于0时，为命令行模式
+            FoxMainCMD.main(args);
+            return;
         }
-        System.out.println("isGUI : " + isGUI);
-*/
+
     /* Set the Nimbus look and feel */
         /*
          private static Set<String> NIMBUS_PRIMARY_COLORS = new HashSet<String>(Arrays.asList(
@@ -2781,7 +2690,6 @@ public class FoxMainFrame extends javax.swing.JFrame {
         });
     }
     
-//    private static boolean isGUI = true;
     private FoxDB oDB;
     private javax.swing.table.DefaultTableModel tBook;
     private javax.swing.table.DefaultTableModel tPage;

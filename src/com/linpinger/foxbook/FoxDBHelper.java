@@ -337,4 +337,92 @@ public class FoxDBHelper {
         oEpub.SaveTo();
     }
 
+    public static void all2Ebook(int transType, String pageids, FoxDB oDB) {
+        all2Ebook(transType, 1, 0, pageids, oDB);
+    }
+
+    public static void all2Ebook(int transType, int inBookIDorMode, FoxDB oDB) {
+        int intransMode = 9;
+        int inBookID = 0;
+        if (inBookIDorMode == 0) {
+            intransMode = 0;
+        } else {
+            intransMode = 2;
+            inBookID = inBookIDorMode;
+        }
+        all2Ebook(transType, intransMode, inBookID, "", oDB);
+    }
+
+    private static void all2Ebook(int transType, int transMode, int bookid, String pageids, FoxDB oDB) {
+        // transType = 1:mobi 2:epub 9:txt
+        // transMode = 0:all pages 1:selected pages 2:one book
+        String sql = "";
+        switch (transMode) {
+            case 0:
+                sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid order by p.bookid,p.id";
+                break;
+            case 2:
+                sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and b.id=" + bookid + " order by p.bookid,p.id";
+                break;
+            case 1:
+                sql = "select b.name as bookname, p.name as title, p.content as content from book as b, page as p where b.id = p.bookid and p.id in (" + pageids + ") order by p.bookid,p.id";
+                break;
+        }
+        ArrayList<HashMap<String, String>> data = (ArrayList<HashMap<String, String>>) oDB.getList(sql);
+        String bookname = data.get(0).get("bookname");
+        String outDir = "./";
+        File saveDir = new File("c:/etc");
+        if (saveDir.exists() && saveDir.isDirectory()) {
+            outDir = "c:/etc/";
+        }
+        String oBookName = bookname;
+        String fBookName = bookname;
+        if (transType != 9) {
+            if (transMode != 2) { // 0:all pages 1:selected pages 2:one book
+                String sst = FoxDBHelper.getSiteType(oDB);
+                oBookName = bookname + "_" + sst;
+                fBookName = "all_" + sst;
+
+                //处理章节名 内容
+                String preBName = "";
+                String nowBName = "";
+                HashMap<String, String> mm;
+                int cData = data.size();
+                for (int i = 0; i < cData; i++) {
+                    mm = data.get(i);
+                    nowBName = mm.get("bookname");
+                    mm.put("content", "\n　　" + mm.get("content").replace("\n", "<br/>\n　　"));
+                    if (!preBName.equals(nowBName)) { // 书名和上一条的不同，修改本条
+                        mm.put("title", "●" + nowBName + "●" + mm.get("title"));
+                        data.set(i, mm);
+                        preBName = nowBName;
+                    }
+                }
+            } else { // 处理txt -> html
+                HashMap<String, String> mm;
+                int cData = data.size();
+                for (int i = 0; i < cData; i++) {
+                    mm = data.get(i);
+                    mm.put("content", "\n　　" + mm.get("content").replace("\n", "<br/>\n　　"));
+                    data.set(i, mm);
+                }
+            }
+        }
+
+        switch (transType) { // 1:mobi 2:epub 9:txt
+            case 1:
+                FoxDBHelper.all2Epub(data, oBookName, outDir + fBookName + ".mobi");
+                break;
+            case 2:
+                FoxDBHelper.all2Epub(data, oBookName, outDir + fBookName + ".epub");
+                break;
+            case 9:
+                if (transMode == 2) {
+                    FoxDBHelper.all2txt(data, true);
+                } else {
+                    FoxDBHelper.all2txt(data, false);
+                }
+                break;
+        }
+    }
 }
