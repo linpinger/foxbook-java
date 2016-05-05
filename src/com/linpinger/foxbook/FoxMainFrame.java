@@ -9,7 +9,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,17 +34,12 @@ public class FoxMainFrame extends javax.swing.JFrame {
     private final int TABLE_FONT_SIZE = 24 ;
     private final int TABLE_ROW_HEIGHT = 30 ;
 
-    private final int SITE_QIDIAN_MOBILE = 16;
-    //	private final int SITE_EASOU = 11 ;
-    private final int SITE_ZSSQ = 12;
-    private final int SITE_KUAIDU = 13;
     public final int downThread = 9;  // 页面下载任务线程数
     public int leftThread = downThread;
     private int DragStartY = 0 ; // 阅读页面拖动起始Y坐标
 
     private void msg(String inMsg) {
         msg.setText(inMsg);
-//	tPage.addRow(new Object[]{inMsg});
     }
 
     public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
@@ -54,12 +48,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
             List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 
             Iterator itr = upList.iterator();
-//            List<Thread> threadList = new ArrayList(30);
             Thread nowT;
             while (itr.hasNext()) {
                 HashMap item = (HashMap<String, String>) itr.next();
                 nowT = new Thread(grpFox, new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
-//              threadList.add(nowT);
                 nowT.start();
             }
 
@@ -93,20 +85,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
                         msg("★　总更新线程数量: " + allThreadCount + "  剩余线程数量: " + nowLeftThreadCount);
                     }
                 });
-//                System.out.println("剩余更新线程数量: " + nowLeftThreadCount + " / " + allThreadCount);
             }
-            
-            /*
-            Iterator itrT = threadList.iterator();
-            while (itrT.hasNext()) {
-                nowT = (Thread) itrT.next();
-                try {
-                    nowT.join();
-                } catch (Exception ex) {
-                    System.out.println("等待线程错误: " + ex.toString());
-                }
-            }
-            */
 
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -154,6 +133,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
 
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     if (bWritePage) {
                         msg("★　本书更新完毕: " + nBookName);
@@ -178,8 +158,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
             this.nURL = BookURL;
         }
 
+        @Override
         public void run() {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     tPage.setRowCount(0);
                     msg("★　开始不受控制滴多线程更新本书: " + nBookName);
@@ -193,13 +175,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
             } catch (InterruptedException ex) {
                 ex.toString();
             }
-            /*
-             SwingUtilities.invokeLater(new Runnable() {
-             public void run() {
-             tPage.addRow(new Object[]{"★　本书不受控制滴更新完毕: " + nBookName});
-             }
-             });
-             */
+
             refreshBookList();
         }
     }
@@ -212,26 +188,24 @@ public class FoxMainFrame extends javax.swing.JFrame {
             this.taskList = iTaskList;
         }
 
+        @Override
         public void run() {
             final String thName = Thread.currentThread().getName();
             Iterator<Map<String, Object>> itr = taskList.iterator();
-            HashMap<String, Object> mm;
-            int nowID;
-            String nowURL;
             int locCount = 0;
             final int allCount = taskList.size();
-            String pageLen = "";
             while (itr.hasNext()) {
                 ++locCount;
-                mm = (HashMap<String, Object>) itr.next();
-                nowID = (Integer) mm.get("id");
-                nowURL = (String) mm.get("url");
+                HashMap<String, Object> mm = (HashMap<String, Object>) itr.next();
+                Integer nowID = (Integer) mm.get("id");
+//              String nowURL = (String) mm.get("url");
 
-                pageLen = FoxDBHelper.updatepage(nowID, oDB);
+                String pageLen = FoxDBHelper.updatepage(nowID, oDB);
 
                 final Object data[] = new Object[]{mm.get("name"), pageLen, mm.get("id"), thName, mm.get("url")};
                 final int xcount = locCount;
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
                         msg("★　剩余线程:线程名:页面/页面数　" + leftThread + " : " + thName + " : " + xcount + " / " + allCount);
                         tPage.addRow(data);
@@ -241,10 +215,9 @@ public class FoxMainFrame extends javax.swing.JFrame {
             }
             --leftThread;
             if (0 == leftThread) { // 所有线程更新完毕
-//                msg.obj = "已更新完所有空白章节>25";
                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
                     public void run() {
-//                        tPage.setRowCount(0);
                         msg("★　恭喜！理论上多线程更新完毕^_^");
                     }
                 });
@@ -276,64 +249,10 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         @Override
         public void run() {
-            String existList = FoxDBHelper.getPageListStr(Integer.valueOf(bookID), oDB);
-
-            int site_type = 0;
-            if (bookUrl.indexOf("zhuishushenqi.com") > -1) {
-                site_type = SITE_ZSSQ;
-            }
-            if (bookUrl.indexOf(".qreader.") > -1) {
-                site_type = SITE_KUAIDU;
-            }
-            if (bookUrl.indexOf("3g.if.qidian.com") > -1) {
-                site_type = SITE_QIDIAN_MOBILE ;
-            }
-
-            String html = "";
-            List<Map<String, Object>> lData;
-            switch (site_type) {
-                case SITE_KUAIDU:
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = site_qreader.qreader_GetIndex(bookUrl, 55, 1); // 更新模式  最后55章
-                    } else {
-                        lData = site_qreader.qreader_GetIndex(bookUrl, 0, 1); // 更新模式
-                    }
-                    break;
-                case SITE_ZSSQ:
-                    html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = site_zssq.json2PageList(html, 55, 1); // 更新模式  最后55章
-                    } else {
-                        lData = site_zssq.json2PageList(html, 0, 1); // 更新模式
-                    }
-                    break;
-                case SITE_QIDIAN_MOBILE:
-                    html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = site_qidian.json2PageList(html); // 更新模式  最后55章
-                    } else {
-                        lData = site_qidian.json2PageList(html); // 更新模式
-                    }
-                    break;
-                default:
-                    html = FoxBookLib.downhtml(bookUrl); // 下载url
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = FoxBookLib.tocHref(html, 55); // 分析获取 list 最后55章
-                    } else {
-                        lData = FoxBookLib.tocHref(html, 0); // 分析获取 list 所有章节
-                    }
-            }
-
-            // 比较，得到新章节
-            lData = FoxBookLib.compare2GetNewPages(lData, existList);
-            if (lData.size() > 0) { // 有新章节才写入数据库
-                FoxDBHelper.inserNewPages(lData, bookID, oDB); //写入数据库
-                lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )"); // 获取新增章节
-            }
+            List<Map<String, Object>> lData = FoxDBHelper.getNewChapters(bookID, bookUrl, bMultiThreadDownOneBook, oDB) ;
 
             if (bDownPage) {
                 int cTask = lData.size(); // 总任务数
-//            System.out.println("任务数:" + cTask);
 
                 if (bMultiThreadDownOneBook) { // 当新章节数大于 25章就采用多任务下载模式
                     int nBaseCount = cTask / downThread; //每线程基础任务数
@@ -364,26 +283,18 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
                         startPoint += aList[i];
                     }
-                } else {
-
-                    // 单线程循环更新页面
+                } else {   // 单线程循环更新页面
                     Iterator<Map<String, Object>> itrz = lData.iterator();
-                    String nowURL = "";
-                    Integer nowpageid = 0;
-                    int nowCount = 0;
-                    String pageLen;
-//                tPage.setRowCount(0); // 填充uPage
                     while (itrz.hasNext()) {
                         HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
-                        nowURL = (String) nn.get("url");
-                        nowpageid = (Integer) nn.get("id");
+                        String nowURL = (String) nn.get("url");
+                        Integer nowpageid = (Integer) nn.get("id");
 
-                        ++nowCount;
-
-                        pageLen = FoxDBHelper.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
+                        String pageLen = FoxDBHelper.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
 
                         final Object data[] = new Object[]{nn.get("name"), pageLen, nn.get("id"), bookName, nn.get("url")};
                         SwingUtilities.invokeLater(new Runnable() {
+                            @Override
                             public void run() {
                                 tPage.addRow(data);
                             }
@@ -392,13 +303,13 @@ public class FoxMainFrame extends javax.swing.JFrame {
                     }
                 }
             } else {
-//                tPage.setRowCount(0); // 填充uPage
                 Iterator itr = lData.iterator();
                 while (itr.hasNext()) {
                     HashMap item = (HashMap) itr.next();
                     final Object data[] = new Object[]{item.get("name"), "0", item.get("id"), bookName, item.get("url")};
 
                     SwingUtilities.invokeLater(new Runnable() {
+                        @Override
                         public void run() {
                             tPage.addRow(data);
                         }
@@ -931,7 +842,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jdEditBookInfo.setTitle("编辑信息");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
 
         uBookID.setText("xx");
         uBookID.setToolTipText("BookID");
@@ -1160,7 +1071,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdEditPageInfo.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jdEditPageInfo.setTitle("编辑章节信息");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
 
         jlPID.setText("Page");
         jlPID.setToolTipText("PageID");
@@ -1715,7 +1626,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-04-11");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-05-04");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);

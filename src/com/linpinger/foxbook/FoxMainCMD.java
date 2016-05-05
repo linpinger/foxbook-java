@@ -14,46 +14,35 @@ import java.util.Map;
  *
  * @author guanli
  */
-/*
-// FoxInterfaceMSG.java
-package com.linpinger.foxbook;
-public interface FoxInterfaceMSG {
-    public void msg(String iStr) ;
-    public void msg(String iStr, int msgType);
-}
-*/
-// public class FoxMainCMD implements FoxInterfaceMSG {
 public class FoxMainCMD {
 
     private FoxDB oDB;             // cmd 使用加上 static
-    private final int SITE_QIDIAN_MOBILE = 16;
-    // private final int SITE_EASOU = 11 ;
-    private final int SITE_ZSSQ = 12;
-    private final int SITE_KUAIDU = 13;
     public final int downThread = 9;  // 页面下载任务线程数
     public int leftThread = downThread;
+  
+    public void updateAllOneByOne() {
+        List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
+        Iterator itr = upList.iterator();
+        while (itr.hasNext()) {
+            HashMap item = (HashMap<String, String>) itr.next();
+            Integer bookID = (Integer) item.get("id");
+            String bookUrl = (String) item.get("url");
+            String bookName = (String) item.get("name");
 
-/*
-    @Override
-    public void msg(String iStr) {
-        System.out.println(iStr);
-    }
-
-    @Override
-    public void msg(String iStr, int msgType) {
-        switch (msgType) {
-            case 1:
-                System.out.println("  " + iStr);
-                break;
-            case 2:
-                System.out.println("    " + iStr);
-                break;
-            default:
-                System.out.println(iStr);
-                break;
+            System.out.println("★　更新: " + bookID + " : " + bookName);
+            List<Map<String, Object>> lData = FoxDBHelper.getNewChapters(bookID, bookUrl, false, oDB);
+            // 单线程循环更新页面
+            Iterator<Map<String, Object>> itrz = lData.iterator();
+            while (itrz.hasNext()) {
+                HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
+                String nowURL = (String) nn.get("url");
+                Integer nowpageid = (Integer) nn.get("id");
+                String pageLen = FoxDBHelper.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
+                System.out.println("★　　新章节: " + nowpageid + " : " + bookName + " : " + nn.get("name") + "  字数: " + pageLen);
+            }
         }
     }
-*/
+
     public static void main(String[] args) {  // 入口
         int argc = args.length;
         String helpMsg = "用法: java -jar FoxBook.jar [动作] [数据库路径]\n"
@@ -61,6 +50,7 @@ public class FoxMainCMD {
                 + "  -up\t\t更新该数据库\n"
                 + "  -upDESC\t更新该数据库并快捷倒序\n"
                 + "  -upASC\t更新该数据库并快捷顺序\n"
+                + "  -upOBO\t依次更新所有书籍\n"
                 + "  -mobi\t\t生成mobi\n"
                 + "  -epub\t\t生成epub\n"
                 + "  -txt\t\t生成txt\n"
@@ -78,6 +68,9 @@ public class FoxMainCMD {
         if (iAction.equalsIgnoreCase("-up")) {
             System.out.println("★　更新: " + iDBPath);
             foxcmd.doUpdateAll();
+        } else if (iAction.equalsIgnoreCase("-upOBO")) {
+            System.out.println("★　依次更新: " + iDBPath);
+            foxcmd.updateAllOneByOne();
         } else if (iAction.equalsIgnoreCase("-upDESC")) {
             System.out.println("★　更新: " + iDBPath);
             long sTime = System.currentTimeMillis();
@@ -146,19 +139,21 @@ public class FoxMainCMD {
     }
     
 
-    public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
+    public class UpdateAllBook implements Runnable { 
 
+        /**
+         * GUI菜单更新所有书籍
+         */
+        @Override
         public void run() {
             ThreadGroup grpFox = new ThreadGroup("fox"); // 更新线程组
             List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 
             Iterator itr = upList.iterator();
-//            List<Thread> threadList = new ArrayList(30);
             Thread nowT;
             while (itr.hasNext()) {
                 HashMap item = (HashMap<String, String>) itr.next();
                 nowT = new Thread(grpFox, new UpdateBook((Integer) item.get("id"), (String) item.get("url"), (String) item.get("name"), true));
-//              threadList.add(nowT);
                 nowT.start();
             }
 
@@ -182,7 +177,6 @@ public class FoxMainCMD {
                 }
 
                 System.out.println("★　　　剩余线程: " + nowLeftThreadCount + " / " + allThreadCount);
-//                System.out.println("★　总更新线程数量: " + allThreadCount + "  剩余线程数量: " + nowLeftThreadCount);
             }
 
             System.out.println("★　全部线程更新完毕，恭喜");
@@ -213,64 +207,10 @@ public class FoxMainCMD {
 
         @Override
         public void run() {
-            String existList = FoxDBHelper.getPageListStr(Integer.valueOf(bookID), oDB);
-
-            int site_type = 0;
-            if (bookUrl.indexOf("zhuishushenqi.com") > -1) {
-                site_type = SITE_ZSSQ;
-            }
-            if (bookUrl.indexOf(".qreader.") > -1) {
-                site_type = SITE_KUAIDU;
-            }
-            if (bookUrl.indexOf("3g.if.qidian.com") > -1) {
-                site_type = SITE_QIDIAN_MOBILE;
-            }
-
-            String html = "";
-            List<Map<String, Object>> lData;
-            switch (site_type) {
-                case SITE_KUAIDU:
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = site_qreader.qreader_GetIndex(bookUrl, 55, 1); // 更新模式  最后55章
-                    } else {
-                        lData = site_qreader.qreader_GetIndex(bookUrl, 0, 1); // 更新模式
-                    }
-                    break;
-                case SITE_ZSSQ:
-                    html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = site_zssq.json2PageList(html, 55, 1); // 更新模式  最后55章
-                    } else {
-                        lData = site_zssq.json2PageList(html, 0, 1); // 更新模式
-                    }
-                    break;
-                case SITE_QIDIAN_MOBILE:
-                    html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = site_qidian.json2PageList(html); // 更新模式  最后55章
-                    } else {
-                        lData = site_qidian.json2PageList(html); // 更新模式
-                    }
-                    break;
-                default:
-                    html = FoxBookLib.downhtml(bookUrl); // 下载url
-                    if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
-                        lData = FoxBookLib.tocHref(html, 55); // 分析获取 list 最后55章
-                    } else {
-                        lData = FoxBookLib.tocHref(html, 0); // 分析获取 list 所有章节
-                    }
-            }
-
-            // 比较，得到新章节
-            lData = FoxBookLib.compare2GetNewPages(lData, existList);
-            if (lData.size() > 0) { // 有新章节才写入数据库
-                FoxDBHelper.inserNewPages(lData, bookID, oDB); //写入数据库
-                lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )"); // 获取新增章节
-            }
+            List<Map<String, Object>> lData = FoxDBHelper.getNewChapters(bookID, bookUrl, bMultiThreadDownOneBook, oDB) ;
 
             if (bDownPage) {
                 int cTask = lData.size(); // 总任务数
-//            System.out.println("任务数:" + cTask);
 
                 if (bMultiThreadDownOneBook) { // 当新章节数大于 25章就采用多任务下载模式
                     int nBaseCount = cTask / downThread; //每线程基础任务数
@@ -305,20 +245,11 @@ public class FoxMainCMD {
 
                     // 单线程循环更新页面
                     Iterator<Map<String, Object>> itrz = lData.iterator();
-                    String nowURL = "";
-                    Integer nowpageid = 0;
-                    int nowCount = 0;
-                    String pageLen;
-//                tPage.setRowCount(0); // 填充uPage
                     while (itrz.hasNext()) {
                         HashMap<String, Object> nn = (HashMap<String, Object>) itrz.next();
-                        nowURL = (String) nn.get("url");
-                        nowpageid = (Integer) nn.get("id");
-
-                        ++nowCount;
-
-                        pageLen = FoxDBHelper.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
-
+                        String nowURL = (String) nn.get("url");
+                        Integer nowpageid = (Integer) nn.get("id");
+                        String pageLen = FoxDBHelper.updatepage(FoxBookLib.getFullURL(bookUrl, nowURL), nowpageid, oDB);
                         System.out.println("★　新章节: " + nowpageid + " : " + bookName + " : " + nn.get("name") + "  字数: " + pageLen);
                     }
                 }
@@ -334,6 +265,10 @@ public class FoxMainCMD {
             this.taskList = iTaskList;
         }
 
+        /**
+         *  多线程任务更新页面列表
+         */
+        @Override
         public void run() {
             final String thName = Thread.currentThread().getName();
             Iterator<Map<String, Object>> itr = taskList.iterator();
@@ -351,9 +286,7 @@ public class FoxMainCMD {
 
                 pageLen = FoxDBHelper.updatepage(nowID, oDB);
 
-//                final Object data[] = new Object[]{mm.get("name"), pageLen, mm.get("id"), thName, mm.get("url")};
                 System.out.println("★　剩余线程:线程名:页面/页面数　" + leftThread + " : " + thName + " : " + locCount + " / " + allCount);
-                // todo tPage.addRow(data);
 
             }
             --leftThread;

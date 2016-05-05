@@ -28,6 +28,11 @@ import java.util.regex.Pattern;
  * @author guanli
  */
 public class FoxDBHelper {
+    private static final int SITE_QIDIAN_MOBILE = 16;
+    // private static final int SITE_EASOU = 11 ;
+    private static final int SITE_ZSSQ = 12;
+    private static final int SITE_KUAIDU = 13;
+
     public static void importQidianTxt(String txtPath, FoxDB oDB) {
         File ttt = new File(txtPath);
         
@@ -234,7 +239,68 @@ public class FoxDBHelper {
         }
      }
     
-        public static String updatepage(int pageid, FoxDB oDB) {
+    
+     public static List<Map<String, Object>> getNewChapters(int bookID, String bookUrl, boolean bMultiThreadDownOneBook, FoxDB oDB) {
+
+        String existList = FoxDBHelper.getPageListStr(Integer.valueOf(bookID), oDB);
+
+        int site_type = 0;
+        if (bookUrl.indexOf("zhuishushenqi.com") > -1) {
+            site_type = SITE_ZSSQ;
+        }
+        if (bookUrl.indexOf(".qreader.") > -1) {
+            site_type = SITE_KUAIDU;
+        }
+        if (bookUrl.indexOf("3g.if.qidian.com") > -1) {
+            site_type = SITE_QIDIAN_MOBILE;
+        }
+
+        String html = "";
+        List<Map<String, Object>> lData;
+        switch (site_type) {
+            case SITE_KUAIDU:
+                if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
+                    lData = site_qreader.qreader_GetIndex(bookUrl, 55, 1); // 更新模式  最后55章
+                } else {
+                    lData = site_qreader.qreader_GetIndex(bookUrl, 0, 1); // 更新模式
+                }
+                break;
+            case SITE_ZSSQ:
+                html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
+                if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
+                    lData = site_zssq.json2PageList(html, 55, 1); // 更新模式  最后55章
+                } else {
+                    lData = site_zssq.json2PageList(html, 0, 1); // 更新模式
+                }
+                break;
+            case SITE_QIDIAN_MOBILE:
+                html = FoxBookLib.downhtml(bookUrl, "utf-8"); // 下载json
+                if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
+                    lData = site_qidian.json2PageList(html); // 更新模式  最后55章
+                } else {
+                    lData = site_qidian.json2PageList(html); // 更新模式
+                }
+                break;
+            default:
+                html = FoxBookLib.downhtml(bookUrl); // 下载url
+                if ((existList.length() > 3) && (!bMultiThreadDownOneBook)) {
+                    lData = FoxBookLib.tocHref(html, 55); // 分析获取 list 最后55章
+                } else {
+                    lData = FoxBookLib.tocHref(html, 0); // 分析获取 list 所有章节
+                }
+        }
+
+        // 比较，得到新章节
+        lData = FoxBookLib.compare2GetNewPages(lData, existList);
+        if (lData.size() > 0) { // 有新章节才写入数据库
+            FoxDBHelper.inserNewPages(lData, bookID, oDB); //写入数据库
+            lData = oDB.getList("select id as id, name as name, url as url from page where ( bookid=" + bookID + " ) and ( (content is null) or ( length(content) < 9 ) )"); // 获取新增章节
+        }
+
+        return lData;
+    }
+    
+    public static String updatepage(int pageid, FoxDB oDB) {
         ArrayList<Map<String, String>> xx = (ArrayList<Map<String, String>>) oDB.getList("select book.url as bu,page.url as pu from book,page where page.id=" + String.valueOf(pageid) + " and  book.id in (select bookid from page where id=" + String.valueOf(pageid) + ")");
         String fullPageURL = FoxBookLib.getFullURL(xx.get(0).get("bu"), xx.get(0).get("pu"));		// 获取bookurl, pageurl 合成得到url
 

@@ -1054,7 +1054,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2016-04-11"/>
+            <Property name="text" type="java.lang.String" value="&#x2605;&#x3000;FoxBook Java Swing &#x7248;  &#x4f5c;&#x8005;: &#x7231;&#x5c14;&#x5170;&#x4e4b;&#x72d0;  Ver: 2016-05-04"/>
             <Property name="toolTipText" type="java.lang.String" value="&#x2605;&#x3000;&#x6211;&#x662f;&#x6d88;&#x606f;&#x680f;&#xff0c;&#x6211;&#x603b;&#x662f;&#x840c;&#x840c;&#x54d2;"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="10"/>
