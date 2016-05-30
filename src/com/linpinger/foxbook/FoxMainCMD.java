@@ -106,7 +106,7 @@ public class FoxMainCMD {
     
     // 更新
     public void doUpdateAll() {
-        try {
+         try {
             Thread uu = new Thread(new UpdateAllBook()); // 更新
             uu.start();
             uu.join();
@@ -146,6 +146,41 @@ public class FoxMainCMD {
          */
         @Override
         public void run() {
+            // 先比较书架
+            System.out.println("★　下载书架...");
+            ArrayList<HashMap<String, Object>> nn = FoxDBHelper.compareShelfToGetNew(oDB);
+            if (nn != null) {
+                int nnSize = nn.size();
+                System.out.println("★　书架: " + nnSize + " 待更新");
+                if (0 == nnSize) {
+                    return;
+                } else {
+                    Iterator<HashMap<String, Object>> itrXX = nn.iterator();
+                    HashMap<String, Object> mm;
+                    int nowBID = 0;
+                    String nowName, nowURL;
+                    Thread nowTTT;
+                    while (itrXX.hasNext()) {
+                        mm = (HashMap<String, Object>) itrXX.next();
+                        nowBID = (Integer) mm.get("id");
+                        nowName = (String) mm.get("name");
+                        nowURL = (String) mm.get("url");
+//						nowPageList = (String) mm.get("pagelist");
+                        nowTTT = new Thread(new UpdateBook(nowBID, nowURL, nowName, true));
+                        nowTTT.start();
+                        try {
+                            nowTTT.join();
+                            System.out.println("★　已更新: " + nowName);
+                        } catch (InterruptedException e) {
+                            e.toString();
+                        }
+                    }
+                    System.out.println("★　完毕: " + nnSize + " 已更新");
+                    return;
+                }
+            }
+            // 比较书架结束
+
             ThreadGroup grpFox = new ThreadGroup("fox"); // 更新线程组
             List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 

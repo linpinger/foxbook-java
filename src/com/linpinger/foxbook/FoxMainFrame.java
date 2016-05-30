@@ -44,6 +44,59 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
     public class UpdateAllBook implements Runnable { // GUI菜单更新所有书籍
         public void run() {
+            // 先比较书架
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    tPage.setRowCount(0);
+                    msg("★　下载书架...");
+                }
+            });
+            ArrayList<HashMap<String, Object>> nn = FoxDBHelper.compareShelfToGetNew(oDB);
+            if (nn != null) {
+                final int nnSize = nn.size();
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        msg("★　书架: " + nnSize + " 待更新");
+                    }
+                });
+                if (0 == nnSize) {
+                    return;
+                } else {
+                    Iterator<HashMap<String, Object>> itrXX = nn.iterator();
+                    HashMap<String, Object> mm;
+                    int nowBID = 0;
+                    String nowName, nowURL;
+                    Thread nowTTT;
+                    while (itrXX.hasNext()) {
+                        mm = (HashMap<String, Object>) itrXX.next();
+                        nowBID = (Integer) mm.get("id");
+                        nowName = (String) mm.get("name");
+                        nowURL = (String) mm.get("url");
+//						nowPageList = (String) mm.get("pagelist");
+                        nowTTT = new Thread(new UpdateBook(nowBID, nowURL, nowName, true));
+                        nowTTT.start();
+                        try {
+                            nowTTT.join();
+                            final String sBookName = nowName;
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    msg("★　已更新: " + sBookName);
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                            e.toString();
+                        }
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            msg("★　完毕: " + nnSize + " 已更新");
+                        }
+                    });
+                    return;
+                }
+            }
+            // 比较书架结束
+            
             ThreadGroup grpFox = new ThreadGroup("fox"); // 更新线程组
             List upList = oDB.getList("select id as id, name as name, url as url from book where isEnd is null or isEnd != 1");
 
@@ -842,7 +895,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
 
         jdEditBookInfo.setTitle("编辑信息");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "BookID | BookName |  QidianID | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
 
         uBookID.setText("xx");
         uBookID.setToolTipText("BookID");
@@ -1071,7 +1124,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jdEditPageInfo.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jdEditPageInfo.setTitle("编辑章节信息");
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("宋体", 0, 12), java.awt.Color.blue)); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "PageID | BookID | Name | CharCount | URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), java.awt.Color.blue)); // NOI18N
 
         jlPID.setText("Page");
         jlPID.setToolTipText("PageID");
@@ -1626,7 +1679,7 @@ public class FoxMainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu2);
 
         msg.setForeground(java.awt.Color.blue);
-        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-05-04");
+        msg.setText("★　FoxBook Java Swing 版  作者: 爱尔兰之狐  Ver: 2016-05-29");
         msg.setToolTipText("★　我是消息栏，我总是萌萌哒");
         msg.setEnabled(false);
         msg.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
